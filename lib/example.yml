@@ -1,0 +1,28 @@
+# rename this file to thrust.yml
+project_name: My Great Project
+app_name: My Great Project
+identity: iOS Signing Identity
+
+specs:
+  configuration: Release # or whichever iOS configuration you want to run specs under
+  target: Specs # Name of the spec build target
+  sdk: 6.1 # SDK version to build/run the specs with
+
+api_token: your testflight token here
+# Add testflight distrobution lists here. Rake tasks are built for all keys directly
+# under distribution.
+distributions:
+  # builds rake testflight:devs task to deploy to the distrobution list. To create a second
+  # deploy task, uncomment and modify the structure below.
+  devs: # http://testflightapp.com/dashboard/team/edit
+    team: TestFlight Team Name
+    token: TestFlight Team Token
+    default_list: Default Distribution List to Permission for the build
+    configuration: iOS configuration to build with e.g. Debug, Release, etc.
+
+# builds rake testflight:foo
+# foo:
+#   team: Foos
+#   token: somethingthatlookslikeyourapitoken
+#   default_list: Foo People
+#   configuration: Release

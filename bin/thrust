@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+project_root = Dir.pwd
+thrust_root  = File.dirname(__FILE__)
+
+FileUtils.cp(thrust_root + '/../lib/tasks/main.rake', project_root + '/Rakefile')
+FileUtils.cp(thrust_root + '/../lib/example.yml', project_root + '/thrust.example.yml')
