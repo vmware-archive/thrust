@@ -1,9 +1,17 @@
 #!/usr/bin/env ruby
+require 'fileutils'
 project_root = Dir.pwd
-thrust_root  = File.join(File.dirname(__FILE__), '..')
+thrust_root  = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
-FileUitils.cp(Dir.glob(File.join(thrust_root, 'lib', 'tasks', '*.rake')), File.join(project_root, 'thrust', 'lib', 'tasks'))
-FileUitils.cp(File.join(thrust_root, 'lib', 'config', 'example.yml'), File.join(project_root, 'thrust', 'lib' 'config', 'thrust.example.yml'))
+if (!Dir.exists?(File.join(project_root, 'thrust', 'lib', 'tasks')))
+  Dir.mkdir(File.join(project_root, 'thrust'))
+  Dir.mkdir(File.join(project_root, 'thrust', 'lib'))
+  Dir.mkdir(File.join(project_root, 'thrust', 'lib', 'tasks'))
+end
+
+FileUtils.cp(Dir.glob(File.join(thrust_root, 'lib', 'tasks', '*.rake')), File.join(project_root, 'thrust', 'lib', 'tasks'))
+FileUtils.cp(File.join(thrust_root, 'lib', 'thrust_config.rb'), File.join(project_root, 'thrust', 'lib'))
+FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'example.yml'), File.join(project_root, 'thrust.example.yml'))
 
 rakefile = File.join(project_root, 'Rakefile')
 if (File.exists?(rakefile))
@@ -16,4 +24,4 @@ else
   puts "a Rakefile was created for you type 'rake -T' to see a list of tasks"
 end
 
-puts 'Copy thrust/lib/config/thrust.example.yml to thrust/lib/config/thrust.yml and edit for your project'
+puts "Rename #{project_root}/thrust.example.yml to #{project_root}/thrust.yml and edit it for your project."
