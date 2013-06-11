@@ -1,6 +1,19 @@
 #!/usr/bin/env ruby
 project_root = Dir.pwd
-thrust_root  = File.dirname(__FILE__)
+thrust_root  = File.join(File.dirname(__FILE__), '..')
 
-FileUtils.cp(thrust_root + '/../lib/tasks/main.rake', project_root + '/Rakefile')
-FileUtils.cp(thrust_root + '/../lib/example.yml', project_root + '/thrust.example.yml')
+FileUitils.cp(Dir.glob(File.join(thrust_root, 'lib', 'tasks', '*.rake')), File.join(project_root, 'thrust', 'lib', 'tasks'))
+FileUitils.cp(File.join(thrust_root, 'lib', 'config', 'example.yml'), File.join(project_root, 'thrust', 'lib' 'config', 'thrust.example.yml'))
+
+rakefile = File.join(project_root, 'Rakefile')
+if (File.exists?(rakefile))
+  puts "You have an existing rakefile to add thrust tasks you should import its tasks:"
+  puts "Dir.glob('thrust/lib/tasks/*.rake').each { |r| import r }"
+else
+  File.open(rakefile, 'w') do |f|
+    f.puts "Dir.glob('thrust/lib/tasks/*.rake').each { |r| import r }"
+  end
+  puts "a Rakefile was created for you type 'rake -T' to see a list of tasks"
+end
+
+puts 'Copy thrust/lib/config/thrust.example.yml to thrust/lib/config/thrust.yml and edit for your project'

@@ -7,6 +7,7 @@ specs:
   configuration: Release # or whichever iOS configuration you want to run specs under
   target: Specs # Name of the spec build target
   sdk: 6.1 # SDK version to build/run the specs with
+  binary: 'Specs/bin/ios-sim' # or 'Specs/bin/waxim'
 
 api_token: your testflight token here
 # Add testflight distrobution lists here. Rake tasks are built for all keys directly
