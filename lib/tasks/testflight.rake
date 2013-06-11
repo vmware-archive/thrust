@@ -1,7 +1,7 @@
 require 'yaml'
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'xcode_config'))
 
-@thrust_config = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'config', 'thrust.yml'))
+@thrust_config = YAML.load_file(File.join(Dir.getwd, 'thrust.yml'))
 
 namespace :bump do
   desc 'Bumps the build'

@@ -1,8 +1,8 @@
-class XcodeConfig
+module XcodeConfig
   PROJECT_ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
   BUILD_DIR = File.join(PROJECT_ROOT, "build")
 
-  class << self
+  #class << self
     def build_prefix_for(configuration)
       "#{BUILD_DIR}/#{configuration}-iphoneos/#{@thrust_config['app_name']}"
     end
@@ -121,5 +121,5 @@ class XcodeConfig
         system_or_exit "git commit -am \"#{message}\" && git push origin head"
       end
     end
-  end
+  #end
 end
