@@ -69,4 +69,9 @@ By default the testflight deploy will notify everyone on the distribution list. 
 
 	NOTIFY=false rake testflight:testers
 
+## Contributing
+Before committing changes to the repo, please build the gemspec, install the gem, and run the thrust binary
 
+    gem build thrust.gemspec
+    gem install./thrust-<version>.gem
+    thrust
