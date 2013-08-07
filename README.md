@@ -25,7 +25,7 @@ if you don't have an existing **Rakefile** in your project root go ahead and cre
 
 you will create a thrust configuration:
 
-	cp [path-to-thrust]/config/example.yml [project-root]/thrust.yml
+	cp [path-to-thrust]/lib/config/example.yml [project-root]/thrust.yml
 
 then edit it to fit your project.
 
