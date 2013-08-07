@@ -1,11 +1,19 @@
 class ThrustConfig
-  attr_reader :project_root, :config, :spec_config, :build_dir
+  attr_reader :project_root, :config, :build_dir
+  THRUST_VERSION = 0.1
 
   def initialize(proj_root, config_file)
     @project_root = File.expand_path(proj_root)
     @build_dir = File.join(project_root, 'build')
     @config = YAML.load_file(config_file)
-    @spec_config = config['specs']
+    verify_configuration(@config)
+  end
+
+  def verify_configuration(config)
+    config['thrust_version'] ||= 0
+    if config['thrust_version'] < THRUST_VERSION
+      fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION} see README for details."
+    end
   end
 
   def build_prefix_for(configuration)
@@ -15,10 +23,6 @@ class ThrustConfig
   # Xcode 4.3 stores its /Developer inside /Applications/Xcode.app, Xcode 4.2 stored it in /Developer
   def xcode_developer_dir
     `xcode-select -print-path`.strip
-  end
-
-  def sim_dir
-    File.join(build_dir, spec_config['configuration'] + '-iphonesimulator')
   end
 
   def system_or_exit(cmd, stdout = nil)

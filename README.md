@@ -13,6 +13,11 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 	rake testflight:testers                  # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
 	rake trim                                # Trim whitespace
 
+# Changelog
+
+## Version 0.1
+The 'specs' configuration has been replaced by an array of specs configurations, called 'spec_targets'. This is to allow you to specify multiple targets to be run as specs - for instance, you may wish to run a set of integration tests separately from your unit tests.
+
 # Installation
 
 clone this repo into a folder in your project (or include as a submodule)
@@ -55,6 +60,11 @@ and configure it for your project as you see fit.
 
 depending on whether you have an existing **Rakefile** it create one or prompt you to adds some imports to the file.
 
+# Upgrading
+Periodically new thrust versions will require changes to your thrust.yml configuration.  Look in the ***upgrading instructions*** section below for a list of versions and how the configuration has changed.  If you need to upgrade multiple versions you may want to just re-create it from the example.yml.
+
+Once you upgrade make sure to add/update the 'thrust_version' key in the configuration to the new version
+
 # Misc
 
 ## Turning off git
@@ -69,9 +79,30 @@ By default the testflight deploy will notify everyone on the distribution list. 
 
 	NOTIFY=false rake testflight:testers
 
-## Contributing
-Before committing changes to the repo, please build the gemspec, install the gem, and run the thrust binary
+## Upgrading Instructions
+### Upgrading from *unversioned* to version 0.1
+You will need to update your thrust.yml as follows. Previously, the 'specs' section was defined at the root level as:
 
-    gem build thrust.gemspec
-    gem install./thrust-<version>.gem
-    thrust
+    specs:
+      configuration: Release # or whichever iOS configuration you want to run specs under
+      target: Specs # Name of the spec build target
+      sdk: 6.1 # SDK version to build/run the specs with
+      binary: 'Specs/bin/ios-sim' # or 'Specs/bin/waxim'
+
+It is now defined as:
+
+    sim_binary: 'ios-sim'
+    spec_targets:
+      specs:
+        name: Specs # Name of the spec build target
+        configuration: Debug # or whichever iOS configuration you want to run specs under
+        target: Specs
+        sdk: 6.1
+      [some_other_rake_task_name]:
+        ...
+
+*Note* that the 'binary' definition has been moved out from the specs definition, and is now a root level value called 'sim_binary'.
+
+This will generate a rake task for every definition in the spec_targets list.
+
+---
