@@ -2,8 +2,8 @@ class ThrustConfig
   attr_reader :project_root, :config, :build_dir
   THRUST_VERSION = 0.1
 
-  def initialize(proj_root, config_file)
-    @project_root = File.expand_path(proj_root)
+  def initialize(relative_project_root, config_file)
+    @project_root = File.expand_path(relative_project_root)
     @build_dir = File.join(project_root, 'build')
     @config = YAML.load_file(config_file)
     verify_configuration(@config)
@@ -51,6 +51,7 @@ class ThrustConfig
           exit(0)
         end
       elsif status == 256
+        STDERR.puts "Retrying..."
         redo
       else
         STDERR.puts "Failed to launch: #{status}"
@@ -59,27 +60,13 @@ class ThrustConfig
     end
   end
 
-    def with_env_vars(env_vars)
-      old_values = {}
-      env_vars.each do |key,new_value|
-        old_values[key] = ENV[key]
-        ENV[key] = new_value
-      end
-
-      yield
-
-      env_vars.each_key do |key|
-        ENV[key] = old_values[key]
-      end
-    end
-
   def output_file(target)
     output_dir = if ENV['IS_CI_BOX']
-                   ENV['CC_BUILD_ARTIFACTS']
-                 else
-                   Dir.mkdir(build_dir) unless File.exists?(build_dir)
-                   build_dir
-                 end
+       ENV['CC_BUILD_ARTIFACTS']
+    else
+      Dir.mkdir(build_dir) unless File.exists?(build_dir)
+      build_dir
+    end
 
     output_file = File.join(output_dir, "#{target}.output")
     STDERR.puts "Output: #{output_file}"
