@@ -18,7 +18,9 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 ## Version 0.1
 * The 'specs' configuration has been replaced by an array of specs configurations, called 'spec_targets'. This is to allow you to specify multiple targets to be run as specs - for instance, you may wish to run a set of integration tests separately from your unit tests.
 
-* Adds 'focused_specs' and 'nof' commands to show files with focussed specs and to remove them, respectively.
+* Adds 'focused_specs' and 'nof' tasks to show files with focussed specs and to remove them, respectively.
+
+* Adds 'current_version' task to show the current build version of the app.
 
 # Installation
 

@@ -3,6 +3,11 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'
 
 @thrust = ThrustConfig.new(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
+desc "show the current build"
+task :current_version do
+  @thrust.system_or_exit("agvtool what-version -terse")
+end
+
 namespace :bump do
   desc 'Bumps the build'
   task :build do
