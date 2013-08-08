@@ -16,8 +16,17 @@ class ThrustConfig
     end
   end
 
-  def build_prefix_for(configuration, suffix = nil)
-    ["#{build_dir}/#{configuration}-iphoneos/#{config['app_name']}", suffix].compact.join('-')
+  def get_app_name_from(build_dir)
+    full_app_path = Dir.glob(build_dir + '/*.app').first
+    raise "No build product found!" unless full_app_path
+    app_file_name = full_app_path.split('/').last
+    app_name_regex = %r{^(?<app_name>.+)\.app$}
+    regex_matches = app_name_regex.match(app_file_name)
+    regex_matches[:app_name]
+  end
+
+  def build_dir_for(configuration)
+    "#{build_dir}/#{configuration}-iphoneos"
   end
 
   # Xcode 4.3 stores its /Developer inside /Applications/Xcode.app, Xcode 4.2 stored it in /Developer

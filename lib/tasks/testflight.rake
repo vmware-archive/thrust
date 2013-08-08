@@ -36,27 +36,43 @@ namespace :bump do
 end
 
 desc 'Build custom configuration'
-task :build_configuration, :configuration, :suffix do |task_name, args|
-  build_prefix = @thrust.build_prefix_for(args[:configuration], args[:suffix])
+task :build, :configuration do |task_name, args|
+  build_dir = @thrust.build_dir_for(args[:configuration])
+  STDERR.puts "Cleaning..."
   @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -alltargets -configuration '#{args[:configuration]}' -sdk iphoneos clean", @thrust.output_file("clean")
+  @thrust.system_or_exit "rm -r #{build_dir} ; exit 0"
+  STDERR.puts "Killing simulator..."
   @thrust.kill_simulator
+  STDERR.puts "Building..."
   @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{@thrust.config['app_name']} -configuration '#{args[:configuration]}' -sdk iphoneos build", @thrust.output_file(args[:configuration])
-  @thrust.system_or_exit "/usr/bin/xcrun -sdk iphoneos PackageApplication -v '#{build_prefix}.app' -o '#{build_prefix}.ipa' --sign '#{@thrust.config['identity']}'"
-  @thrust.system_or_exit "zip -r -T -y '#{build_prefix}.app.dSYM.zip' '#{build_prefix}.app.dSYM'"
+end
+
+desc 'Build custom configuration'
+task :package, :build_dir, :app_name do |task_name, args|
+  build_dir = args[:build_dir]
+  app_name = args[:app_name]
+
+  STDERR.puts "Packaging..."
+  @thrust.system_or_exit "/usr/bin/xcrun -sdk iphoneos PackageApplication -v '#{build_dir}/#{app_name}.app' -o '#{build_dir}/#{app_name}.ipa' --sign '#{@thrust.config['identity']}'"
+  STDERR.puts "Zipping dSYM..."
+  @thrust.system_or_exit "zip -r -T -y '#{build_dir}/#{app_name}.app.dSYM.zip' '#{build_dir}/#{app_name}.app.dSYM'"
+  STDERR.puts "Done!"
 end
 
 namespace :testflight do
   @thrust.config['distributions'].each do |task_name, info|
     desc "Deploy build to testflight #{info['team']} team (use NOTIFY=false to prevent team notification)"
     task task_name do
-      Rake::Task["testflight:deploy"].invoke(info['token'], info['default_list'], info['configuration'], info['suffix'])
+      Rake::Task["testflight:deploy"].invoke(info['token'], info['default_list'], info['configuration'])
     end
   end
 
-  task :deploy, :team, :distribution_list, :configuration, :suffix do |task, args|
-    build_prefix = @thrust.build_prefix_for(args[:configuration], args[:suffix])
+  task :deploy, :team_token, :distribution_list, :configuration do |task, args|
+    build_dir = @thrust.build_dir_for(args[:configuration])
     Rake::Task["bump:build"].invoke
-    Rake::Task["build_configuration"].invoke(args[:configuration], args[:suffix])
+    Rake::Task["build"].invoke(args[:configuration])
+    app_name = @thrust.get_app_name_from(build_dir)
+    Rake::Task["package"].invoke(build_dir, app_name)
     print "Deploy Notes: "
     message = STDIN.gets
     message += "\n" + `git log HEAD^..HEAD`
@@ -64,10 +80,10 @@ namespace :testflight do
     File.open(message_file, 'w') {|f| f.write(message) }
 
     @thrust.system_or_exit "curl http://testflightapp.com/api/builds.json\
-      -F file=@#{build_prefix}.ipa\
-      -F dsym=@#{build_prefix}.app.dSYM.zip\
+      -F file=@#{build_dir}/#{app_name}.ipa\
+      -F dsym=@#{build_dir}/#{app_name}.app.dSYM.zip\
       -F api_token='#{@thrust.config['api_token']}'\
-      -F team_token='#{args[:team]}'\
+      -F team_token='#{args[:team_token]}'\
       -F notes=@#{message_file.path}\
       -F notify=#{(ENV['NOTIFY'] || 'true').downcase.capitalize}\
       #{"-F distribution_lists='#{args[:distribution_list]}'" if args[:distribution_list]}"
