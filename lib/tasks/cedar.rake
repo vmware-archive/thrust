@@ -50,7 +50,7 @@ end
 
 @thrust.config['spec_targets'].each do |task_name, info|
   desc "Run #{info['name']}"
-  task task_name do
+  task task_name => :clean do
     Rake::Task["build_specs"].invoke(info['target'], info['configuration'])
     Rake::Task["run_cedar"].invoke(info['target'], info['sdk'], info['configuration'])
   end
