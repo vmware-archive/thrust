@@ -1,5 +1,6 @@
 require 'yaml'
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'))
+require 'tempfile'
 
 @thrust = ThrustConfig.new(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
@@ -56,12 +57,18 @@ namespace :testflight do
     build_prefix = @thrust.build_prefix_for(args[:configuration])
     Rake::Task["bump:build"].invoke
     Rake::Task["build_configuration"].invoke(args[:configuration])
+    print "Deploy Notes: "
+    message = STDIN.gets
+    message += "\n" + `git log HEAD^..HEAD`
+    message_file = Tempfile.new("deploy_notes")
+    File.open(message_file, 'w') {|f| f.write(message) }
+
     @thrust.system_or_exit "curl http://testflightapp.com/api/builds.json\
       -F file=@#{build_prefix}.ipa\
       -F dsym=@#{build_prefix}.app.dSYM.zip\
       -F api_token='#{@thrust.config['api_token']}'\
       -F team_token='#{args[:team]}'\
-      -F notes='This build was uploaded via the upload API'\
+      -F notes=@#{message_file.path}\
       -F notify=#{(ENV['NOTIFY'] || 'true').downcase.capitalize}\
       #{"-F distribution_lists='#{args[:distribution_list]}'" if args[:distribution_list]}"
   end

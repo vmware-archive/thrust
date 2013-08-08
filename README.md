@@ -22,6 +22,8 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 
 * Adds 'current_version' task to show the current build version of the app.
 
+* Testflight deploys now prompt the user for a deployment message
+
 # Installation
 
 clone this repo into a folder in your project (or include as a submodule)
