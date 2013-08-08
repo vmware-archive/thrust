@@ -34,7 +34,7 @@ task :build_configuration, :configuration do |task_name, args|
   build_prefix = @thrust.build_prefix_for(args[:configuration])
   @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -alltargets -configuration '#{args[:configuration]}' -sdk iphoneos clean", @thrust.output_file("clean")
   @thrust.kill_simulator
-  @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{@thrust.config['app_name']} -configuration '#{args[:configuration]}' -sdk iphoneos build", @thrust.output_file(args[:configuration])
+  @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{@thrust.config['app_name']} -configuration '#{args[:configuration]}' -sdk iphoneos build SYMROOT=#{ @thrust.build_dir }", @thrust.output_file(args[:configuration])
   @thrust.system_or_exit "/usr/bin/xcrun -sdk iphoneos PackageApplication -v '#{build_prefix}.app' -o '#{build_prefix}.ipa' --sign '#{@thrust.config['identity']}'"
   @thrust.system_or_exit "zip -r -T -y '#{build_prefix}.app.dSYM.zip' '#{build_prefix}.app.dSYM'"
 end
