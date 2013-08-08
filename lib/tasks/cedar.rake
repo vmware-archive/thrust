@@ -5,7 +5,9 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'
 
 @thrust = ThrustConfig.new(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
-task :default => [:trim, :specs]
+ci_dependencies = [:nof, @thrust.config['spec_targets'].keys.map(&:to_sym)].flatten
+desc "CI build - runs the following (#{ci_dependencies.join(", ")})"
+task :ci => ci_dependencies
 
 desc 'Trim whitespace'
 task :trim do
@@ -30,7 +32,6 @@ task :clean do
 end
 
 task :build_specs, :target, :build_configuration do |task_name, args|
-  @thrust.kill_simulator
   # TODO: ARCHS=i386 ONLY_ACTIVE_ARCH=NO
   @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{args[:target]} -configuration #{args[:build_configuration]} -sdk iphonesimulator build", @thrust.output_file("specs")
 end
@@ -51,7 +52,9 @@ end
 @thrust.config['spec_targets'].each do |task_name, info|
   desc "Run #{info['name']}"
   task task_name => :clean do
+    Rake::Task["build_specs"].reenable
     Rake::Task["build_specs"].invoke(info['target'], info['configuration'])
+    Rake::Task["run_cedar"].reenable
     Rake::Task["run_cedar"].invoke(info['target'], info['sdk'], info['configuration'])
   end
 end

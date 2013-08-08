@@ -26,6 +26,12 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 
 * Testflight deploys now prompt the user for a deployment message
 
+* Removes adding to default tasks. This is now your responsibility - please define in your own Rakefile if you need to add to the default task. e.g.
+
+<code>task :default => [:specs :something_random]</code>
+
+* Adds a 'ci' task. This will run a 'nof' and then run all defined targets under spec_targets in order.
+
 # Installation
 
 clone this repo into a folder in your project (or include as a submodule)

@@ -47,10 +47,9 @@ class ThrustConfig
         STDERR.puts result
         if result.include?('FAILURE')
           exit(1)
-        else
-          exit(0)
         end
       elsif status == 256
+        kill_simulator
         STDERR.puts "Retrying..."
         redo
       else
