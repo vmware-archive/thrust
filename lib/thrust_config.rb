@@ -26,25 +26,25 @@ class ThrustConfig
   end
 
   def system_or_exit(cmd, stdout = nil)
-    puts "Executing #{cmd}"
+    STDERR.puts "Executing #{cmd}"
     cmd += " >#{stdout}" if stdout
     system(cmd) or raise '******** Build failed ********'
   end
 
   def run(cmd)
-    puts "Executing #{cmd}"
+    STDERR.puts "Executing #{cmd}"
     `#{cmd}`
   end
 
   def grep_cmd_for_failure(cmd)
     1.times do
-      puts "Executing #{cmd} and checking for FAILURE"
+      STDERR.puts "Executing #{cmd} and checking for FAILURE"
       %x[#{cmd} > #{Dir.tmpdir}/cmd.out 2>&1]
       status = $?
       result = File.read("#{Dir.tmpdir}/cmd.out")
       if status.success?
-        puts 'Results:'
-        puts result
+        STDERR.puts 'Results:'
+        STDERR.puts result
         if result.include?('FAILURE')
           exit(1)
         else
@@ -53,7 +53,7 @@ class ThrustConfig
       elsif status == 256
         redo
       else
-        puts "Failed to launch: #{status}"
+        STDERR.puts "Failed to launch: #{status}"
         exit(1)
       end
     end
@@ -82,7 +82,7 @@ class ThrustConfig
                  end
 
     output_file = File.join(output_dir, "#{target}.output")
-    puts "Output: #{output_file}"
+    STDERR.puts "Output: #{output_file}"
     output_file
   end
 
@@ -95,10 +95,10 @@ class ThrustConfig
   def update_version(release)
     run_git_with_message('Changes version to $(agvtool what-marketing-version -terse)') do
       version = run "agvtool what-marketing-version -terse | head -n1 |cut -f2 -d\="
-      puts "version !#{version}!"
+      STDERR.puts "version !#{version}!"
       build_regex = %r{^(?<major>\d+)(\.(?<minor>\d+))?(\.(?<patch>\d+))$}
       if (match = build_regex.match(version))
-        puts "found match #{match.inspect}"
+        STDERR.puts "found match #{match.inspect}"
         v = {:major => match[:major].to_i, :minor => match[:minor].to_i, :patch => match[:patch].to_i}
         case(release)
           when :major then new_build_version(v[:major] + 1, 0, 0)
@@ -119,12 +119,12 @@ class ThrustConfig
 
   def run_git_with_message(message, &block)
     if ENV['IGNORE_GIT']
-      puts 'WARNING NOT CHECKING FOR CLEAN WORKING DIRECTORY'
+      STDERR.puts 'WARNING NOT CHECKING FOR CLEAN WORKING DIRECTORY'
       block.call
     else
-      puts 'Checking for clean working tree...'
+      STDERR.puts 'Checking for clean working tree...'
       system_or_exit 'git diff-index --quiet HEAD'
-      puts 'Checking that the master branch is up to date...'
+      STDERR.puts 'Checking that the master branch is up to date...'
       system_or_exit 'git fetch && git diff --quiet HEAD origin/master'
       block.call
       system_or_exit "git commit -am \"#{message}\" && git push origin head"

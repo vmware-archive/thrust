@@ -12,6 +12,16 @@ task :trim do
   @thrust.system_or_exit %Q[git status --short | awk '{if ($1 != "D" && $1 != "R") print $2}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
 end
 
+desc "Remove any focus from specs"
+task :nof do
+  @thrust.system_or_exit %Q[ rake focused_specs | xargs -I{} sed -i '' -e 's/fit\(@/it\(@/g;' -e 's/fdescribe\(@/describe\(@/g;' -e 's/fcontext\(@/context\(@/g;' "{}" ]
+end
+
+desc "Print out names of files containing focused specs"
+task :focused_specs do
+  @thrust.system_or_exit %Q[ grep -l -r -e "\\(fit\\|fdescribe\\|fcontext\\)" #{ @thrust.config['spec_targets'].values.map {|h| h['target']}.join(' ') } | grep -v 'Frameworks' ; exit 0 ]
+end
+
 desc 'Clean all targets'
 task :clean do
   @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -alltargets -configuration 'AdHoc' -sdk iphoneos clean", @thrust.output_file("clean")
