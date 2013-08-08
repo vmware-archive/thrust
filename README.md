@@ -22,6 +22,8 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 
 * Adds 'current_version' task to show the current build version of the app.
 
+* Adds optional 'app_name_suffix' option to distributions. This allows you to specify a suffix for the build app name. For instance, an app_name_suffix value of "Foo" would be appended to an app called "App" as "App-Foo".
+
 * Testflight deploys now prompt the user for a deployment message
 
 # Installation

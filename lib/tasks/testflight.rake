@@ -36,8 +36,8 @@ namespace :bump do
 end
 
 desc 'Build custom configuration'
-task :build_configuration, :configuration do |task_name, args|
-  build_prefix = @thrust.build_prefix_for(args[:configuration])
+task :build_configuration, :configuration, :suffix do |task_name, args|
+  build_prefix = @thrust.build_prefix_for(args[:configuration], args[:suffix])
   @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -alltargets -configuration '#{args[:configuration]}' -sdk iphoneos clean", @thrust.output_file("clean")
   @thrust.kill_simulator
   @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{@thrust.config['app_name']} -configuration '#{args[:configuration]}' -sdk iphoneos build", @thrust.output_file(args[:configuration])
@@ -49,14 +49,14 @@ namespace :testflight do
   @thrust.config['distributions'].each do |task_name, info|
     desc "Deploy build to testflight #{info['team']} team (use NOTIFY=false to prevent team notification)"
     task task_name do
-      Rake::Task["testflight:deploy"].invoke(info['token'], info['default_list'], info['configuration'])
+      Rake::Task["testflight:deploy"].invoke(info['token'], info['default_list'], info['configuration'], info['suffix'])
     end
   end
 
-  task :deploy, :team, :distribution_list, :configuration do |task, args|
-    build_prefix = @thrust.build_prefix_for(args[:configuration])
+  task :deploy, :team, :distribution_list, :configuration, :suffix do |task, args|
+    build_prefix = @thrust.build_prefix_for(args[:configuration], args[:suffix])
     Rake::Task["bump:build"].invoke
-    Rake::Task["build_configuration"].invoke(args[:configuration])
+    Rake::Task["build_configuration"].invoke(args[:configuration], args[:suffix])
     print "Deploy Notes: "
     message = STDIN.gets
     message += "\n" + `git log HEAD^..HEAD`

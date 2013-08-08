@@ -16,8 +16,8 @@ class ThrustConfig
     end
   end
 
-  def build_prefix_for(configuration)
-    "#{build_dir}/#{configuration}-iphoneos/#{config['app_name']}"
+  def build_prefix_for(configuration, suffix = nil)
+    ["#{build_dir}/#{configuration}-iphoneos/#{config['app_name']}", suffix].compact.join('-')
   end
 
   # Xcode 4.3 stores its /Developer inside /Applications/Xcode.app, Xcode 4.2 stored it in /Developer

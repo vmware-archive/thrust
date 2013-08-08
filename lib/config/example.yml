@@ -28,10 +28,10 @@ distributions:
     token: TestFlight Team Token
     default_list: Default Distribution List to Permission for the build
     configuration: iOS configuration to build with e.g. Debug, Release, etc.
-
-# builds rake testflight:foo
-# foo:
-#   team: Foos
-#   token: somethingthatlookslikeyourapitoken
-#   default_list: Foo People
-#   configuration: Release
+    #app_name_suffix: Dev  # optional param - adds a suffix to the built app name, i.e. "My Great Project-Dev"
+  foo: # builds rake testflight:foo
+     team: Foos
+     token: somethingthatlookslikeyourapitoken
+     default_list: Foo People
+     configuration: Release
+     app_name_suffix: Bar # optional param - adds a suffix to the built app name, i.e. "My Great Project-Bar"
