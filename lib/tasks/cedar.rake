@@ -32,7 +32,7 @@ end
 task :build_specs, :target, :build_configuration do |task_name, args|
   @thrust.kill_simulator
   # TODO: ARCHS=i386 ONLY_ACTIVE_ARCH=NO
-  @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{args[:target]} -configuration #{args[:build_configuration]} -sdk iphonesimulator build SYMROOT=#{@thrust.build_dir}", @thrust.output_file("specs")
+  @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{args[:target]} -configuration #{args[:build_configuration]} -sdk iphonesimulator build", @thrust.output_file("specs")
 end
 
 task :run_cedar, :target, :sdk, :build_configuration do |task_name, args|
