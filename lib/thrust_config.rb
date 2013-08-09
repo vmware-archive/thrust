@@ -46,25 +46,15 @@ class ThrustConfig
   end
 
   def grep_cmd_for_failure(cmd)
-    1.times do
-      STDERR.puts "Executing #{cmd} and checking for FAILURE"
-      %x[#{cmd} > #{Dir.tmpdir}/cmd.out 2>&1]
-      status = $?
-      result = File.read("#{Dir.tmpdir}/cmd.out")
-      if status.success?
-        STDERR.puts 'Results:'
-        STDERR.puts result
-        if result.include?('FAILURE')
-          exit(1)
-        end
-      elsif status == 256
-        kill_simulator
-        STDERR.puts "Retrying..."
-        redo
-      else
-        STDERR.puts "Failed to launch: #{status}"
-        exit(1)
-      end
+    STDERR.puts "Executing #{cmd} and checking for FAILURE"
+    result = %x[#{cmd} 2>&1]
+    STDERR.puts "Results:"
+    STDERR.puts result
+
+    if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
+      exit(1)
+    else
+      exit(0)
     end
   end
 
