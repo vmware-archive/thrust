@@ -28,8 +28,6 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 
 	<code>task :default => [:specs :something_random]</code>
 
-* Adds a 'ci' task. This will run a 'nof' and then run all defined targets under spec_targets in order.
-
 * Adds support for non-standard app names defined in your XCode project. These are determined by looking for the first ".app" file it can find in the build folder and basing the name off that file.
 
 # Installation

@@ -5,10 +5,6 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'
 
 @thrust = ThrustConfig.new(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
-ci_dependencies = [:nof, @thrust.config['spec_targets'].keys.map(&:to_sym)].flatten
-desc "CI build - runs the following (#{ci_dependencies.join(", ")})"
-task :ci => ci_dependencies
-
 desc 'Trim whitespace'
 task :trim do
   @thrust.system_or_exit %Q[git status --short | awk '{if ($1 != "D" && $1 != "R") print $2}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
