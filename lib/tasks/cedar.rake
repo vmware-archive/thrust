@@ -37,3 +37,8 @@ task :specs => :build_specs do
     exit(1)
   end
 end
+
+desc 'Remove focus from specs'
+task :nof do
+  system_or_exit %Q[ grep -l -r -e "\\(fit\\|fdescribe\\|fcontext\\)" #{@thrust.spec_config['target']]} | grep -v '#{@thrust.spec_config['target']}/Frameworks' | xargs -I{} sed -i '' -e 's/fit\(@/it\(@/g;' -e 's/fdescribe\(@/describe\(@/g;' -e 's/fcontext\(@/context\(@/g;' "{}" ]
+end
