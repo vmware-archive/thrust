@@ -35,30 +35,6 @@ namespace :bump do
   end
 end
 
-desc 'Build custom configuration'
-task :build, :configuration do |task_name, args|
-  build_dir = @thrust.build_dir_for(args[:configuration])
-  STDERR.puts "Cleaning..."
-  @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -alltargets -configuration '#{args[:configuration]}' -sdk iphoneos clean", @thrust.output_file("clean")
-  @thrust.system_or_exit "rm -r #{build_dir} ; exit 0"
-  STDERR.puts "Killing simulator..."
-  @thrust.kill_simulator
-  STDERR.puts "Building..."
-  @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{@thrust.config['app_name']} -configuration '#{args[:configuration]}' -sdk iphoneos build", @thrust.output_file(args[:configuration])
-end
-
-desc 'Build custom configuration'
-task :package, :build_dir, :app_name do |task_name, args|
-  build_dir = args[:build_dir]
-  app_name = args[:app_name]
-
-  STDERR.puts "Packaging..."
-  @thrust.system_or_exit "/usr/bin/xcrun -sdk iphoneos PackageApplication -v '#{build_dir}/#{app_name}.app' -o '#{build_dir}/#{app_name}.ipa' --sign '#{@thrust.config['identity']}'"
-  STDERR.puts "Zipping dSYM..."
-  @thrust.system_or_exit "zip -r -T -y '#{build_dir}/#{app_name}.app.dSYM.zip' '#{build_dir}/#{app_name}.app.dSYM'"
-  STDERR.puts "Done!"
-end
-
 namespace :testflight do
   @thrust.config['distributions'].each do |task_name, info|
     desc "Deploy build to testflight #{info['team']} team (use NOTIFY=false to prevent team notification)"
@@ -79,9 +55,25 @@ namespace :testflight do
     build_dir = @thrust.build_dir_for(configuration)
 
     Rake::Task["bump:build"].invoke
-    Rake::Task["build"].invoke(configuration)
+
+    configuration = @configuration
+
+    STDERR.puts "Cleaning..."
+    @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -alltargets -configuration '#{configuration}' -sdk iphoneos clean", @thrust.output_file("clean")
+    @thrust.system_or_exit "rm -r #{build_dir} ; exit 0"
+    STDERR.puts "Killing simulator..."
+    @thrust.kill_simulator
+    STDERR.puts "Building..."
+    @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{@thrust.config['app_name']} -configuration '#{configuration}' -sdk iphoneos build", @thrust.output_file(configuration)
+
     app_name = @thrust.get_app_name_from(build_dir)
-    Rake::Task["package"].invoke(build_dir, app_name)
+
+    STDERR.puts "Packaging..."
+    @thrust.system_or_exit "/usr/bin/xcrun -sdk iphoneos PackageApplication -v '#{build_dir}/#{app_name}.app' -o '#{build_dir}/#{app_name}.ipa' --sign '#{@thrust.config['identity']}'"
+    STDERR.puts "Zipping dSYM..."
+    @thrust.system_or_exit "zip -r -T -y '#{build_dir}/#{app_name}.app.dSYM.zip' '#{build_dir}/#{app_name}.app.dSYM'"
+    STDERR.puts "Done!"
+
     print "Deploy Notes: "
     message = STDIN.gets
     message += "\n" + `git log HEAD^..HEAD`
