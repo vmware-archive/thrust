@@ -46,25 +46,15 @@ class ThrustConfig
   end
 
   def grep_cmd_for_failure(cmd)
-    1.times do
-      STDERR.puts "Executing #{cmd} and checking for FAILURE"
-      %x[#{cmd} > #{Dir.tmpdir}/cmd.out 2>&1]
-      status = $?
-      result = File.read("#{Dir.tmpdir}/cmd.out")
-      if status.success?
-        STDERR.puts 'Results:'
-        STDERR.puts result
-        if result.include?('FAILURE')
-          exit(1)
-        end
-      elsif status == 256
-        kill_simulator
-        STDERR.puts "Retrying..."
-        redo
-      else
-        STDERR.puts "Failed to launch: #{status}"
-        exit(1)
-      end
+    STDERR.puts "Executing #{cmd} and checking for FAILURE"
+    result = %x[#{cmd} 2>&1]
+    STDERR.puts "Results:"
+    STDERR.puts result
+
+    if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
+      exit(1)
+    else
+      exit(0)
     end
   end
 
@@ -85,6 +75,41 @@ class ThrustConfig
     system %q[killall -m -KILL "gdb"]
     system %q[killall -m -KILL "otest"]
     system %q[killall -m -KILL "iPhone Simulator"]
+  end
+
+  def xcodebuild(build_configuration, sdk, target)
+    run_xcodebuild('build', build_configuration, sdk, target)
+  end
+
+  def xcodeclean(build_configuration, sdk)
+    run_xcodebuild('clean', build_configuration, sdk)
+  end
+
+  def run_xcodebuild(build_command, build_configuration, sdk, target = nil)
+    system_or_exit(
+      [
+        "xcodebuild",
+        "-project #{config['project_name']}.xcodeproj",
+        target ? "-target #{target}" : "-alltargets",
+        "-configuration #{build_configuration}",
+        "-sdk #{sdk}",
+        "#{build_command}"
+      ].join(" "),
+      output_file("#{build_configuration}-#{build_command}")
+    )
+  end
+
+  def run_cedar(build_configuration, target, sdk)
+    binary = config['sim_binary']
+    sim_dir = File.join(build_dir, "#{build_configuration}-iphonesimulator", "#{target}.app")
+    if binary =~ /waxim%/
+      grep_cmd_for_failure(%Q[#{binary} -s #{sdk} -f iphone -e CFFIXED_USER_HOME=#{Dir.tmpdir} -e CEDAR_HEADLESS_SPECS=1 -e CEDAR_REPORTER_CLASS=CDRDefaultReporter #{sim_dir}])
+    elsif binary =~ /ios-sim$/
+      grep_cmd_for_failure(%Q[#{binary} launch #{sim_dir} --sdk #{sdk} --family iphone --retina --tall --setenv CFFIXED_USER_HOME=#{Dir.tmpdir} --setenv CEDAR_HEADLESS_SPECS=1 --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter])
+    else
+      puts "Unknown binary for running specs: '#{binary}'"
+      exit(1)
+    end
   end
 
   def update_version(release)
