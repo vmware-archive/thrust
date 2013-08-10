@@ -51,20 +51,19 @@ namespace :testflight do
     raise "You need to run a distribution configuration." unless @configured
     team_token = @team_token
     distribution_list = @distribution_list
-    configuration = @configuration
-    build_dir = @thrust.build_dir_for(configuration)
+    build_configuration = @configuration
+    build_dir = @thrust.build_dir_for(build_configuration)
+    target = @thrust.config['app_name']
 
     Rake::Task["bump:build"].invoke
 
-    configuration = @configuration
-
     STDERR.puts "Cleaning..."
-    @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -alltargets -configuration '#{configuration}' -sdk iphoneos clean", @thrust.output_file("clean")
+    @thrust.xcodeclean(build_configuration, 'iphoneos')
     @thrust.system_or_exit "rm -r #{build_dir} ; exit 0"
     STDERR.puts "Killing simulator..."
     @thrust.kill_simulator
     STDERR.puts "Building..."
-    @thrust.system_or_exit "xcodebuild -project #{@thrust.config['project_name']}.xcodeproj -target #{@thrust.config['app_name']} -configuration '#{configuration}' -sdk iphoneos build", @thrust.output_file(configuration)
+    @thrust.xcodebuild(build_configuration, 'iphoneos', target)
 
     app_name = @thrust.get_app_name_from(build_dir)
 
@@ -80,13 +79,15 @@ namespace :testflight do
     message_file = Tempfile.new("deploy_notes")
     File.open(message_file, 'w') {|f| f.write(message) }
 
-    @thrust.system_or_exit "curl http://testflightapp.com/api/builds.json\
-      -F file=@#{build_dir}/#{app_name}.ipa\
-      -F dsym=@#{build_dir}/#{app_name}.app.dSYM.zip\
-      -F api_token='#{@thrust.config['api_token']}'\
-      -F team_token='#{team_token}'\
-      -F notes=@#{message_file.path}\
-      -F notify=#{(ENV['NOTIFY'] || 'true').downcase.capitalize}\
-      #{"-F distribution_lists='#{distribution_list}'" if distribution_list}"
+    @thrust.system_or_exit [
+      "curl http://testflightapp.com/api/builds.json",
+      "-F file=@#{build_dir}/#{app_name}.ipa",
+      "-F dsym=@#{build_dir}/#{app_name}.app.dSYM.zip",
+      "-F api_token='#{@thrust.config['api_token']}'",
+      "-F team_token='#{team_token}'",
+      "-F notes=@#{message_file.path}",
+      "-F notify=#{(ENV['NOTIFY'] || 'true').downcase.capitalize}",
+      ("-F distribution_lists='#{distribution_list}'" if distribution_list)
+    ].compact.join(' ')
   end
 end
