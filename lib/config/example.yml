@@ -11,11 +11,13 @@ spec_targets:
     configuration: Release # or whichever iOS configuration you want to run specs under
     target: Specs # Name of the spec build target
     sdk: 6.1  # SDK version to build/run the specs with
+
 #  integration:
 #    name: Integration Specs
 #    configuration: Debug
 #    target: IntegrationSpecs
 #    sdk: 6.1
+#    device: ipad # Defaults to iphone
 
 api_token: your testflight token here
 # Add testflight distribution lists here. Rake tasks are built for all keys directly
