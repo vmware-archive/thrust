@@ -99,13 +99,13 @@ class ThrustConfig
     )
   end
 
-  def run_cedar(build_configuration, target, sdk)
+  def run_cedar(build_configuration, target, sdk, device)
     binary = config['sim_binary']
     sim_dir = File.join(build_dir, "#{build_configuration}-iphonesimulator", "#{target}.app")
     if binary =~ /waxim%/
-      grep_cmd_for_failure(%Q[#{binary} -s #{sdk} -f iphone -e CFFIXED_USER_HOME=#{Dir.tmpdir} -e CEDAR_HEADLESS_SPECS=1 -e CEDAR_REPORTER_CLASS=CDRDefaultReporter #{sim_dir}])
+      grep_cmd_for_failure(%Q[#{binary} -s #{sdk} -f #{device} -e CFFIXED_USER_HOME=#{Dir.tmpdir} -e CEDAR_HEADLESS_SPECS=1 -e CEDAR_REPORTER_CLASS=CDRDefaultReporter #{sim_dir}])
     elsif binary =~ /ios-sim$/
-      grep_cmd_for_failure(%Q[#{binary} launch #{sim_dir} --sdk #{sdk} --family iphone --retina --tall --setenv CFFIXED_USER_HOME=#{Dir.tmpdir} --setenv CEDAR_HEADLESS_SPECS=1 --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter])
+      grep_cmd_for_failure(%Q[#{binary} launch #{sim_dir} --sdk #{sdk} --family #{device} --retina --tall --setenv CFFIXED_USER_HOME=#{Dir.tmpdir} --setenv CEDAR_HEADLESS_SPECS=1 --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter])
     else
       puts "Unknown binary for running specs: '#{binary}'"
       exit(1)
