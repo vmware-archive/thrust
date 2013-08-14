@@ -30,6 +30,8 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 
 * Adds support for non-standard app names defined in your XCode project. These are determined by looking for the first ".app" file it can find in the build folder and basing the name off that file.
 
+* Adds support for disabling incrementing the build number during a testflight deploy. This is via the 'increments_build_number' configuration setting under a distribution in your thrust.yml.
+
 # Installation
 
 clone this repo into a folder in your project (or include as a submodule)
