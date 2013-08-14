@@ -42,6 +42,7 @@ namespace :testflight do
       @team_token = info['token']
       @distribution_list = info['default_list']
       @configuration = info['configuration']
+      @bumps_build_number = info['increments_build_number'].nil? ? true : info['increments_build_number']
       @configured = true
       Rake::Task["testflight:deploy"].invoke
     end
@@ -55,7 +56,11 @@ namespace :testflight do
     build_dir = @thrust.build_dir_for(build_configuration)
     target = @thrust.config['app_name']
 
-    Rake::Task["bump:build"].invoke
+    if (@bumps_build_number)
+      Rake::Task["bump:build"].invoke
+    else
+      @thrust.check_for_clean_working_tree
+    end
 
     STDERR.puts "Cleaning..."
     @thrust.xcodeclean(build_configuration, 'iphoneos')
