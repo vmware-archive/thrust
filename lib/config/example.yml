@@ -31,3 +31,4 @@ distributions:
      token: somethingthatlookslikeyourapitoken
      default_list: Foo People
      configuration: Release
+     increments_build_number: false # use to decide whether or not to increment and commit new build number (default true)

@@ -142,12 +142,20 @@ class ThrustConfig
       STDERR.puts 'WARNING NOT CHECKING FOR CLEAN WORKING DIRECTORY'
       block.call
     else
-      STDERR.puts 'Checking for clean working tree...'
-      system_or_exit 'git diff-index --quiet HEAD'
+      check_for_clean_working_tree
       STDERR.puts 'Checking that the master branch is up to date...'
       system_or_exit 'git fetch && git diff --quiet HEAD origin/master'
       block.call
       system_or_exit "git commit -am \"#{message}\" && git push origin head"
+    end
+  end
+
+  def check_for_clean_working_tree
+    if ENV['IGNORE_GIT']
+      STDERR.puts 'WARNING NOT CHECKING FOR CLEAN WORKING DIRECTORY'
+    else
+      STDERR.puts 'Checking for clean working tree...'
+      system_or_exit 'git diff-index --quiet HEAD'
     end
   end
 end
