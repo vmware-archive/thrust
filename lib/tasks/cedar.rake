@@ -12,12 +12,19 @@ end
 
 desc "Remove any focus from specs"
 task :nof do
-  @thrust.system_or_exit %Q[ rake focused_specs | xargs -I{} sed -i '' -e 's/fit\(@/it\(@/g;' -e 's/fdescribe\(@/describe\(@/g;' -e 's/fcontext\(@/context\(@/g;' "{}" ]
+  substitutions = focused_methods.map do |method|
+    unfocused_method = method.sub(/^f/, '')
+    "-e 's/#{method}/#{unfocused_method}/g;'"
+  end
+
+  @thrust.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
 end
 
 desc "Print out names of files containing focused specs"
 task :focused_specs do
-  @thrust.system_or_exit %Q[ grep -l -r -e "\\(fit\\|fdescribe\\|fcontext\\)" #{ @thrust.config['spec_targets'].values.map {|h| h['target']}.join(' ') } | grep -v 'Frameworks' ; exit 0 ]
+  pattern = focused_methods.join("\\|")
+  directories = @thrust.config['spec_targets'].values.map {|h| h['target']}.join(' ')
+  @thrust.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
 end
 
 desc 'Clean all targets'
@@ -38,4 +45,8 @@ end
     @thrust.xcodebuild(build_configuration, 'iphonesimulator', target)
     @thrust.run_cedar(build_configuration, target, sdk, info['device'])
   end
+end
+
+def focused_methods
+  ["fit", "fcontext", "fdescribe"].map { |method| "#{method}(@" }
 end
