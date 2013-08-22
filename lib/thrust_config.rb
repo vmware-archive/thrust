@@ -85,6 +85,22 @@ class ThrustConfig
     run_xcode('clean', build_configuration, sdk)
   end
 
+  def xcode_package(build_configuration)
+    build_dir = build_dir_for(build_configuration)
+    app_name = get_app_name_from(build_dir)
+    ipa_file = "#{build_dir}/#{app_name}.ipa"
+    system_or_exit(
+      [
+        "xcrun",
+        "-sdk iphoneos",
+        "-v PackageApplication",
+        "'#{build_dir}/#{app_name}.app'",
+        "-o '#{ipa_file}'",
+        "--sign '#{config['identity']}'"
+      ].join(" "))
+    ipa_file
+  end
+
   def run_cedar(build_configuration, target, sdk, device)
     binary = config['sim_binary']
     sim_dir = File.join(build_dir, "#{build_configuration}-iphonesimulator", "#{target}.app")

@@ -73,7 +73,7 @@ namespace :testflight do
     app_name = @thrust.get_app_name_from(build_dir)
 
     STDERR.puts "Packaging..."
-    @thrust.system_or_exit "/usr/bin/xcrun -sdk iphoneos PackageApplication -v '#{build_dir}/#{app_name}.app' -o '#{build_dir}/#{app_name}.ipa' --sign '#{@thrust.config['identity']}'"
+    ipa_file = @thrust.xcode_package(build_configuration)
     STDERR.puts "Zipping dSYM..."
     @thrust.system_or_exit "zip -r -T -y '#{build_dir}/#{app_name}.app.dSYM.zip' '#{build_dir}/#{app_name}.app.dSYM'"
     STDERR.puts "Done!"
