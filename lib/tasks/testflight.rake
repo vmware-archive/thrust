@@ -63,12 +63,12 @@ namespace :testflight do
     end
 
     STDERR.puts "Cleaning..."
-    @thrust.xcodeclean(build_configuration, 'iphoneos')
+    @thrust.xcode_clean(build_configuration, 'iphoneos')
     @thrust.system_or_exit "rm -r #{build_dir} ; exit 0"
     STDERR.puts "Killing simulator..."
     @thrust.kill_simulator
     STDERR.puts "Building..."
-    @thrust.xcodebuild(build_configuration, 'iphoneos', target)
+    @thrust.xcode_build(build_configuration, 'iphoneos', target)
 
     app_name = @thrust.get_app_name_from(build_dir)
 

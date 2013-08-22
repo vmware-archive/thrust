@@ -77,26 +77,12 @@ class ThrustConfig
     system %q[killall -m -KILL "iPhone Simulator"]
   end
 
-  def xcodebuild(build_configuration, sdk, target)
-    run_xcodebuild('build', build_configuration, sdk, target)
+  def xcode_build(build_configuration, sdk, target)
+    run_xcode('build', build_configuration, sdk, target)
   end
 
-  def xcodeclean(build_configuration, sdk)
-    run_xcodebuild('clean', build_configuration, sdk)
-  end
-
-  def run_xcodebuild(build_command, build_configuration, sdk, target = nil)
-    system_or_exit(
-      [
-        "xcodebuild",
-        "-project #{config['project_name']}.xcodeproj",
-        target ? "-target #{target}" : "-alltargets",
-        "-configuration #{build_configuration}",
-        "-sdk #{sdk}",
-        "#{build_command}"
-      ].join(" "),
-      output_file("#{build_configuration}-#{build_command}")
-    )
+  def xcode_clean(build_configuration, sdk)
+    run_xcode('clean', build_configuration, sdk)
   end
 
   def run_cedar(build_configuration, target, sdk, device)
@@ -157,5 +143,21 @@ class ThrustConfig
       STDERR.puts 'Checking for clean working tree...'
       system_or_exit 'git diff-index --quiet HEAD'
     end
+  end
+
+  private
+
+  def run_xcode(build_command, build_configuration, sdk, target = nil)
+    system_or_exit(
+      [
+        "xcodebuild",
+        "-project #{config['project_name']}.xcodeproj",
+        target ? "-target #{target}" : "-alltargets",
+        "-configuration #{build_configuration}",
+        "-sdk #{sdk}",
+        "#{build_command}"
+      ].join(" "),
+      output_file("#{build_configuration}-#{build_command}")
+    )
   end
 end
