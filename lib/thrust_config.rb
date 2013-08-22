@@ -9,19 +9,11 @@ class ThrustConfig
     verify_configuration(@config)
   end
 
-  def verify_configuration(config)
-    config['thrust_version'] ||= 0
-    if config['thrust_version'] < THRUST_VERSION
-      fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION} see README for details."
-    end
-  end
-
   def get_app_name_from(build_dir)
     full_app_path = Dir.glob(build_dir + '/*.app').first
     raise "No build product found!" unless full_app_path
     app_file_name = full_app_path.split('/').last
-    app_name_regex = %r{^(?<app_name>.+)\.app$}
-    regex_matches = app_name_regex.match(app_file_name)
+    regex_matches = %r{^(?<app_name>.+)\.app$}.match(app_file_name)
     regex_matches[:app_name]
   end
 
@@ -43,32 +35,6 @@ class ThrustConfig
   def run(cmd)
     STDERR.puts "Executing #{cmd}"
     `#{cmd}`
-  end
-
-  def grep_cmd_for_failure(cmd)
-    STDERR.puts "Executing #{cmd} and checking for FAILURE"
-    result = %x[#{cmd} 2>&1]
-    STDERR.puts "Results:"
-    STDERR.puts result
-
-    if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
-      exit(1)
-    else
-      exit(0)
-    end
-  end
-
-  def output_file(target)
-    output_dir = if ENV['IS_CI_BOX']
-       ENV['CC_BUILD_ARTIFACTS']
-    else
-      Dir.mkdir(build_dir) unless File.exists?(build_dir)
-      build_dir
-    end
-
-    output_file = File.join(output_dir, "#{target}.output")
-    STDERR.puts "Output: #{output_file}"
-    output_file
   end
 
   def kill_simulator
@@ -175,5 +141,38 @@ class ThrustConfig
       ].join(" "),
       output_file("#{build_configuration}-#{build_command}")
     )
+  end
+
+  def output_file(target)
+    output_dir = if ENV['IS_CI_BOX']
+                   ENV['CC_BUILD_ARTIFACTS']
+                 else
+                   Dir.mkdir(build_dir) unless File.exists?(build_dir)
+                   build_dir
+                 end
+
+    output_file = File.join(output_dir, "#{target}.output")
+    STDERR.puts "Output: #{output_file}"
+    output_file
+  end
+
+  def grep_cmd_for_failure(cmd)
+    STDERR.puts "Executing #{cmd} and checking for FAILURE"
+    result = %x[#{cmd} 2>&1]
+    STDERR.puts "Results:"
+    STDERR.puts result
+
+    if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
+      exit(1)
+    else
+      exit(0)
+    end
+  end
+
+  def verify_configuration(config)
+    config['thrust_version'] ||= 0
+    if config['thrust_version'] < THRUST_VERSION
+      fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION} see README for details."
+    end
   end
 end

@@ -1,5 +1,5 @@
 require 'yaml'
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'))
+require File.expand_path('../../thrust_config', __FILE__)
 require 'tempfile'
 
 @thrust = ThrustConfig.new(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
@@ -56,7 +56,7 @@ namespace :testflight do
     build_dir = @thrust.build_dir_for(build_configuration)
     target = @thrust.config['app_name']
 
-    if (@bumps_build_number)
+    if @bumps_build_number
       Rake::Task["bump:build"].invoke
     else
       @thrust.check_for_clean_working_tree
@@ -75,7 +75,9 @@ namespace :testflight do
     STDERR.puts "Packaging..."
     ipa_file = @thrust.xcode_package(build_configuration)
     STDERR.puts "Zipping dSYM..."
-    @thrust.system_or_exit "zip -r -T -y '#{build_dir}/#{app_name}.app.dSYM.zip' '#{build_dir}/#{app_name}.app.dSYM'"
+    dsym_path = "#{build_dir}/#{app_name}.app.dSYM"
+    zipped_dsym_path = "#{dsym_path}.zip"
+    @thrust.system_or_exit "zip -r -T -y '#{zipped_dsym_path}' '#{dsym_path}'"
     STDERR.puts "Done!"
 
     print "Deploy Notes: "
@@ -86,8 +88,8 @@ namespace :testflight do
 
     @thrust.system_or_exit [
       "curl http://testflightapp.com/api/builds.json",
-      "-F file=@#{build_dir}/#{app_name}.ipa",
-      "-F dsym=@#{build_dir}/#{app_name}.app.dSYM.zip",
+      "-F file=@#{ipa_file}",
+      "-F dsym=@#{zipped_dsym_path}",
       "-F api_token='#{@thrust.config['api_token']}'",
       "-F team_token='#{team_token}'",
       "-F notes=@#{message_file.path}",
