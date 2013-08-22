@@ -9,19 +9,11 @@ class ThrustConfig
     verify_configuration(@config)
   end
 
-  def verify_configuration(config)
-    config['thrust_version'] ||= 0
-    if config['thrust_version'] < THRUST_VERSION
-      fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION} see README for details."
-    end
-  end
-
   def get_app_name_from(build_dir)
     full_app_path = Dir.glob(build_dir + '/*.app').first
     raise "No build product found!" unless full_app_path
     app_file_name = full_app_path.split('/').last
-    app_name_regex = %r{^(?<app_name>.+)\.app$}
-    regex_matches = app_name_regex.match(app_file_name)
+    regex_matches = %r{^(?<app_name>.+)\.app$}.match(app_file_name)
     regex_matches[:app_name]
   end
 
@@ -45,58 +37,34 @@ class ThrustConfig
     `#{cmd}`
   end
 
-  def grep_cmd_for_failure(cmd)
-    STDERR.puts "Executing #{cmd} and checking for FAILURE"
-    result = %x[#{cmd} 2>&1]
-    STDERR.puts "Results:"
-    STDERR.puts result
-
-    if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
-      exit(1)
-    else
-      exit(0)
-    end
-  end
-
-  def output_file(target)
-    output_dir = if ENV['IS_CI_BOX']
-       ENV['CC_BUILD_ARTIFACTS']
-    else
-      Dir.mkdir(build_dir) unless File.exists?(build_dir)
-      build_dir
-    end
-
-    output_file = File.join(output_dir, "#{target}.output")
-    STDERR.puts "Output: #{output_file}"
-    output_file
-  end
-
   def kill_simulator
     system %q[killall -m -KILL "gdb"]
     system %q[killall -m -KILL "otest"]
     system %q[killall -m -KILL "iPhone Simulator"]
   end
 
-  def xcodebuild(build_configuration, sdk, target)
-    run_xcodebuild('build', build_configuration, sdk, target)
+  def xcode_build(build_configuration, sdk, target)
+    run_xcode('build', build_configuration, sdk, target)
   end
 
-  def xcodeclean(build_configuration, sdk)
-    run_xcodebuild('clean', build_configuration, sdk)
+  def xcode_clean(build_configuration, sdk)
+    run_xcode('clean', build_configuration, sdk)
   end
 
-  def run_xcodebuild(build_command, build_configuration, sdk, target = nil)
+  def xcode_package(build_configuration)
+    build_dir = build_dir_for(build_configuration)
+    app_name = get_app_name_from(build_dir)
+    ipa_file = "#{build_dir}/#{app_name}.ipa"
     system_or_exit(
       [
-        "xcodebuild",
-        "-project #{config['project_name']}.xcodeproj",
-        target ? "-target #{target}" : "-alltargets",
-        "-configuration #{build_configuration}",
-        "-sdk #{sdk}",
-        "#{build_command}"
-      ].join(" "),
-      output_file("#{build_configuration}-#{build_command}")
-    )
+        "xcrun",
+        "-sdk iphoneos",
+        "-v PackageApplication",
+        "'#{build_dir}/#{app_name}.app'",
+        "-o '#{ipa_file}'",
+        "--sign '#{config['identity']}'"
+      ].join(" "))
+    ipa_file
   end
 
   def run_cedar(build_configuration, target, sdk, device)
@@ -156,6 +124,55 @@ class ThrustConfig
     else
       STDERR.puts 'Checking for clean working tree...'
       system_or_exit 'git diff-index --quiet HEAD'
+    end
+  end
+
+  private
+
+  def run_xcode(build_command, build_configuration, sdk, target = nil)
+    system_or_exit(
+      [
+        "xcodebuild",
+        "-project #{config['project_name']}.xcodeproj",
+        target ? "-target #{target}" : "-alltargets",
+        "-configuration #{build_configuration}",
+        "-sdk #{sdk}",
+        "#{build_command}"
+      ].join(" "),
+      output_file("#{build_configuration}-#{build_command}")
+    )
+  end
+
+  def output_file(target)
+    output_dir = if ENV['IS_CI_BOX']
+                   ENV['CC_BUILD_ARTIFACTS']
+                 else
+                   Dir.mkdir(build_dir) unless File.exists?(build_dir)
+                   build_dir
+                 end
+
+    output_file = File.join(output_dir, "#{target}.output")
+    STDERR.puts "Output: #{output_file}"
+    output_file
+  end
+
+  def grep_cmd_for_failure(cmd)
+    STDERR.puts "Executing #{cmd} and checking for FAILURE"
+    result = %x[#{cmd} 2>&1]
+    STDERR.puts "Results:"
+    STDERR.puts result
+
+    if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
+      exit(1)
+    else
+      exit(0)
+    end
+  end
+
+  def verify_configuration(config)
+    config['thrust_version'] ||= 0
+    if config['thrust_version'] < THRUST_VERSION
+      fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION} see README for details."
     end
   end
 end

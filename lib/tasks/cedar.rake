@@ -29,9 +29,9 @@ end
 
 desc 'Clean all targets'
 task :clean do
-  @thrust.xcodeclean('AdHoc', 'iphoneos')
-  @thrust.xcodeclean('Debug', 'iphoneos')
-  @thrust.xcodeclean('Release', 'iphoneos')
+  @thrust.xcode_clean('AdHoc', 'iphoneos')
+  @thrust.xcode_clean('Debug', 'iphoneos')
+  @thrust.xcode_clean('Release', 'iphoneos')
 end
 
 @thrust.config['spec_targets'].each do |task_name, info|
@@ -41,8 +41,8 @@ end
     target = info['target']
     sdk = info['sdk']
 
-    @thrust.xcodeclean(build_configuration, 'iphonesimulator')
-    @thrust.xcodebuild(build_configuration, 'iphonesimulator', target)
+    @thrust.xcode_clean(build_configuration, 'iphonesimulator')
+    @thrust.xcode_build(build_configuration, 'iphonesimulator', target)
     @thrust.run_cedar(build_configuration, target, sdk, info['device'])
   end
 end
