@@ -7,7 +7,17 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'
 
 desc 'Trim whitespace'
 task :trim do
-  @thrust.system_or_exit %Q[git status --short | awk '{if ($1 != "D" && $1 != "R") print $2}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
+  awk_statement = <<-AWK
+  {
+    if ($1 == "RM" || $1 == "R")
+      print $4;
+    else if ($1 != "D")
+      print $2;
+  }
+  AWK
+  awk_statement.gsub!(%r{\s+}, " ")
+
+  @thrust.system_or_exit %Q[git status --short | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
 end
 
 desc "Remove any focus from specs"
