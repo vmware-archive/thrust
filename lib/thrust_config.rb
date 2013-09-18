@@ -13,8 +13,7 @@ class ThrustConfig
     full_app_path = Dir.glob(build_dir + '/*.app').first
     raise "No build product found!" unless full_app_path
     app_file_name = full_app_path.split('/').last
-    regex_matches = %r{^(?<app_name>.+)\.app$}.match(app_file_name)
-    regex_matches[:app_name]
+    return app_file_name.gsub('.app','')
   end
 
   def build_dir_for(configuration)
@@ -84,15 +83,15 @@ class ThrustConfig
     run_git_with_message('Changes version to $(agvtool what-marketing-version -terse)') do
       version = run "agvtool what-marketing-version -terse | head -n1 |cut -f2 -d\="
       STDERR.puts "version !#{version}!"
-      build_regex = %r{^(?<major>\d+)(\.(?<minor>\d+))?(\.(?<patch>\d+))$}
-      if (match = build_regex.match(version))
+      well_formed_version_regex = %r{^\d+(\.\d+)?(\.\d+)?$}
+      if (match = well_formed_version_regex.match(version))
         STDERR.puts "found match #{match.inspect}"
-        v = {:major => match[:major].to_i, :minor => match[:minor].to_i, :patch => match[:patch].to_i}
+        major, minor, patch = (version.split(".").map(&:to_i) + [0, 0, 0]).first(3)
         case(release)
-          when :major then new_build_version(v[:major] + 1, 0, 0)
-          when :minor then new_build_version(v[:major], v[:minor] + 1, 0)
-          when :patch then new_build_version(v[:major], v[:minor], v[:patch] + 1)
-          when :clear then new_build_version(v[:major], v[:minor], v[:patch])
+          when :major then new_build_version(major + 1, 0, 0)
+          when :minor then new_build_version(major, minor + 1, 0)
+          when :patch then new_build_version(major, minor, patch + 1)
+          when :clear then new_build_version(major, minor, patch)
         end
       else
         raise "Unknown version #{version} it should match major.minor.patch"
