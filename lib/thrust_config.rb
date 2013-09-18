@@ -132,12 +132,15 @@ class ThrustConfig
   def run_xcode(build_command, build_configuration, sdk, target = nil)
     system_or_exit(
       [
+        "set -o pipefail &&",
         "xcodebuild",
         "-project #{config['project_name']}.xcodeproj",
         target ? "-target #{target}" : "-alltargets",
         "-configuration #{build_configuration}",
         "-sdk #{sdk}",
-        "#{build_command}"
+        "#{build_command}",
+        "2>&1",
+        "| grep -v 'backing file'"
       ].join(" "),
       output_file("#{build_configuration}-#{build_command}")
     )
