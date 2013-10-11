@@ -91,7 +91,7 @@ There are times where you are just testing things around the deploy and don't ac
 	IGNORE_GIT=1 rake testflight:developers
 
 ## Notifying distribution list
-By default the testflight deploy will notify everyone on the distribution list.  If you would prefer to not notify them then you can set the environment variable: NOTIFY to false. E.G.
+By default the testflight deploy will notify everyone on the distribution list.  If you would prefer to not notify them then you can change the 'notify' value in your config file for that distribution list. You can also set the environment variable 'NOTIFY' to false. E.G.
 
 	NOTIFY=false rake testflight:testers
 
