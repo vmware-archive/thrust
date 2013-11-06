@@ -1,11 +1,18 @@
+require File.expand_path('../xcrun', __FILE__)
+
 class ThrustConfig
   attr_reader :project_root, :config, :build_dir
   THRUST_VERSION = 0.1
 
-  def initialize(relative_project_root, config_file)
+  def self.make(relative_project_root, config_file)
+    new(relative_project_root, YAML.load_file(config_file), XCRun.new)
+  end
+
+  def initialize(relative_project_root, config, xcrun)
     @project_root = File.expand_path(relative_project_root)
     @build_dir = File.join(project_root, 'build')
-    @config = YAML.load_file(config_file)
+    @config = config
+    @xcrun = xcrun
     verify_configuration(@config)
   end
 
@@ -53,17 +60,7 @@ class ThrustConfig
   def xcode_package(build_configuration)
     build_dir = build_dir_for(build_configuration)
     app_name = get_app_name_from(build_dir)
-    ipa_file = "#{build_dir}/#{app_name}.ipa"
-    system_or_exit(
-      [
-        "xcrun",
-        "-sdk iphoneos",
-        "-v PackageApplication",
-        "'#{build_dir}/#{app_name}.app'",
-        "-o '#{ipa_file}'",
-        "--sign '#{config['identity']}'"
-      ].join(" "))
-    ipa_file
+    xcrun.call(build_dir, app_name, config['identity'])
   end
 
   def run_cedar(build_configuration, target, sdk, device)
@@ -88,10 +85,10 @@ class ThrustConfig
         STDERR.puts "found match #{match.inspect}"
         major, minor, patch = (version.split(".").map(&:to_i) + [0, 0, 0]).first(3)
         case(release)
-          when :major then new_build_version(major + 1, 0, 0)
-          when :minor then new_build_version(major, minor + 1, 0)
-          when :patch then new_build_version(major, minor, patch + 1)
-          when :clear then new_build_version(major, minor, patch)
+        when :major then new_build_version(major + 1, 0, 0)
+        when :minor then new_build_version(major, minor + 1, 0)
+        when :patch then new_build_version(major, minor, patch + 1)
+        when :clear then new_build_version(major, minor, patch)
         end
       else
         raise "Unknown version #{version} it should match major.minor.patch"
@@ -128,6 +125,8 @@ class ThrustConfig
 
   private
 
+  attr_reader :xcrun
+
   def run_xcode(build_command, build_configuration, sdk, target = nil)
     system_or_exit(
       [
@@ -141,7 +140,7 @@ class ThrustConfig
         "2>&1",
         "| grep -v 'backing file'"
       ].join(" "),
-      output_file("#{build_configuration}-#{build_command}")
+        output_file("#{build_configuration}-#{build_command}")
     )
   end
 
