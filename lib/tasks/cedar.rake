@@ -3,7 +3,7 @@ require 'tmpdir'
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'))
 
-@thrust = ThrustConfig.new(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@thrust = ThrustConfig.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 desc 'Trim whitespace'
 task :trim do
