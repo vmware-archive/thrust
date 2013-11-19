@@ -53,8 +53,8 @@ class ThrustConfig
     run_xcode('build', build_configuration, sdk, target)
   end
 
-  def xcode_clean(build_configuration, sdk)
-    run_xcode('clean', build_configuration, sdk)
+  def xcode_clean(build_configuration)
+    run_xcode('clean', build_configuration)
   end
 
   def xcode_package(build_configuration)
@@ -127,7 +127,7 @@ class ThrustConfig
 
   attr_reader :xcrun
 
-  def run_xcode(build_command, build_configuration, sdk, target = nil)
+  def run_xcode(build_command, build_configuration, sdk = nil, target = nil)
     system_or_exit(
       [
         "set -o pipefail &&",
@@ -135,7 +135,7 @@ class ThrustConfig
         "-project #{config['project_name']}.xcodeproj",
         target ? "-target #{target}" : "-alltargets",
         "-configuration #{build_configuration}",
-        "-sdk #{sdk}",
+        sdk ? "-sdk #{sdk}" : "",
         "#{build_command}",
         "2>&1",
         "| grep -v 'backing file'"

@@ -4,6 +4,12 @@ project_name: My Great Project
 app_name: My Great Project
 identity: iOS Signing Identity
 
+# configurations to clean.
+configurations:
+  - AdHoc
+  - Debug
+  - Release
+
 sim_binary: 'Specs/bin/ios-sim' # or 'Specs/bin/waxim'
 spec_targets:
   specs:
