@@ -57,6 +57,16 @@ class ThrustConfig
     run_xcode('clean', build_configuration)
   end
 
+  def xcode_build_configurations
+    output = `xcodebuild -project #{config['project_name']}.xcodeproj -list`
+    match = /Build Configurations:(.+?)\n\n/m.match(output)
+    if match
+      match[1].strip.split("\n").map { |line| line.strip }
+    else
+      []
+    end
+  end
+
   def xcode_package(build_configuration)
     build_dir = build_dir_for(build_configuration)
     app_name = get_app_name_from(build_dir)

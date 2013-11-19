@@ -39,7 +39,7 @@ end
 
 desc 'Clean all targets'
 task :clean do
-  (@thrust.config[:configurations] || %w{AdHoc Debug Release}).each do |config|
+  @thrust.xcode_build_configurations.each do |config|
     @thrust.xcode_clean(config)
   end
 end
