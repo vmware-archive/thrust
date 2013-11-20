@@ -50,10 +50,11 @@ end
     build_configuration = info['configuration']
     target = info['target']
     sdk = info['sdk']
+    os = info['os'] || 'iphonesimulator'
 
     @thrust.xcode_clean(build_configuration)
-    @thrust.xcode_build(build_configuration, 'iphonesimulator', target)
-    @thrust.run_cedar(build_configuration, target, sdk, info['device'])
+    @thrust.xcode_build(build_configuration, os, target)
+    @thrust.run_cedar(build_configuration, target, sdk, os, info['device'])
   end
 end
 
