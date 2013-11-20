@@ -153,6 +153,7 @@ class ThrustConfig
         "-configuration #{build_configuration}",
         sdk ? "-sdk #{sdk}" : "",
         "#{build_command}",
+        "SYMROOT=#{@build_dir.inspect}",
         "2>&1",
         "| grep -v 'backing file'"
       ].join(" "),
