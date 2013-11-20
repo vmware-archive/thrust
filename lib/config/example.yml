@@ -17,6 +17,7 @@ spec_targets:
 #    configuration: Debug
 #    target: IntegrationSpecs
 #    sdk: 6.1
+#    os: macosx # Defaults to iphonesimulator. Made sure to copy the cedar framework for OSX
 #    device: ipad # Defaults to iphone
 
 api_token: your testflight token here
