@@ -65,7 +65,7 @@ namespace :testflight do
     end
 
     STDERR.puts "Cleaning..."
-    @thrust.xcode_clean(build_configuration, 'iphoneos')
+    @thrust.xcode_clean(build_configuration)
     @thrust.system_or_exit "rm -r #{build_dir} ; exit 0"
     STDERR.puts "Killing simulator..."
     @thrust.kill_simulator
