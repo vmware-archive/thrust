@@ -175,8 +175,6 @@ class ThrustConfig
 
     if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
       exit(1)
-    else
-      exit(0)
     end
   end
 
