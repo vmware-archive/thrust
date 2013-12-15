@@ -53,7 +53,10 @@ end
 
     @thrust.xcode_clean(build_configuration)
     @thrust.xcode_build(build_configuration, 'iphonesimulator', target)
-    @thrust.run_cedar(build_configuration, target, sdk, info['device'])
+    return_code = @thrust.run_cedar(build_configuration, target, sdk, info['device'])
+    if return_code != 0
+		exit(return_code)
+    end
   end
 end
 
