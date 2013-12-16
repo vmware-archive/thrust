@@ -45,6 +45,7 @@ namespace :testflight do
       @distribution_list = info['default_list']
       @configuration = info['configuration']
       @bumps_build_number = info['increments_build_number'].nil? ? true : info['increments_build_number']
+      @notify = (info['notify'] || true).to_s
       @configured = true
       Rake::Task["testflight:deploy"].invoke(args[:provision_search_query])
     end
@@ -53,6 +54,7 @@ namespace :testflight do
   task :deploy, :provision_search_query do |task, args|
     raise "You need to run a distribution configuration." unless @configured
     team_token = @team_token
+    notify = @notify
     distribution_list = @distribution_list
     build_configuration = @configuration
     build_dir = @thrust.build_dir_for(build_configuration)
@@ -97,7 +99,7 @@ namespace :testflight do
      "-F api_token='#{@thrust.config['api_token']}'",
      "-F team_token='#{team_token}'",
      "-F notes=@#{message_file.path}",
-     "-F notify=#{(ENV['NOTIFY'] || 'true').downcase.capitalize}",
+     "-F notify=#{(ENV['NOTIFY'] || notify).downcase.capitalize}",
      ("-F distribution_lists='#{distribution_list}'" if distribution_list)
     ].compact.join(' ')
     end

@@ -26,11 +26,13 @@ distributions:
   # builds rake testflight:devs task to deploy to the distribution list. To create a second
   # deploy task, uncomment and modify the structure below.
   devs: # http://testflightapp.com/dashboard/team/edit
+    notify: false
     token: TestFlight Team Token
     default_list: Default Distribution List to Permission for the build
     configuration: iOS configuration to build with e.g. Debug, Release, etc.
   foo: # builds rake testflight:foo
-     token: somethingthatlookslikeyourapitoken
-     default_list: Foo People
-     configuration: Release
-     increments_build_number: false # use to decide whether or not to increment and commit new build number (default true)
+    notify: true
+    token: somethingthatlookslikeyourapitoken
+    default_list: Foo People
+    configuration: Release
+    increments_build_number: false # use to decide whether or not to increment and commit new build number (default true)
