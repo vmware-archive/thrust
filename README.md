@@ -39,9 +39,10 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 Clone this repo into a folder in your project as a submodule and create a `Rakefile`:
 
     git submodule add https://github.com/pivotal/thrust.git Vendor/thrust
+    gem install colorize
     echo "Dir.glob('Vendor/thrust/lib/tasks/*.rake').each { |r| import r }" >> Rakefile
 
-you will create a thrust configuration:
+Next, create the configuration file, thrust.yml:
 
 	cp [path-to-thrust]/lib/config/example.yml [project-root]/thrust.yml
 
@@ -49,6 +50,8 @@ then edit it to fit your project.
 
 **Note:** replace [path-to-thrust] and [project-root] where you installed thrust and your project-root respectively
 ****
+
+Now run `rake thrust:doctor` for more tips about how to properly configure your project.
 
 ### Alternate installation:
 if you would prefer to install a static version of the library and are familiar with Rubygems you can install the thrust gem
