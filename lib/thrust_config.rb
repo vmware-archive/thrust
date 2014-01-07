@@ -3,9 +3,17 @@ require File.expand_path('../xcrun', __FILE__)
 class ThrustConfig
   attr_reader :project_root, :config, :build_dir
   THRUST_VERSION = 0.1
+  THRUST_ROOT = File.expand_path('../..', __FILE__)
 
   def self.make(relative_project_root, config_file)
-    new(relative_project_root, YAML.load_file(config_file), XCRun.new)
+    begin
+      config_file_contents = YAML.load_file(config_file)
+    rescue
+      puts "thrust: ERROR: Missing thrust.yml. Create by running:"
+      puts "thrust: ERROR:    cp #{THRUST_ROOT}/lib/config/example.yml thrust.yml"
+      exit 1
+    end
+    new(relative_project_root, config_file_contents, XCRun.new)
   end
 
   def initialize(relative_project_root, config, xcrun)

@@ -36,13 +36,10 @@ Thrust is a small project that contains some useful rake tasks to run cedar spec
 
 (note: thrust requires ruby >= 1.9.2)
 
-clone this repo into a folder in your project (or include as a submodule)
+Clone this repo into a folder in your project as a submodule and create a `Rakefile`:
 
-Add the following to your **Rakefile**:
-
-	Dir.glob('[path-to-thrust]/lib/tasks/*.rake').each { |r| import r }
-
-if you don't have an existing **Rakefile** in your project root go ahead and create one.
+    git submodule add https://github.com/pivotal/thrust.git Vendor/thrust
+    echo "Dir.glob('Vendor/thrust/lib/tasks/*.rake').each { |r| import r }" >> Rakefile
 
 you will create a thrust configuration:
 
