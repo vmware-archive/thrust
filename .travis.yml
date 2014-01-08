@@ -1,1 +1,4 @@
 language: ruby
+
+notifications:
+  webhooks: http://pulse.pivotallabs.com/projects/2cc350f8-8e97-4e36-a656-517e3dd8a5e5/status
