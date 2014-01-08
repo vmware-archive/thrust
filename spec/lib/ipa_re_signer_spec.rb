@@ -2,7 +2,7 @@ require 'tmpdir'
 require 'pathname'
 require File.expand_path('../../../lib/ipa_re_signer', __FILE__)
 
-describe IpaReSigner do
+describe IpaReSigner, requires_ios: true do
   def in_temp_dir(&block)
     Dir.mktmpdir do |temp_path|
       Dir.mkdir("#{temp_path}/Extra Path With Spaces")
