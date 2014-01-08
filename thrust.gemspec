@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://github.com/dipolesource/thrust'
   s.executables << 'thrust'
   s.add_dependency 'colorize'
+  s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'sandbox'
 end
