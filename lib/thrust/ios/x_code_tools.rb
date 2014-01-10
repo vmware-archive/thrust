@@ -1,4 +1,4 @@
-class Thrust::XCodeTools
+class Thrust::IOS::XCodeTools
   ProvisioningProfileNotFound = Class.new(StandardError)
 
   def self.build_configurations(project_name) #TODO:  Backfill a test

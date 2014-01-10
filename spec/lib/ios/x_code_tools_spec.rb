@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Thrust::XCodeTools do
+describe Thrust::IOS::XCodeTools do
   let(:out) { StringIO.new }
   let(:build_configuration) { 'Release' }
   let(:project_name) { 'AwesomeProject' }
@@ -11,7 +11,7 @@ describe Thrust::XCodeTools do
       FileUtils.mkdir_p(File.join(build_dir, "Release-iphoneos"))
     end
   end
-  subject(:x_code_tools) { Thrust::XCodeTools.new(out, build_configuration, build_directory, project_name) }
+  subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(out, build_configuration, build_directory, project_name) }
 
   before do
     Thrust::Executor.stub(:system_or_exit)

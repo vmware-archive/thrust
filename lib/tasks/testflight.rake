@@ -15,7 +15,7 @@ namespace :testflight do
   @thrust.app_config['distributions'].each do |task_name, distribution_config|
     desc "Deploy iOS build to testflight #{distribution_config['team']} team (use NOTIFY=false to prevent team notification)"
     task task_name, :provision_search_query do |task, args|
-      Thrust::Deploy.make(@thrust, distribution_config, args[:provision_search_query]).run
+      Thrust::IOS::Deploy.make(@thrust, distribution_config, args[:provision_search_query]).run
     end
 
     desc "Deploy Android build to testflight #{distribution_config['team']} team (use NOTIFY=false to prevent team notification)"
