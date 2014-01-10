@@ -45,7 +45,7 @@ task :clean_build do
   end
 end
 
-@thrust.app_config['spec_targets'].each do |task_name, target_info|
+(@thrust.app_config['spec_targets'] || []).each do |task_name, target_info|
   desc "Run #{target_info['name']}"
   task task_name do
     build_configuration = target_info['configuration']

@@ -83,7 +83,7 @@ describe Thrust::Deploy do
     end
 
     it 'uploads to TestFlight' do
-      testflight.should_receive(:upload).with('build_configuration_directory', 'AppName', 'ipa_path', 'true', 'devs')
+      testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', 'build_configuration_directory/AppName.app.dSYM')
       deploy.run
     end
 

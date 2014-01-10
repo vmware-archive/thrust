@@ -23,7 +23,8 @@ class Thrust::Deploy
     @x_code_tools.change_build_number(@git.current_commit)
     app_name = @thrust_config.app_config['app_name']
     ipa_file = @x_code_tools.cleanly_create_ipa(app_name, app_name, @thrust_config.app_config['identity'], @provisioning_search_query)
-    @testflight.upload(@x_code_tools.build_configuration_directory, app_name, ipa_file, @distribution_config['notify'], @distribution_config['default_list'])
+    dsym_path = "#{@x_code_tools.build_configuration_directory}/#{app_name}.app.dSYM"
+    @testflight.upload(ipa_file, @distribution_config['notify'], @distribution_config['default_list'], dsym_path)
     @git.reset
   end
 end

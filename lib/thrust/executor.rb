@@ -1,11 +1,11 @@
 module Thrust::Executor
-  def self.system_or_exit(cmd, stdout = nil)
-    self.system(cmd, stdout) or raise '******** Build failed ********'
+  def self.system_or_exit(cmd, output_file = nil)
+    self.system(cmd, output_file) or raise '******** Build failed ********'
   end
 
-  def self.system(cmd, stdout = nil)
+  def self.system(cmd, output_file = nil)
     STDERR.puts "Executing #{cmd}"
-    cmd += " >#{stdout}" if stdout
+    cmd += " >#{output_file}" if output_file
     Kernel::system(cmd)
   end
 
