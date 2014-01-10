@@ -1,5 +1,4 @@
-class XCodeTools
-
+class Thrust::XCodeTools
   def initialize(out, build_configuration, build_directory, project_name)
     @out = out
     @build_configuration = build_configuration
@@ -11,19 +10,23 @@ class XCodeTools
     Thrust::Executor.system_or_exit "agvtool new-marketing-version '#{build_number}'"
   end
 
-  def cleanly_create_ipa(sdk, target, app_name, signing_identity, provision_search_query = nil)
-    clean(sdk)
+  def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
+    clean_build
     kill_simulator
     build(target)
     create_ipa(app_name, signing_identity, provision_search_query)
   end
 
+  def build_configuration_directory
+    "#{@build_directory}/#{@build_configuration}-iphoneos"
+  end
+
   private
 
-  def clean(sdk)
+  def clean_build
     @out.puts 'Cleaning...'
-    run_xcode('clean', sdk)
-    FileUtils.rm_rf(@build_directory)
+    run_xcode('clean')
+    FileUtils.rm_rf(build_configuration_directory)
   end
 
   def kill_simulator
@@ -35,13 +38,13 @@ class XCodeTools
 
   def create_ipa(app_name, signing_identity, provision_search_query)
     @out.puts 'Packaging...'
-    ipa_filename = "#{build_directory_for_config}/#{app_name}.ipa"
+    ipa_filename = "#{build_configuration_directory}/#{app_name}.ipa"
     Thrust::Executor.system_or_exit(
         [
             "xcrun",
             "-sdk iphoneos",
             "-v PackageApplication",
-            "'#{build_directory_for_config}/#{app_name}.app'",
+            "'#{build_configuration_directory}/#{app_name}.app'",
             "-o '#{ipa_filename}'",
             "--sign '#{signing_identity}'"
         ].join(' ')
@@ -52,10 +55,6 @@ class XCodeTools
   def build(target)
     @out.puts "Building..."
     run_xcode('build', 'iphoneos', target)
-  end
-
-  def build_directory_for_config
-    "#{@build_directory}/#{@build_configuration}-iphoneos"
   end
 
   def run_xcode(build_command, sdk = nil, target = nil)

@@ -10,15 +10,10 @@ describe IpaReSigner, requires_ios: true do
     end
   end
 
-  let(:fixture_dir) {
-    Pathname(File.expand_path("../../fixtures", __FILE__))
-  }
-  let(:ipa_path) {
-    fixture_dir.join("Fake.ipa")
-  }
-  let(:output_swallower) {
-    double('output', :puts => nil)
-  }
+  let(:fixture_dir) { Pathname(File.expand_path("../../fixtures", __FILE__)) }
+  let(:ipa_path) { fixture_dir.join("Fake.ipa") }
+  let(:resigned_ipa_path) { fixture_dir.join("Fake.resigned.ipa") }
+  let(:output_swallower) { double('output', :puts => nil) }
 
   it "re-signs an existing IPA file" do
     begin
@@ -39,8 +34,9 @@ describe IpaReSigner, requires_ios: true do
                                     output_swallower)
 
         signer.should_receive(:call).with(identity, %r{Payload/Fake.app/ResourceRules.plist}, %r{Payload/Fake.app})
-        re_signer.call
+        returned_ipa_path = re_signer.call
 
+        expect(returned_ipa_path).to eq(resigned_ipa_path)
         `cd "#{provision_search_path}"; unzip #{fixture_dir.join("Fake.resigned.ipa")}`
         expect(File.exists?(provision_search_path.join("Payload/Fake.app/_CodeSignature/"))).to be_false
         expect(File.exists?(provision_search_path.join("Payload/Fake.app/CodeResources/"))).to be_false

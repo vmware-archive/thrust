@@ -1,18 +1,17 @@
 require 'spec_helper'
 
-describe XCodeTools do
+describe Thrust::XCodeTools do
   let(:out) { StringIO.new }
   let(:build_configuration) { 'Release' }
   let(:project_name) { 'AwesomeProject' }
   let(:build_directory) do
     FileUtils.mkdir_p('build').first.tap do |build_dir|
-      FileUtils.touch(File.join(build_dir, "garbage_build_file"))
+      FileUtils.mkdir_p(File.join(build_dir, "Release-iphoneos"))
     end
   end
-  subject(:x_code_tools) { XCodeTools.new(out, build_configuration, build_directory, project_name) }
+  subject(:x_code_tools) { Thrust::XCodeTools.new(out, build_configuration, build_directory, project_name) }
 
   describe '#cleanly_create_ipa' do
-    let(:sdk) { 'iphoneos' }
     let(:target) { 'AppTarget' }
     let(:app_name) { 'AppName' }
     let(:signing_identity) { 'iPhone Distribution' }
@@ -25,11 +24,11 @@ describe XCodeTools do
     end
 
     def create_ipa
-      x_code_tools.cleanly_create_ipa(sdk, target, app_name, signing_identity, provision_search_query)
+      x_code_tools.cleanly_create_ipa(target, app_name, signing_identity, provision_search_query)
     end
 
     it 'asks xcodebuild to clean' do
-      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release -sdk iphoneos clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
+      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release  clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
       expected_output = 'build/Release-clean.output'
       Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
 
@@ -38,7 +37,7 @@ describe XCodeTools do
 
     it 'deletes the build folder' do
       create_ipa
-      expect(File.file?('build/garbage_build_file')).to be_false
+      expect(File.directory?('build/Release-iphoneos')).to be_false
     end
 
     it 'kills the simulator' do
@@ -65,10 +64,11 @@ describe XCodeTools do
     end
 
     it 'resigns the ipa' do
-      ipa_resigner = double(:ipa_resigner).tap { |resigner| resigner.should_receive(:call) }
+      ipa_resigner = double(:ipa_resigner).tap { |resigner| resigner.should_receive(:call).and_return('resigned_ipa_path') }
       IpaReSigner.should_receive(:make).with('build/Release-iphoneos/AppName.ipa', signing_identity, provision_search_query) { ipa_resigner }
 
-      create_ipa
+      resigned_path = create_ipa
+      expect(resigned_path).to eq('resigned_ipa_path')
     end
   end
 end

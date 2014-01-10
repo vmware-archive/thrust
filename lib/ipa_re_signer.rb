@@ -29,6 +29,8 @@ class IpaReSigner
       signer.call(identity, "#{tmpdir}/Payload/#{app_name}.app/ResourceRules.plist", "#{tmpdir}/Payload/#{app_name}.app")
       execute "cd #{tmpdir}; zip -qr #{resigned_ipa_path} Payload"
     end
+
+    resigned_ipa_path
   end
 
   private
