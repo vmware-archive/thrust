@@ -38,7 +38,7 @@ task :focused_specs do
 end
 
 desc 'Clean all targets'
-task :clean do
+task :clean_build do
   @thrust.xcode_build_configurations.each do |config|
     @thrust.xcode_clean(config)
   end

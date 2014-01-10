@@ -15,11 +15,9 @@ describe Thrust::Doctor do
 
   context 'when Specs do not exist' do
     it 'prints an error' do
-      Sandbox.play do |path|
-        subject.run
-        out.string.should include "ERROR"
-        out.string.should include "Specs"
-      end
+      subject.run
+      out.string.should include "ERROR"
+      out.string.should include "Specs"
     end
   end
 end

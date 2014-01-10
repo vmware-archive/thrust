@@ -1,5 +1,7 @@
 # ![Thrust](thrust.png)
 
+[![Build Status](https://travis-ci.org/pivotal/thrust.png?branch=master)](https://travis-ci.org/pivotal/thrust)
+
 Thrust is a small project that contains some useful rake tasks to run cedar specs and deploy your application to TestFlight distribution lists. It will also change your default task to be 'specs'
 
 	rake build_configuration[configuration]  # Build custom configuration
