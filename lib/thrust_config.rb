@@ -1,5 +1,3 @@
-require File.expand_path('../xcrun', __FILE__)
-
 class ThrustConfig
   attr_reader :project_root, :app_config, :build_dir
   THRUST_VERSION = 0.1
@@ -13,14 +11,13 @@ class ThrustConfig
       puts "thrust: ERROR:    cp #{THRUST_ROOT}/lib/config/example.yml thrust.yml"
       exit 1
     end
-    new(relative_project_root, config_file_contents, XCRun.new)
+    new(relative_project_root, config_file_contents)
   end
 
-  def initialize(relative_project_root, config, xcrun)
+  def initialize(relative_project_root, config)
     @project_root = File.expand_path(relative_project_root)
     @build_dir = File.join(project_root, 'build')
     @app_config = config
-    @xcrun = xcrun
     verify_configuration(@app_config)
   end
 
@@ -31,28 +28,10 @@ class ThrustConfig
   end
 
 
-  def run_cedar(build_configuration, target, sdk, os, device)
-    return_code = 1
-    if os == 'macosx'
-      build_path = File.join(build_dir, build_configuration)
-      app_dir = File.join(build_path, target)
-      return_code = grep_cmd_for_failure("DYLD_FRAMEWORK_PATH=#{build_path.inspect} #{app_dir}")
-    else
-      binary = app_config['sim_binary']
-      sim_dir = File.join(build_dir, "#{build_configuration}-#{os}", "#{target}.app")
-      if binary =~ /waxim%/
-        return_code = grep_cmd_for_failure(%Q[#{binary} -s #{sdk} -f #{device} -e CFFIXED_USER_HOME=#{Dir.tmpdir} -e CEDAR_HEADLESS_SPECS=1 -e CEDAR_REPORTER_CLASS=CDRDefaultReporter #{sim_dir}])
-      elsif binary =~ /ios-sim$/
-        return_code = grep_cmd_for_failure(%Q[#{binary} launch #{sim_dir} --sdk #{sdk} --family #{device} --retina --tall --setenv CFFIXED_USER_HOME=#{Dir.tmpdir} --setenv CEDAR_HEADLESS_SPECS=1 --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter])
-      else
-        puts "Unknown binary for running specs: '#{binary}'"
-      end
-    end
-    return return_code
-  end
+
 
   def update_version(release)
-    run_git_with_message('Changes version to $(agvtool what-marketing-version -terse)') do
+    Thrust::Git.new($stdout).commit_with_message('Changes version to $(agvtool what-marketing-version -terse)') do
       cmd = "agvtool what-marketing-version -terse | head -n1 |cut -f2 -d\="
       STDERR.puts "Executing #{cmd}"
       version = `#{cmd}`
@@ -79,44 +58,8 @@ class ThrustConfig
     system_or_exit "agvtool new-marketing-version \"#{version}\""
   end
 
-  def run_git_with_message(message, &block)
-    if ENV['IGNORE_GIT']
-      STDERR.puts 'WARNING NOT CHECKING FOR CLEAN WORKING DIRECTORY'
-      block.call
-    else
-      check_for_clean_working_tree
-      STDERR.puts 'Checking that the master branch is up to date...'
-      system_or_exit 'git fetch && git diff --quiet HEAD origin/master'
-      block.call
-      system_or_exit "git commit -am \"#{message}\" && git push origin head"
-    end
-  end
-
-  def check_for_clean_working_tree
-    if ENV['IGNORE_GIT']
-      STDERR.puts 'WARNING NOT CHECKING FOR CLEAN WORKING DIRECTORY'
-    else
-      STDERR.puts 'Checking for clean working tree...'
-      system_or_exit 'git diff-index --quiet HEAD'
-    end
-  end
-
   private
 
-  attr_reader :xcrun
-
-  def grep_cmd_for_failure(cmd)
-    STDERR.puts "Executing #{cmd} and checking for FAILURE"
-    result = %x[#{cmd} 2>&1]
-    STDERR.puts "Results:"
-    STDERR.puts result
-
-    if !result.include?("Finished") || result.include?("FAILURE") || result.include?("EXCEPTION")
-      return 1
-    else
-      return 0
-    end
-  end
 
   def verify_configuration(config)
     config['thrust_version'] ||= 0

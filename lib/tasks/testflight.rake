@@ -14,7 +14,7 @@ end
 namespace :bump do
   desc 'Bumps the build'
   task :build do
-    @thrust.run_git_with_message 'Bumped build to $(agvtool what-version -terse)' do
+    Thrust::Git.new($stdout).commit_with_message 'Bumped build to $(agvtool what-version -terse)' do
       @thrust.system_or_exit 'agvtool bump -all'
     end
   end

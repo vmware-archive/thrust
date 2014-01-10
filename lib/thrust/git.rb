@@ -19,4 +19,17 @@ class Thrust::Git
   def reset
     Thrust::Executor.system_or_exit('git reset --hard')
   end
+
+  def commit_with_message(message, &block) #TODO: test
+    if ENV['IGNORE_GIT']
+      STDERR.puts 'WARNING NOT CHECKING FOR CLEAN WORKING DIRECTORY'
+      block.call
+    else
+      ensure_clean
+      STDERR.puts 'Checking that the master branch is up to date...'
+      Thrust::Executor.system_or_exit 'git fetch && git diff --quiet HEAD origin/master'
+      block.call
+      Thrust::Executor.system_or_exit "git commit -am \"#{message}\" && git push origin head"
+    end
+  end
 end
