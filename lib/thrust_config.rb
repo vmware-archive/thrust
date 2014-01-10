@@ -24,58 +24,12 @@ class ThrustConfig
     verify_configuration(@app_config)
   end
 
-  def get_app_name_from(build_dir)
-    full_app_path = Dir.glob(build_dir + '/*.app').first
-    raise "No build product found!" unless full_app_path
-    app_file_name = full_app_path.split('/').last
-    return app_file_name.gsub('.app','')
-  end
-
-  def build_dir_for(configuration)
-    "#{build_dir}/#{configuration}-iphoneos"
-  end
-
-  # Xcode 4.3 stores its /Developer inside /Applications/Xcode.app, Xcode 4.2 stored it in /Developer
-  def xcode_developer_dir
-    `xcode-select -print-path`.strip
-  end
-
   def system_or_exit(cmd, stdout = nil)
     STDERR.puts "Executing #{cmd}"
     cmd += " >#{stdout}" if stdout
     system(cmd) or raise '******** Build failed ********'
   end
 
-  def run(cmd)
-    STDERR.puts "Executing #{cmd}"
-    `#{cmd}`
-  end
-
-  def kill_simulator
-    system %q[killall -m -KILL "gdb"]
-    system %q[killall -m -KILL "otest"]
-    system %q[killall -m -KILL "iPhone Simulator"]
-  end
-
-  def xcode_build(build_configuration, sdk, target)
-    run_xcode('build', build_configuration, sdk, target)
-  end
-
-  def xcode_build_configurations
-    output = `xcodebuild -project #{app_config['project_name']}.xcodeproj -list`
-    match = /Build Configurations:(.+?)\n\n/m.match(output)
-    if match
-      match[1].strip.split("\n").map { |line| line.strip }
-    else
-      []
-    end
-  end
-
-  def xcode_package(build_configuration)
-    build_dir = build_dir_for(build_configuration)
-    app_name = get_app_name_from(build_dir)
-    xcrun.call(build_dir, app_name, app_config['identity'])
-  end
 
   def run_cedar(build_configuration, target, sdk, os, device)
     return_code = 1
@@ -99,7 +53,10 @@ class ThrustConfig
 
   def update_version(release)
     run_git_with_message('Changes version to $(agvtool what-marketing-version -terse)') do
-      version = run "agvtool what-marketing-version -terse | head -n1 |cut -f2 -d\="
+      cmd = "agvtool what-marketing-version -terse | head -n1 |cut -f2 -d\="
+      STDERR.puts "Executing #{cmd}"
+      version = `#{cmd}`
+
       STDERR.puts "version !#{version}!"
       well_formed_version_regex = %r{^\d+(\.\d+)?(\.\d+)?$}
       if (match = well_formed_version_regex.match(version))
@@ -147,37 +104,6 @@ class ThrustConfig
   private
 
   attr_reader :xcrun
-
-  def run_xcode(build_command, build_configuration, sdk = nil, target = nil)
-    system_or_exit(
-      [
-        "set -o pipefail &&",
-        "xcodebuild",
-        "-project #{app_config['project_name']}.xcodeproj",
-        target ? "-target #{target}" : "-alltargets",
-        "-configuration #{build_configuration}",
-        sdk ? "-sdk #{sdk}" : "",
-        "#{build_command}",
-        "SYMROOT=#{@build_dir.inspect}",
-        "2>&1",
-        "| grep -v 'backing file'"
-      ].join(" "),
-        output_file("#{build_configuration}-#{build_command}")
-    )
-  end
-
-  def output_file(target)
-    output_dir = if ENV['IS_CI_BOX']
-                   ENV['CC_BUILD_ARTIFACTS']
-                 else
-                   Dir.mkdir(build_dir) unless File.exists?(build_dir)
-                   build_dir
-                 end
-
-    output_file = File.join(output_dir, "#{target}.output")
-    STDERR.puts "Output: #{output_file}"
-    output_file
-  end
 
   def grep_cmd_for_failure(cmd)
     STDERR.puts "Executing #{cmd} and checking for FAILURE"

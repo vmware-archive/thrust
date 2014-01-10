@@ -1,6 +1,16 @@
 class Thrust::XCodeTools
   ProvisioningProfileNotFound = Class.new(StandardError)
 
+  def self.build_configurations(project_name) #TODO:  Backfill a test
+    output = `xcodebuild -project #{project_name}.xcodeproj -list`
+    match = /Build Configurations:(.+?)\n\n/m.match(output)
+    if match
+      match[1].strip.split("\n").map { |line| line.strip }
+    else
+      []
+    end
+  end
+
   def initialize(out, build_configuration, build_directory, project_name)
     @out = out
     @build_configuration = build_configuration
@@ -15,7 +25,7 @@ class Thrust::XCodeTools
   def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
     clean_build
     kill_simulator
-    build(target)
+    build_target(target, 'iphoneos')
     create_ipa(app_name, signing_identity, provision_search_query)
   end
 
@@ -29,7 +39,17 @@ class Thrust::XCodeTools
     FileUtils.rm_rf(build_configuration_directory)
   end
 
+  def clean_and_build_target(target, build_sdk)
+    clean_build
+    build_target(target, build_sdk)
+  end
+
   private
+
+  def build_target(target, build_sdk)
+    @out.puts "Building..."
+    run_xcode('build', build_sdk, target)
+  end
 
   def kill_simulator
     @out.puts('Killing simulator...')
@@ -61,10 +81,6 @@ class Thrust::XCodeTools
     ipa_filename
   end
 
-  def build(target)
-    @out.puts "Building..."
-    run_xcode('build', 'iphoneos', target)
-  end
 
   def run_xcode(build_command, sdk = nil, target = nil)
     target_flag = target ? "-target #{target}" : "-alltargets"

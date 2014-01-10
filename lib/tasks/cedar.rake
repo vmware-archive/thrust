@@ -39,7 +39,7 @@ end
 
 desc 'Clean all targets'
 task :clean_build do
-  @thrust.xcode_build_configurations.each do |config|
+  Thrust::XCodeTools.build_configurations(@thrust.app_config['project_name']).each do |config|
     xcode_tools = Thrust::XCodeTools.new($stdout, config, @thrust.build_dir, @thrust.app_config['project_name'])
     xcode_tools.clean_build
   end
@@ -49,15 +49,14 @@ end
   desc "Run #{target_info['name']}"
   task task_name do
     build_configuration = target_info['configuration']
+    target = target_info['target']
+    build_sdk = target_info['os'] || 'iphonesimulator' #build sdk - version you compile the code with
 
     xcode_tools = Thrust::XCodeTools.new($stdout, build_configuration, @thrust.build_dir, @thrust.app_config['project_name'])
-    xcode_tools.clean_build
+    xcode_tools.clean_and_build_target(target, build_sdk)
 
-    target = target_info['target']
-    sdk = target_info['sdk']
-    os = target_info['os'] || 'iphonesimulator'
-    @thrust.xcode_build(build_configuration, os, target)
-    return_code = @thrust.run_cedar(build_configuration, target, sdk, os, target_info['device'])
+    runtime_sdk = target_info['sdk'] #runtime sdk
+    return_code = @thrust.run_cedar(build_configuration, target, runtime_sdk, build_sdk, target_info['device'])
     if return_code != 0
 		exit(return_code)
     end

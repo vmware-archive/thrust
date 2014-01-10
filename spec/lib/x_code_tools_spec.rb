@@ -4,6 +4,8 @@ describe Thrust::XCodeTools do
   let(:out) { StringIO.new }
   let(:build_configuration) { 'Release' }
   let(:project_name) { 'AwesomeProject' }
+  let(:os) { 'iphoneos' }
+  let(:target) { 'AppTarget' }
   let(:build_directory) do
     FileUtils.mkdir_p('build').first.tap do |build_dir|
       FileUtils.mkdir_p(File.join(build_dir, "Release-iphoneos"))
@@ -30,9 +32,25 @@ describe Thrust::XCodeTools do
       expect(File.directory?('build/Release-iphoneos')).to be_false
     end
   end
+
+  describe '#clean_and_build_target' do
+    it 'cleans the build' do
+      subject.should_receive(:clean_build)
+      subject.clean_and_build_target(target, os)
+    end
+
+    it 'calls xcodebuild with the build command' do
+      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -target AppTarget -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\''
+      expected_output = 'build/Release-build.output'
+      Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
+
+      subject.clean_and_build_target(target, os)
+    end
+
+  end
   
   describe '#cleanly_create_ipa' do
-    let(:target) { 'AppTarget' }
+
     let(:app_name) { 'AppName' }
     let(:signing_identity) { 'iPhone Distribution' }
     let(:provision_search_query) { 'query' }
@@ -60,10 +78,7 @@ describe Thrust::XCodeTools do
     end
 
     it 'builds the app' do
-      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -target AppTarget -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\''
-      expected_output = 'build/Release-build.output'
-      Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
-
+      subject.should_receive(:build_target).with(target, os)
       create_ipa
     end
 
