@@ -1,6 +1,5 @@
 require 'yaml'
 require File.expand_path('../../thrust_config', __FILE__)
-require File.expand_path('../../ipa_re_signer', __FILE__)
 require File.expand_path('../../thrust', __FILE__)
 require 'tempfile'
 

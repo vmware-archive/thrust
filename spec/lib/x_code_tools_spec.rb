@@ -16,11 +16,12 @@ describe Thrust::XCodeTools do
     let(:app_name) { 'AppName' }
     let(:signing_identity) { 'iPhone Distribution' }
     let(:provision_search_query) { 'query' }
+    let(:provisioning_path) { 'provisioning-path' }
 
     before do
       Thrust::Executor.stub(:system_or_exit)
       Thrust::Executor.stub(:system)
-      IpaReSigner.stub(:make) { double(:ipa_resigner).as_null_object }
+      x_code_tools.stub(:`).and_return(provisioning_path)
     end
 
     def create_ipa
@@ -57,18 +58,18 @@ describe Thrust::XCodeTools do
     end
 
     it 'creates the ipa' do
-      expected_command = "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --sign 'iPhone Distribution'"
+      expected_command = "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --sign 'iPhone Distribution' --embed '#{provisioning_path}'"
       Thrust::Executor.should_receive(:system_or_exit).with(expected_command)
 
       create_ipa
     end
 
-    it 'resigns the ipa' do
-      ipa_resigner = double(:ipa_resigner).tap { |resigner| resigner.should_receive(:call).and_return('resigned_ipa_path') }
-      IpaReSigner.should_receive(:make).with('build/Release-iphoneos/AppName.ipa', signing_identity, provision_search_query) { ipa_resigner }
+    context 'when it can not find the provisioning profile' do
+      let(:provisioning_path) { 'nonexistent-file' }
 
-      resigned_path = create_ipa
-      expect(resigned_path).to eq('resigned_ipa_path')
+      it 'raises an error' do
+        x_code_tools.cleanly_create_ipa(target, app_name, signing_identity, provisioning_path)
+      end
     end
   end
 end

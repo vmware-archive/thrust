@@ -1,4 +1,6 @@
 class Thrust::XCodeTools
+  ProvisioningProfileNotFound = Class.new(StandardError)
+
   def initialize(out, build_configuration, build_directory, project_name)
     @out = out
     @build_configuration = build_configuration
@@ -36,20 +38,27 @@ class Thrust::XCodeTools
     Thrust::Executor.system %q[killall -m -KILL "iPhone Simulator"]
   end
 
+  def provision_path(provision_search_query)
+    provision_search_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/")
+    command = %Q(grep -rl "#{provision_search_query}" "#{provision_search_path}")
+    paths = `#{command}`.split("\n")
+    paths.first or raise(ProvisioningProfileNotFound, "\nCouldn't find provisioning profiles matching #{provision_search_query}.\n\nThe command used was:\n\n#{command}")
+  end
+
   def create_ipa(app_name, signing_identity, provision_search_query)
     @out.puts 'Packaging...'
     ipa_filename = "#{build_configuration_directory}/#{app_name}.ipa"
-    Thrust::Executor.system_or_exit(
-        [
-            "xcrun",
-            "-sdk iphoneos",
-            "-v PackageApplication",
-            "'#{build_configuration_directory}/#{app_name}.app'",
-            "-o '#{ipa_filename}'",
-            "--sign '#{signing_identity}'"
-        ].join(' ')
-    )
-    IpaReSigner.make(ipa_filename, signing_identity, provision_search_query).call
+    cmd = [
+        "xcrun",
+        "-sdk iphoneos",
+        "-v PackageApplication",
+        "'#{build_configuration_directory}/#{app_name}.app'",
+        "-o '#{ipa_filename}'",
+        "--sign '#{signing_identity}'",
+        "--embed '#{provision_path(provision_search_query)}'"
+    ].join(' ')
+    Thrust::Executor.system_or_exit(cmd)
+    ipa_filename
   end
 
   def build(target)
