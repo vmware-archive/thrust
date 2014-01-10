@@ -1,7 +1,7 @@
 require File.expand_path('../xcrun', __FILE__)
 
 class ThrustConfig
-  attr_reader :project_root, :config, :build_dir
+  attr_reader :project_root, :app_config, :build_dir
   THRUST_VERSION = 0.1
   THRUST_ROOT = File.expand_path('../..', __FILE__)
 
@@ -19,9 +19,9 @@ class ThrustConfig
   def initialize(relative_project_root, config, xcrun)
     @project_root = File.expand_path(relative_project_root)
     @build_dir = File.join(project_root, 'build')
-    @config = config
+    @app_config = config
     @xcrun = xcrun
-    verify_configuration(@config)
+    verify_configuration(@app_config)
   end
 
   def get_app_name_from(build_dir)
@@ -61,12 +61,8 @@ class ThrustConfig
     run_xcode('build', build_configuration, sdk, target)
   end
 
-  def xcode_clean(build_configuration)
-    run_xcode('clean', build_configuration)
-  end
-
   def xcode_build_configurations
-    output = `xcodebuild -project #{config['project_name']}.xcodeproj -list`
+    output = `xcodebuild -project #{app_config['project_name']}.xcodeproj -list`
     match = /Build Configurations:(.+?)\n\n/m.match(output)
     if match
       match[1].strip.split("\n").map { |line| line.strip }
@@ -78,7 +74,7 @@ class ThrustConfig
   def xcode_package(build_configuration)
     build_dir = build_dir_for(build_configuration)
     app_name = get_app_name_from(build_dir)
-    xcrun.call(build_dir, app_name, config['identity'])
+    xcrun.call(build_dir, app_name, app_config['identity'])
   end
 
   def run_cedar(build_configuration, target, sdk, os, device)
@@ -88,7 +84,7 @@ class ThrustConfig
       app_dir = File.join(build_path, target)
       return_code = grep_cmd_for_failure("DYLD_FRAMEWORK_PATH=#{build_path.inspect} #{app_dir}")
     else
-      binary = config['sim_binary']
+      binary = app_config['sim_binary']
       sim_dir = File.join(build_dir, "#{build_configuration}-#{os}", "#{target}.app")
       if binary =~ /waxim%/
         return_code = grep_cmd_for_failure(%Q[#{binary} -s #{sdk} -f #{device} -e CFFIXED_USER_HOME=#{Dir.tmpdir} -e CEDAR_HEADLESS_SPECS=1 -e CEDAR_REPORTER_CLASS=CDRDefaultReporter #{sim_dir}])
@@ -157,7 +153,7 @@ class ThrustConfig
       [
         "set -o pipefail &&",
         "xcodebuild",
-        "-project #{config['project_name']}.xcodeproj",
+        "-project #{app_config['project_name']}.xcodeproj",
         target ? "-target #{target}" : "-alltargets",
         "-configuration #{build_configuration}",
         sdk ? "-sdk #{sdk}" : "",

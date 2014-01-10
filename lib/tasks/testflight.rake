@@ -38,7 +38,7 @@ namespace :bump do
 end
 
 namespace :testflight do
-  @thrust.config['distributions'].each do |task_name, distribution_config|
+  @thrust.app_config['distributions'].each do |task_name, distribution_config|
     desc "Deploy build to testflight #{distribution_config['team']} team (use NOTIFY=false to prevent team notification)"
     task task_name, :provision_search_query do |task, args|
       Thrust::Deploy.make(@thrust, distribution_config, args[:provision_search_query]).run

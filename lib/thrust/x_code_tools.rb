@@ -23,13 +23,13 @@ class Thrust::XCodeTools
     "#{@build_directory}/#{@build_configuration}-iphoneos"
   end
 
-  private
-
   def clean_build
     @out.puts 'Cleaning...'
     run_xcode('clean')
     FileUtils.rm_rf(build_configuration_directory)
   end
+
+  private
 
   def kill_simulator
     @out.puts('Killing simulator...')

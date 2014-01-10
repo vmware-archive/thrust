@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Thrust::Deploy do
-  let(:app_config_config) do
+  let(:app_config) do
     {
         'app_name' => 'AppName',
         'identity' => 'signing_identity',
@@ -9,19 +9,19 @@ describe Thrust::Deploy do
         'api_token' => 'api_token'
     }
   end
-  let(:app_config) { double(ThrustConfig, config: app_config_config, build_dir: 'build_dir') }
+  let(:thrust_config) { double(ThrustConfig, app_config: app_config, build_dir: 'build_dir') }
   let(:distribution_config) { {'notify' => 'true', 'default_list' => 'devs', 'configuration' => 'configuration', 'token' => 'team_token'} }
   let(:provisioning_search_query) { 'Provisioning Profile query' }
 
   describe ".make" do
-    subject(:make) { Thrust::Deploy.make(app_config, distribution_config, provisioning_search_query) }
+    subject(:make) { Thrust::Deploy.make(thrust_config, distribution_config, provisioning_search_query) }
 
     it 'returns a new Thrust::Deploy' do
       expect(make).to be_instance_of(Thrust::Deploy)
     end
 
-    it 'passes provisioning search query, app_config, and distribution_config to the Thrust::Deploy' do
-      Thrust::Deploy.should_receive(:new).with($stdout, anything, anything, anything, provisioning_search_query, app_config, distribution_config)
+    it 'passes provisioning search query, thrust config, and distribution_config to the Thrust::Deploy' do
+      Thrust::Deploy.should_receive(:new).with($stdout, anything, anything, anything, provisioning_search_query, thrust_config, distribution_config)
       make
     end
 
@@ -61,7 +61,7 @@ describe Thrust::Deploy do
     let(:x_code_tools) { double(Thrust::XCodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
     let(:testflight) { double(Thrust::Testflight).as_null_object }
-    subject(:deploy) { Thrust::Deploy.new(out, x_code_tools, git, testflight, provisioning_search_query, app_config, distribution_config) }
+    subject(:deploy) { Thrust::Deploy.new(out, x_code_tools, git, testflight, provisioning_search_query, thrust_config, distribution_config) }
 
     before do
       git.stub(:current_commit).and_return('31758012490')

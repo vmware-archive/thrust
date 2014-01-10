@@ -11,6 +11,26 @@ describe Thrust::XCodeTools do
   end
   subject(:x_code_tools) { Thrust::XCodeTools.new(out, build_configuration, build_directory, project_name) }
 
+  before do
+    Thrust::Executor.stub(:system_or_exit)
+    Thrust::Executor.stub(:system)
+  end
+
+  describe '#clean_build' do
+    it 'asks xcodebuild to clean' do
+      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release  clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
+      expected_output = 'build/Release-clean.output'
+      Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
+
+      subject.clean_build
+    end
+
+    it 'deletes the build folder' do
+      subject.clean_build
+      expect(File.directory?('build/Release-iphoneos')).to be_false
+    end
+  end
+  
   describe '#cleanly_create_ipa' do
     let(:target) { 'AppTarget' }
     let(:app_name) { 'AppName' }
@@ -19,8 +39,6 @@ describe Thrust::XCodeTools do
     let(:provisioning_path) { 'provisioning-path' }
 
     before do
-      Thrust::Executor.stub(:system_or_exit)
-      Thrust::Executor.stub(:system)
       x_code_tools.stub(:`).and_return(provisioning_path)
     end
 
@@ -28,17 +46,9 @@ describe Thrust::XCodeTools do
       x_code_tools.cleanly_create_ipa(target, app_name, signing_identity, provision_search_query)
     end
 
-    it 'asks xcodebuild to clean' do
-      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release  clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
-      expected_output = 'build/Release-clean.output'
-      Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
-
+    it 'cleans the build' do
+      subject.should_receive(:clean_build).and_call_original
       create_ipa
-    end
-
-    it 'deletes the build folder' do
-      create_ipa
-      expect(File.directory?('build/Release-iphoneos')).to be_false
     end
 
     it 'kills the simulator' do
