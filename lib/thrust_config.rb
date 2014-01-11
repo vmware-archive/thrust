@@ -30,33 +30,7 @@ class ThrustConfig
 
 
 
-  def update_version(release)
-    Thrust::Git.new($stdout).commit_with_message('Changes version to $(agvtool what-marketing-version -terse)') do
-      cmd = "agvtool what-marketing-version -terse | head -n1 |cut -f2 -d\="
-      STDERR.puts "Executing #{cmd}"
-      version = `#{cmd}`
 
-      STDERR.puts "version !#{version}!"
-      well_formed_version_regex = %r{^\d+(\.\d+)?(\.\d+)?$}
-      if (match = well_formed_version_regex.match(version))
-        STDERR.puts "found match #{match.inspect}"
-        major, minor, patch = (version.split(".").map(&:to_i) + [0, 0, 0]).first(3)
-        case(release)
-        when :major then new_build_version(major + 1, 0, 0)
-        when :minor then new_build_version(major, minor + 1, 0)
-        when :patch then new_build_version(major, minor, patch + 1)
-        when :clear then new_build_version(major, minor, patch)
-        end
-      else
-        raise "Unknown version #{version} it should match major.minor.patch"
-      end
-    end
-  end
-
-  def new_build_version(major, minor, patch)
-    version = [major, minor, patch].join(".")
-    system_or_exit "agvtool new-marketing-version \"#{version}\""
-  end
 
   private
 

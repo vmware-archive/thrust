@@ -17,7 +17,7 @@ task :trim do
   AWK
   awk_statement.gsub!(%r{\s+}, " ")
 
-  @thrust.system_or_exit %Q[git status --short | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
+  Thrust::Executor.system_or_exit %Q[git status --short | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
 end
 
 desc "Remove any focus from specs"
@@ -27,14 +27,14 @@ task :nof do
     "-e 's/#{method}/#{unfocused_method}/g;'"
   end
 
-  @thrust.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
+  Thrust::Executor.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
 end
 
 desc "Print out names of files containing focused specs"
 task :focused_specs do
   pattern = focused_methods.join("\\|")
   directories = @thrust.app_config['spec_targets'].values.map {|h| h['target']}.join(' ')
-  @thrust.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
+  Thrust::Executor.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
 end
 
 desc 'Clean all targets'

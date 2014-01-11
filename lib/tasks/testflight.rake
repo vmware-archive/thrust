@@ -8,33 +8,7 @@ require 'tempfile'
 
 desc "show the current build"
 task :current_version do
-  @thrust.system_or_exit("agvtool what-version -terse")
-end
-
-namespace :bump do
-  desc 'Bumps the build'
-  task :build do
-    Thrust::Git.new($stdout).commit_with_message 'Bumped build to $(agvtool what-version -terse)' do
-      @thrust.system_or_exit 'agvtool bump -all'
-    end
-  end
-
-  namespace :version do
-    desc 'Bumps the major marketing version in (major.minor.patch)'
-    task :major do
-      @thrust.update_version(:major)
-    end
-
-    desc 'Bumps the minor marketing version in (major.minor.patch)'
-    task :minor do
-      @thrust.update_version(:minor)
-    end
-
-    desc 'Bumps the patch marketing version in (major.minor.patch)'
-    task :patch do
-      @thrust.update_version(:patch)
-    end
-  end
+  Thrust::Executor.system_or_exit("agvtool what-version -terse")
 end
 
 namespace :testflight do
