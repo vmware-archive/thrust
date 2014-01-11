@@ -56,10 +56,9 @@ end
     xcode_tools.clean_and_build_target(target, build_sdk)
 
     runtime_sdk = target_info['sdk'] #runtime sdk
-    return_code = Thrust::Cedar.run(build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config)
-    if return_code != 0
-		exit(return_code)
-    end
+    cedar_success = Thrust::Cedar.run(build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config)
+
+		exit(cedar_success ? 0 : 1)
   end
 end
 

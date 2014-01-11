@@ -3,8 +3,8 @@ thrust_version: 0.1
 project_name: My Great Project
 app_name: My Great Project
 identity: iOS Signing Identity
+sim_binary: 'Specs/bin/ios-sim' # or 'Specs/bin/waxim' - used for running tests
 
-sim_binary: 'Specs/bin/ios-sim' # or 'Specs/bin/waxim'
 spec_targets:
   specs:
     name: Specs # Name of the spec build target (used in the description of the generated rake task)

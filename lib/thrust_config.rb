@@ -21,19 +21,7 @@ class ThrustConfig
     verify_configuration(@app_config)
   end
 
-  def system_or_exit(cmd, stdout = nil)
-    STDERR.puts "Executing #{cmd}"
-    cmd += " >#{stdout}" if stdout
-    system(cmd) or raise '******** Build failed ********'
-  end
-
-
-
-
-
-
   private
-
 
   def verify_configuration(config)
     config['thrust_version'] ||= 0
