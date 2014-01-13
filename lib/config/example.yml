@@ -12,7 +12,7 @@ deployment_targets:
   staging:
     distribution_list: Developers
     notify: true
-    ios_target: MyGreatAppTarget # name of the build target, iOS only
+    ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name. iOS only.
     ios_build_configuration: Release # iOS only
     ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
 

@@ -22,9 +22,12 @@ class Thrust::IOS::Deploy
   def run
     @git.ensure_clean
     @x_code_tools.change_build_number(@git.current_commit)
+
     app_name = @thrust_config.app_config['app_name']
-    ipa_file = @x_code_tools.cleanly_create_ipa(@deployment_config['ios_target'], app_name, @thrust_config.app_config['ios_distribution_certificate'], @provisioning_search_query)
-    dsym_path = "#{@x_code_tools.build_configuration_directory}/#{app_name}.app.dSYM" #TODO: confirm that this is app_name and not target
+    target = @deployment_config['ios_target'] || app_name
+    ipa_file = @x_code_tools.cleanly_create_ipa(target, app_name, @thrust_config.app_config['ios_distribution_certificate'], @provisioning_search_query)
+
+    dsym_path = "#{@x_code_tools.build_configuration_directory}/#{app_name}.app.dSYM"
     @testflight.upload(ipa_file, @deployment_config['notify'], @deployment_config['distribution_list'], dsym_path)
     @git.reset
   end
