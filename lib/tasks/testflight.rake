@@ -11,19 +11,23 @@ task :current_version do
 end
 
 namespace :testflight do
+  android_project = File.exists?('AndroidManifest.xml')
+
   @thrust.app_config['deployment_targets'].each do |task_name, deployment_config|
-    desc "Deploy iOS build to #{task_name} (use NOTIFY=false to prevent team notification)"
-    task task_name do |_, _|
-      Thrust::IOS::Deploy.make(@thrust, deployment_config).run
+    if android_project
+      desc "Deploy Android build to #{task_name} (use NOTIFY=false to prevent team notification)"
+      task task_name do |_, _|
+        Thrust::Android::Deploy.make(@thrust, deployment_config).run
 
-      Rake::Task['autotag:create'].invoke(task_name)
-    end
+        Rake::Task['autotag:create'].invoke(task_name)
+      end
+    else
+      desc "Deploy iOS build to #{task_name} (use NOTIFY=false to prevent team notification)"
+      task task_name do |_, _|
+        Thrust::IOS::Deploy.make(@thrust, deployment_config).run
 
-    desc "Deploy Android build to #{task_name} (use NOTIFY=false to prevent team notification)"
-    task "#{task_name}:android" do |_, _|
-      Thrust::Android::Deploy.make(@thrust, deployment_config).run
-
-      Rake::Task['autotag:create'].invoke(task_name)
+        Rake::Task['autotag:create'].invoke(task_name)
+      end
     end
   end
 end
