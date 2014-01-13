@@ -8,7 +8,7 @@ describe Thrust::Android::Deploy do
         'api_token' => 'api_token'
     }
   end
-  let(:thrust_config) { double(ThrustConfig, app_config: app_config, build_dir: 'build_dir') }
+  let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
   let(:distribution_config) { {'notify' => 'true', 'default_list' => 'devs', 'token' => 'team_token'} }
 
   describe ".make" do

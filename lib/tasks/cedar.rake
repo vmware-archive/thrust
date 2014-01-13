@@ -1,9 +1,9 @@
 require 'yaml'
 require 'tmpdir'
+require File.expand_path('../../thrust', __FILE__)
 
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'))
 
-@thrust = ThrustConfig.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 desc 'Trim whitespace'
 task :trim do
@@ -56,7 +56,7 @@ end
     xcode_tools.clean_and_build_target(target, build_sdk)
 
     runtime_sdk = target_info['sdk'] #runtime sdk
-    cedar_success = Thrust::Cedar.run(build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config)
+    cedar_success = Thrust::Cedar.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config)
 
 		exit(cedar_success ? 0 : 1)
   end

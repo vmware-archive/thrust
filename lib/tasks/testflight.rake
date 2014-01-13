@@ -1,10 +1,9 @@
 require 'yaml'
-require File.expand_path('../../thrust_config', __FILE__)
-require File.expand_path('../../thrust', __FILE__)
 require 'tempfile'
+require File.expand_path('../../thrust', __FILE__)
 
 
-@thrust = ThrustConfig.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 desc "show the current build"
 task :current_version do

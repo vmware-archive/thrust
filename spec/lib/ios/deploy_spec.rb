@@ -9,7 +9,7 @@ describe Thrust::IOS::Deploy do
         'api_token' => 'api_token'
     }
   end
-  let(:thrust_config) { double(ThrustConfig, app_config: app_config, build_dir: 'build_dir') }
+  let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
   let(:distribution_config) { {'notify' => 'true', 'default_list' => 'devs', 'configuration' => 'configuration', 'token' => 'team_token'} }
   let(:provisioning_search_query) { 'Provisioning Profile query' }
 

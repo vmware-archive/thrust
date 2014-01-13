@@ -15,4 +15,13 @@ module Thrust::Executor
 
     captured_output
   end
+
+  def self.check_command_for_failure(cmd)
+    STDERR.puts "Executing #{cmd} and checking for FAILURE"
+    result = %x[#{cmd} 2>&1]
+    STDERR.puts "Results:"
+    STDERR.puts result
+
+    result.include?("Finished") && !result.include?("FAILURE") && !result.include?("EXCEPTION")
+  end
 end

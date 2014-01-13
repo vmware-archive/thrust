@@ -1,6 +1,7 @@
 require 'rspec'
 require 'stringio'
 require 'timecop'
+require 'tmpdir'
 require 'fakefs/safe'
 
 require_relative '../lib/thrust'
