@@ -13,11 +13,10 @@ describe Thrust::IOS::Deploy do
     }
   end
   let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
-  let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'ios_build_configuration' => 'configuration'} }
-  let(:provisioning_search_query) { 'Provisioning Profile query' }
+  let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'ios_build_configuration' => 'configuration', 'ios_provisioning_search_query' => 'Provisioning Profile query'} }
 
   describe ".make" do
-    subject(:make) { Thrust::IOS::Deploy.make(thrust_config, distribution_config, provisioning_search_query) }
+    subject(:make) { Thrust::IOS::Deploy.make(thrust_config, distribution_config) }
 
     before do
       Thrust::IOS::XCodeTools.stub(:new)
@@ -28,7 +27,7 @@ describe Thrust::IOS::Deploy do
     end
 
     it 'passes provisioning search query, thrust config, and distribution_config to the Thrust::IOS::Deploy' do
-      Thrust::IOS::Deploy.should_receive(:new).with($stdout, anything, anything, anything, provisioning_search_query, thrust_config, distribution_config)
+      Thrust::IOS::Deploy.should_receive(:new).with($stdout, anything, anything, anything, thrust_config, distribution_config)
       make
     end
 
@@ -68,7 +67,7 @@ describe Thrust::IOS::Deploy do
     let(:x_code_tools) { double(Thrust::IOS::XCodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
     let(:testflight) { double(Thrust::Testflight).as_null_object }
-    subject(:deploy) { Thrust::IOS::Deploy.new(out, x_code_tools, git, testflight, provisioning_search_query, thrust_config, distribution_config) }
+    subject(:deploy) { Thrust::IOS::Deploy.new(out, x_code_tools, git, testflight, thrust_config, distribution_config) }
 
     before do
       git.stub(:current_commit).and_return('31758012490')
@@ -95,7 +94,7 @@ describe Thrust::IOS::Deploy do
     end
 
     context 'when the target is set' do
-      let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'ios_build_configuration' => 'configuration', 'ios_target' => 'TargetName'} }
+      let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'ios_build_configuration' => 'configuration', 'ios_target' => 'TargetName', 'ios_provisioning_search_query' => 'Provisioning Profile query'} }
 
       it 'creates the ipa, using the target' do
         x_code_tools.should_receive(:cleanly_create_ipa).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
@@ -104,7 +103,7 @@ describe Thrust::IOS::Deploy do
     end
 
     context 'when the target is not set' do
-      let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'ios_build_configuration' => 'configuration'} }
+      let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'ios_build_configuration' => 'configuration', 'ios_provisioning_search_query' => 'Provisioning Profile query'} }
 
       it 'defaults to the app name as the target when building the ipa' do
         x_code_tools.should_receive(:cleanly_create_ipa).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
