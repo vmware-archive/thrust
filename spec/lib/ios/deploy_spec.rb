@@ -16,6 +16,10 @@ describe Thrust::IOS::Deploy do
   describe ".make" do
     subject(:make) { Thrust::IOS::Deploy.make(thrust_config, distribution_config, provisioning_search_query) }
 
+    before do
+      Thrust::IOS::XCodeTools.stub(:new)
+    end
+
     it 'returns a new Thrust::IOS::Deploy' do
       expect(make).to be_instance_of(Thrust::IOS::Deploy)
     end

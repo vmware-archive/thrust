@@ -13,6 +13,7 @@ class Thrust::IOS::XCodeTools
 
   def initialize(out, build_configuration, build_directory, project_name)
     @out = out
+    @git = Thrust::Git.new(out)
     @build_configuration = build_configuration
     @build_directory = build_directory
     @project_name = project_name
@@ -20,6 +21,7 @@ class Thrust::IOS::XCodeTools
 
   def change_build_number(build_number)
     Thrust::Executor.system_or_exit "agvtool new-version -all '#{build_number}'"
+    @git.checkout_file('*.xcodeproj')
   end
 
   def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)

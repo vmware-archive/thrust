@@ -6,6 +6,7 @@ describe Thrust::IOS::XCodeTools do
   let(:project_name) { 'AwesomeProject' }
   let(:os) { 'iphoneos' }
   let(:target) { 'AppTarget' }
+  let(:git) { double(Thrust::Git, checkout_file: 'checkout_file') }
   let(:build_directory) do
     FileUtils.mkdir_p('build').first.tap do |build_dir|
       FileUtils.mkdir_p(File.join(build_dir, "Release-iphoneos"))
@@ -16,6 +17,19 @@ describe Thrust::IOS::XCodeTools do
   before do
     Thrust::Executor.stub(:system_or_exit)
     Thrust::Executor.stub(:system)
+    Thrust::Git.stub(:new).and_return(git)
+  end
+
+  describe '#change_build_number' do
+    it 'updates the build number' do
+      Thrust::Executor.should_receive(:system_or_exit).with("agvtool new-version -all 'abcdef'")
+      x_code_tools.change_build_number('abcdef')
+    end
+
+    it 'does not change the project file (only changing Info.plist)' do
+      git.should_receive(:checkout_file).with('*.xcodeproj')
+      x_code_tools.change_build_number('abcdef')
+    end
   end
 
   describe '#clean_build' do
