@@ -19,7 +19,7 @@ class Thrust::IOS::XCodeTools
   end
 
   def change_build_number(build_number)
-    Thrust::Executor.system_or_exit "agvtool new-marketing-version '#{build_number}'"
+    Thrust::Executor.system_or_exit "agvtool new-version -all '#{build_number}'"
   end
 
   def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
