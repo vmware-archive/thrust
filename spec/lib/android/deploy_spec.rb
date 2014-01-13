@@ -5,11 +5,14 @@ describe Thrust::Android::Deploy do
     {
         'app_name' => 'AppName',
         'project_name' => 'project_name',
-        'api_token' => 'api_token'
+        'testflight' => {
+            'team_token' => 'team_token',
+            'api_token' => 'api_token'
+        }
     }
   end
   let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
-  let(:distribution_config) { {'notify' => 'true', 'default_list' => 'devs', 'token' => 'team_token'} }
+  let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs' } }
 
   describe ".make" do
     subject(:make) { Thrust::Android::Deploy.make(thrust_config, distribution_config) }

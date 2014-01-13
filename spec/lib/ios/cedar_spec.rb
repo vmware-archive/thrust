@@ -8,9 +8,9 @@ describe Thrust::IOS::Cedar do
   let(:device) { 'device' }
   let(:build_dir) { 'build_dir' }
   let(:out) { StringIO.new }
-  let(:app_config) { {'sim_binary' => 'ios-sim'} }
+  let(:sim_binary) { 'ios-sim' }
 
-  subject { Thrust::IOS::Cedar.run(out, build_configuration, target, sdk, os, device, build_dir, app_config) }
+  subject { Thrust::IOS::Cedar.run(out, build_configuration, target, sdk, os, device, build_dir, sim_binary) }
 
   before do
     Thrust::Executor.stub(:check_command_for_failure)
@@ -30,7 +30,7 @@ describe Thrust::IOS::Cedar do
     end
 
     context 'the binary is not valid' do
-      before { app_config['sim_binary'] = 'invalid-binary' }
+      let(:sim_binary) { 'invalid-binary' }
 
       it 'returns false when the binary is not recognized' do
         expect(subject).to be_false

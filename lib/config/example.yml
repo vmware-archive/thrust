@@ -1,38 +1,35 @@
-# rename this file to thrust.yml
-thrust_version: 0.1
+thrust_version: 0.2
 project_name: My Great Project
-app_name: My Great Project
-identity: iOS Signing Identity
-sim_binary: 'Specs/bin/ios-sim' # or 'Specs/bin/waxim' - used for running tests
+app_name: My Great App
+ios_distribution_certificate: 'Name of Distribution Signing Certificate'
+ios_sim_binary: 'ios-sim' # or wax-sim, or any other runner you want to use
 
-spec_targets:
-  specs:
-    name: Specs # Name of the spec build target (used in the description of the generated rake task)
-    configuration: Release # or whichever iOS configuration you want to run specs under
-    target: Specs # Name of the spec build target
-    sdk: 6.1  # SDK version to build/run the specs with
+testflight:
+  api_token: 'testflight api token'
+  team_token: 'testflight team token'
 
-#  integration:
-#    name: Integration Specs
-#    configuration: Debug
-#    target: IntegrationSpecs
-#    sdk: 6.1
-#    os: macosx # Defaults to iphonesimulator. Made sure to copy the cedar framework for OSX
-#    device: ipad # Defaults to iphone
-
-api_token: your testflight token here
-# Add testflight distribution lists here. Rake tasks are built for all keys directly
-# under distribution.
-distributions:
-  # builds rake testflight:devs task to deploy to the distribution list. To create a second
-  # deploy task, uncomment and modify the structure below.
-  devs: # http://testflightapp.com/dashboard/team/edit
-    notify: false
-    token: TestFlight Team Token
-    default_list: Default Distribution List to Permission for the build
-    configuration: iOS configuration to build with e.g. Debug, Release, etc.
-  foo: # builds rake testflight:foo
+deployment_targets:
+  staging:
+    distribution_list: Developers
     notify: true
-    token: somethingthatlookslikeyourapitoken
-    default_list: Foo People
-    configuration: Release
+    ios_target: MyGreatAppTarget # name of the build target, iOS only
+    ios_build_configuration: Release # iOS only
+    ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
+
+  demo:
+    distribution_list: Beta Testers
+    notify: true
+
+ios_spec_targets:
+  specs:
+    target: UISpecs # name of the build target
+    build_configuration: Debug # name of the build configuration
+    build_sdk: 6.1 # SDK used to build the target. Optional, defaults to iphonesimulator.
+    runtime_sdk: 7.0 # SDK used to run the target. Not optional.
+    device: ipad # Device to run the specs on. Defaults to iPhone.
+
+  integration:
+    target: IntegrationSpecs
+    build_configuration: Release
+    build_sdk: macosx
+    runtime_sdk: macosx

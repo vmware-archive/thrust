@@ -1,9 +1,12 @@
 class Thrust::Android::Deploy
-  def self.make(thrust_config, distribution_config)
+  def self.make(thrust_config, deployment_config)
     tools = Thrust::Android::Tools.new($stdout)
     git = Thrust::Git.new($stdout)
-    testflight = Thrust::Testflight.new($stdout, $stdin, thrust_config.app_config['api_token'], distribution_config['token'])
-    self.new($stdout, tools, git, testflight, distribution_config['notify'], distribution_config['default_list'])
+
+    testflight_config = thrust_config.app_config['testflight']
+    testflight = Thrust::Testflight.new($stdout, $stdin, testflight_config['api_token'], testflight_config['team_token'])
+
+    self.new($stdout, tools, git, testflight, deployment_config['notify'], deployment_config['distribution_list'])
   end
 
   def initialize(out, tools, git, testflight, notify, distribution_list)

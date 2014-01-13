@@ -1,30 +1,31 @@
 class Thrust::IOS::Deploy
-  def self.make(thrust_config, distribution_config, provisioning_search_query)
-    build_configuration = distribution_config['configuration']
+  def self.make(thrust_config, deployment_config, provisioning_search_query)
+    build_configuration = deployment_config['ios_build_configuration']
     x_code_tools = Thrust::IOS::XCodeTools.new($stdout, build_configuration, thrust_config.build_dir, thrust_config.app_config['project_name'])
     git = Thrust::Git.new($stdout)
-    testflight = Thrust::Testflight.new($stdout, $stdin, thrust_config.app_config['api_token'], distribution_config['token'])
+    testflight_config = thrust_config.app_config['testflight']
+    testflight = Thrust::Testflight.new($stdout, $stdin, testflight_config['api_token'], testflight_config['team_token'])
 
-    new($stdout, x_code_tools, git, testflight, provisioning_search_query, thrust_config, distribution_config)
+    new($stdout, x_code_tools, git, testflight, provisioning_search_query, thrust_config, deployment_config)
   end
 
-  def initialize(out, x_code_tools, git, testflight, provisioning_search_query, thrust_config, distribution_config)
+  def initialize(out, x_code_tools, git, testflight, provisioning_search_query, thrust_config, deployment_config)
     @out = out
     @x_code_tools = x_code_tools
     @git = git
     @testflight = testflight
     @provisioning_search_query = provisioning_search_query
     @thrust_config = thrust_config
-    @distribution_config = distribution_config
+    @deployment_config = deployment_config
   end
 
   def run
     @git.ensure_clean
     @x_code_tools.change_build_number(@git.current_commit)
     app_name = @thrust_config.app_config['app_name']
-    ipa_file = @x_code_tools.cleanly_create_ipa(app_name, app_name, @thrust_config.app_config['identity'], @provisioning_search_query)
-    dsym_path = "#{@x_code_tools.build_configuration_directory}/#{app_name}.app.dSYM"
-    @testflight.upload(ipa_file, @distribution_config['notify'], @distribution_config['default_list'], dsym_path)
+    ipa_file = @x_code_tools.cleanly_create_ipa(@deployment_config['ios_target'], app_name, @thrust_config.app_config['ios_distribution_certificate'], @provisioning_search_query)
+    dsym_path = "#{@x_code_tools.build_configuration_directory}/#{app_name}.app.dSYM" #TODO: confirm that this is app_name and not target
+    @testflight.upload(ipa_file, @deployment_config['notify'], @deployment_config['distribution_list'], dsym_path)
     @git.reset
   end
 end

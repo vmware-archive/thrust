@@ -4,13 +4,16 @@ describe Thrust::IOS::Deploy do
   let(:app_config) do
     {
         'app_name' => 'AppName',
-        'identity' => 'signing_identity',
+        'ios_distribution_certificate' => 'signing_identity',
         'project_name' => 'project_name',
-        'api_token' => 'api_token'
+        'testflight' => {
+            'team_token' => 'team_token',
+            'api_token' => 'api_token'
+        }
     }
   end
   let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
-  let(:distribution_config) { {'notify' => 'true', 'default_list' => 'devs', 'configuration' => 'configuration', 'token' => 'team_token'} }
+  let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'ios_build_configuration' => 'configuration', 'ios_target' => 'TargetName'} }
   let(:provisioning_search_query) { 'Provisioning Profile query' }
 
   describe ".make" do
@@ -82,7 +85,7 @@ describe Thrust::IOS::Deploy do
     end
 
     it 'creates the ipa' do
-      x_code_tools.should_receive(:cleanly_create_ipa).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
+      x_code_tools.should_receive(:cleanly_create_ipa).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
       deploy.run
     end
 

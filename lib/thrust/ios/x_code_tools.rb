@@ -2,7 +2,7 @@ class Thrust::IOS::XCodeTools
   ProvisioningProfileNotFound = Class.new(StandardError)
 
   def self.build_configurations(project_name) #TODO:  Backfill a test
-    output = `xcodebuild -project #{project_name}.xcodeproj -list`
+    output = Thrust::Executor.capture_output_from_system("xcodebuild -project #{project_name}.xcodeproj -list")
     match = /Build Configurations:(.+?)\n\n/m.match(output)
     if match
       match[1].strip.split("\n").map { |line| line.strip }
