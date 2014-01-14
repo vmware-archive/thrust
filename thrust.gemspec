@@ -10,9 +10,11 @@ Gem::Specification.new do |s|
   s.email       = 'mc+jbritz@pivotallabs.com'
   s.files       = FileList['lib/**/*.rb', 'lib/**/*.rake', 'lib/**/*.yml'].to_a
   s.homepage    = 'http://github.com/dipolesource/thrust'
-  s.executables << 'thrust'
-  s.add_dependency 'colorize'
-  s.add_dependency 'auto_tagger'
+  s.default_executable = 'thrust'
+  s.require_paths = ['lib']
+  s.executables = ['thrust']
+  s.add_runtime_dependency 'colorize'
+  s.add_runtime_dependency 'auto_tagger'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'fakefs', '~> 0.5.0'
   s.add_development_dependency 'rspec'
