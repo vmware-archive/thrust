@@ -25,8 +25,8 @@ class Thrust::Config
 
   def verify_configuration(config)
     config['thrust_version'] ||= 0
-    if config['thrust_version'] < THRUST_VERSION
-      fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION} see README for details."
+    if config['thrust_version'] != THRUST_VERSION
+      fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION}. See README for details.".red
     end
   end
 end
