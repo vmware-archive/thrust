@@ -1,7 +1,13 @@
+require 'colorize'
+
 class Thrust::Android::Tools
   def initialize(out)
     @out = out
-    raise 'ANDROID_HOME not set' if ENV['ANDROID_HOME'].nil?
+
+    if ENV['ANDROID_HOME'].nil?
+      @out.puts 'Setting /usr/local/opt/android-sdk as ANDROID_HOME...'.magenta
+      ENV['ANDROID_HOME'] = '/usr/local/opt/android-sdk'
+    end
   end
 
   def change_build_number(version_code, version_name)
