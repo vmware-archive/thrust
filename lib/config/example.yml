@@ -2,7 +2,7 @@ thrust_version: 0.2
 project_name: My Great Project
 app_name: My Great App
 ios_distribution_certificate: 'Name of Distribution Signing Certificate'
-ios_sim_binary: 'ios-sim' # or wax-sim, or any other runner you want to use
+ios_sim_binary: 'ios-sim' # or wax-sim. iOS only.
 
 testflight:
   api_token: 'testflight api token'
@@ -27,7 +27,7 @@ ios_spec_targets:
     build_configuration: Debug # name of the build configuration
     build_sdk: 6.1 # SDK used to build the target. Optional, defaults to iphonesimulator.
     runtime_sdk: 7.0 # SDK used to run the target. Not optional.
-    device: ipad # Device to run the specs on. Defaults to iPhone.
+    device: ipad # Device to run the specs on. Optional, defaults to iPhone.
 
   integration:
     target: IntegrationSpecs
