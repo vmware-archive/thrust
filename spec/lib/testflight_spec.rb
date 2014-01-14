@@ -5,7 +5,12 @@ describe Thrust::Testflight do
   let(:input) { StringIO.new }
   let(:api_token) { 'api_token' }
   let(:team_token) { 'team_token' }
+  let(:git) { double(Thrust::Git, generate_notes_for_deployment: 'notes') }
   subject(:testflight) { Thrust::Testflight.new(out, input, api_token, team_token) }
+
+  before do
+    Thrust::Git.stub(:new).and_return(git)
+  end
 
   describe '#upload' do
     let(:build_directory) { 'build' }
@@ -14,6 +19,7 @@ describe Thrust::Testflight do
     let(:notify) { true }
     let(:distribution_list) { 'developers' }
     let(:dsym_path) { nil }
+    let(:autogenerate_deploy_notes) { false }
 
     before do
       Thrust::Executor.stub(:system_or_exit)
@@ -22,7 +28,7 @@ describe Thrust::Testflight do
 
 
     def upload
-      testflight.upload(ipa_file, notify, distribution_list, dsym_path)
+      testflight.upload(ipa_file, notify, distribution_list, autogenerate_deploy_notes, 'staging', dsym_path)
     end
 
     context 'when a dSYM path is given' do
@@ -56,9 +62,29 @@ describe Thrust::Testflight do
       end
     end
 
-    it 'gets the deploy notes from the user' do
-      Thrust::UserPrompt.should_receive(:get_user_input).with('Deploy Notes: ', out, input)
-      upload
+    context 'when told to autogenerate deploy notes' do
+      let(:autogenerate_deploy_notes) { true }
+
+      it 'does not get the deploy notes from the user' do
+        Thrust::UserPrompt.should_not_receive(:get_user_input)
+        upload
+      end
+
+      it 'generates the deploy notes from commit messages and uploads them to testflight' do
+        git.should_receive(:generate_notes_for_deployment).with('staging').and_return('generated_notes_file_name')
+        Thrust::Executor.should_receive(:system_or_exit).with(/notes=@generated_notes_file_name/)
+        upload
+      end
+    end
+
+    context 'when not told to autogenerate deploy notes' do
+      let(:autogenerate_deploy_notes) { false }
+
+      it 'gets the deploy notes from the user and uploads them to testflight' do
+        Thrust::UserPrompt.should_receive(:get_user_input).with('Deploy Notes: ', out, input).and_return('message_file_name')
+        Thrust::Executor.should_receive(:system_or_exit).with(/notes=@message_file_name/)
+        upload
+      end
     end
 
     it 'respects the environment variable around notifications' do

@@ -5,7 +5,7 @@ module Thrust::Executor
 
   def self.system(cmd, output_file = nil)
     STDERR.puts "Executing #{cmd}"
-    cmd += " >#{output_file}" if output_file
+    cmd += " > #{output_file}" if output_file
     Kernel::system(cmd)
   end
 

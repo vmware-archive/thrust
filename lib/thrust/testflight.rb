@@ -2,11 +2,12 @@ class Thrust::Testflight
   def initialize(out, input, api_token, team_token)
     @out = out
     @in = input
+    @git = Thrust::Git.new(@out)
     @api_token = api_token
     @team_token = team_token
   end
 
-  def upload(package_file, notify, distribution_list, dsym_path = nil)
+  def upload(package_file, notify, distribution_list, autogenerate_deploy_notes, deployment_target, dsym_path = nil)
     if dsym_path
       @out.puts 'Zipping dSYM...'
       zipped_dsym_path = "#{dsym_path}.zip"
@@ -14,7 +15,12 @@ class Thrust::Testflight
       @out.puts 'Done!'
     end
 
-    message_file_path = Thrust::UserPrompt.get_user_input('Deploy Notes: ', @out, @in)
+    if autogenerate_deploy_notes
+      message_file_path = @git.generate_notes_for_deployment(deployment_target)
+    else
+      message_file_path = Thrust::UserPrompt.get_user_input('Deploy Notes: ', @out, @in)
+    end
+
 
     Thrust::Executor.system_or_exit [
                                       'curl http://testflightapp.com/api/builds.json',

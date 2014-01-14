@@ -12,6 +12,7 @@ deployment_targets:
   staging:
     distribution_list: Developers
     notify: true
+    note_generation_method: autotag  # If you set this value, it will auto-generate the deploy notes from the commit history. Optional.
     ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name. iOS only.
     ios_build_configuration: Release # iOS only
     ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
