@@ -1,3 +1,5 @@
+require 'colorize'
+
 class Thrust::Git
   def initialize(out)
     @out = out

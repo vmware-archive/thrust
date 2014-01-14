@@ -1,6 +1,8 @@
+require 'colorize'
+
 module Thrust::UserPrompt
   def self.get_user_input(prompt, out, stdin = $stdin)
-    out.print prompt
+    out.print prompt.yellow
     message = stdin.gets
     message_file = Tempfile.new('message')
     message_file << message
