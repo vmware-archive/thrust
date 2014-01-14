@@ -5,21 +5,25 @@ class Thrust::Android::Tools
     @out = out
 
     if ENV['ANDROID_HOME'].nil?
-      @out.puts 'Setting /usr/local/opt/android-sdk as ANDROID_HOME...'.magenta
-      ENV['ANDROID_HOME'] = '/usr/local/opt/android-sdk'
+      if File.directory?('/usr/local/opt/android-sdk')
+        @out.puts 'Setting /usr/local/opt/android-sdk as ANDROID_HOME...'.magenta
+        ENV['ANDROID_HOME'] = '/usr/local/opt/android-sdk'
+      else
+        raise('**********Android is not installed. Run `brew install android`.**********')
+      end
     end
   end
 
   def change_build_number(version_code, version_name)
     Thrust::Executor.system_or_exit(
-      "sed -i ''" +
-        " -e 's/android:versionCode=\"[0-9]*\"/android:versionCode=\"#{version_code}\"/'" +
-        " -e 's/android:versionName=\"\\([^ \"]*\\)[^\"]*\"/android:versionName=\"\\1 (#{version_name})\"/'" +
-        " AndroidManifest.xml")
+        "sed -i ''" +
+            " -e 's/android:versionCode=\"[0-9]*\"/android:versionCode=\"#{version_code}\"/'" +
+            " -e 's/android:versionName=\"\\([^ \"]*\\)[^\"]*\"/android:versionName=\"\\1 (#{version_name})\"/'" +
+            " AndroidManifest.xml")
     Thrust::Executor.system_or_exit(
-      "sed -i ''" +
-        " '1,/<version>/s/<version>\\([^- <]*\\)[^<]*<\\/version>/<version>\\1 (#{version_name})<\\/version>/'" +
-        " pom.xml")
+        "sed -i ''" +
+            " '1,/<version>/s/<version>\\([^- <]*\\)[^<]*<\\/version>/<version>\\1 (#{version_name})<\\/version>/'" +
+            " pom.xml")
   end
 
   def build_signed_release

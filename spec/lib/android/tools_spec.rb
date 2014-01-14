@@ -2,12 +2,29 @@ require 'spec_helper'
 
 describe Thrust::Android::Tools do
   describe 'initialization' do
-    it 'sets a default value for android home if it is not set' do
-      ENV.delete('ANDROID_HOME')
+    context 'when android home is not set' do
+      before do
+        ENV.delete('ANDROID_HOME')
+      end
 
-      Thrust::Android::Tools.new(StringIO.new)
+      context 'when /usr/local/opt/android-sdk does not exist' do
+        it 'tells the user to install android' do
+          expect {
+            Thrust::Android::Tools.new(StringIO.new)
+          }.to raise_exception('**********Android is not installed. Run `brew install android`.**********')
+        end
+      end
 
-      expect(ENV['ANDROID_HOME']).to eq('/usr/local/opt/android-sdk')
+      context 'when /usr/local/opt/android-sdk exists' do
+        before do
+          FileUtils.mkdir_p('/usr/local/opt/android-sdk')
+        end
+
+        it 'sets it as the default value for android home' do
+          Thrust::Android::Tools.new(StringIO.new)
+          expect(ENV['ANDROID_HOME']).to eq('/usr/local/opt/android-sdk')
+        end
+      end
     end
   end
 end
