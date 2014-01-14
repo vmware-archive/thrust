@@ -1,5 +1,4 @@
 # Thrust
----
 
 # ![Thrust](thrust.png)
 
@@ -21,7 +20,7 @@ __Thrust__ is a small project that contains some useful rake tasks to run Cedar 
 
 (Note: **Thrust** requires ruby >= 1.9.3)
 
-Thrust should be installed as a gem.  It comes with an installer that will set up your Rakefile and create an example configuration file.
+**Thrust** should be installed as a gem.  It comes with an installer that will set up your Rakefile and create an example configuration file.
 
     gem install thrust
     thrust install
@@ -34,19 +33,21 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 ## Version 0.2
 
-* **Thrust** should now be installed as a gem, not a submodule.  Running `thrust install` after installation sets up the `Rakefile` and creates an example thrust.yml.
+* **Thrust** should now be installed as a gem, not a submodule.  Running `thrust install` after installation sets up the `Rakefile` and creates an example `thrust.yml`.
 
 * The code has been cleaned up and modularized, making it easier to add new features in the future.
 
 * **Thrust** now supports deploying Android apps to TestFlight.  **Thrust** auto-detects whether your project is Android or iOS and will generate the appropriate rake tasks.
 
-* The structure of thrust.yml has been updated, and the names of certain keys have changed to make their meaning clearer.
+* The structure of `thrust.yml` has been updated, and the names of certain keys have changed to make their meaning clearer.
 
 * All deployments are tagged using [auto_tagger](https://github.com/zilkey/auto_tagger). Run `rake autotag:list` to see which commits are deployed to each environment.
 
-* Deploy notes can be auto-generated from commit messages. Set `note_generation_method` to `autotag` in thrust.yml to use this feature.
+* Deploy notes can be auto-generated from commit messages. Set `note_generation_method` to `autotag` in `thrust.yml` to use this feature.
 
 * Build numbers are no longer auto-incremented during deployment.  Instead, the build number is set to the short SHA of the commit that is being deployed.  Deployment history is managed by auto_tagger.
+
+* You no longer have to be in sync with _origin_ to deploy to TestFlight.
 
 
 ## Version 0.1
@@ -57,7 +58,7 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * Adds 'current_version' task to show the current build version of the app.
 
-* Testflight deploys now prompt the user for a deployment message
+* TestFlight deploys now prompt the user for a deployment message
 
 * Removes adding to default tasks. This is now your responsibility - please define in your own Rakefile if you need to add to the default task. e.g.
 
@@ -65,11 +66,11 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * Adds support for non-standard app names defined in your XCode project. These are determined by looking for the first ".app" file it can find in the build folder and basing the name off that file.
 
-* Adds support for disabling incrementing the build number during a testflight deploy. This is via the 'increments_build_number' configuration setting under a distribution in your thrust.yml.
+* Adds support for disabling incrementing the build number during a TestFlight deploy. This is via the 'increments_build_number' configuration setting under a distribution in your thrust.yml.
 
 # Upgrading
 
-Periodically new thrust versions will require changes to your thrust.yml configuration.  Look in the ***upgrading instructions*** section below for a list of versions and how the configuration has changed.  If you need to upgrade multiple versions, you may want to just re-create it from the example.yml.
+Periodically new thrust versions will require changes to your `thrust.yml` configuration.  Look in the ***Upgrading Instructions*** section below for guidance on how to upgrade from the previous version.  If you need to upgrade multiple versions, you may want to just re-create your configuration from the `example.yml`.
 
 Once you upgrade make sure to add/update the 'thrust_version' key in the configuration to the new version.
 
@@ -77,7 +78,7 @@ Once you upgrade make sure to add/update the 'thrust_version' key in the configu
 
 ## Ignoring Git during deploys
 
-**Thrust** TestFlight deployment requires you to be in a clean git repo and to be at the head of your current branch. You can disable this by setting the environment variable `IGNORE_GIT=1`. **We do not recommend this.** If your git repository is not clean, deployment will discard all your uncommitted changes.
+TestFlight deployment requires you to be in a clean git repo and to be at the head of your current branch. You can disable this by setting the environment variable `IGNORE_GIT=1`. **We do not recommend this.** If your git repository is not clean, deployment will discard all your uncommitted changes.
 
 ## Notifying distribution lists
 
