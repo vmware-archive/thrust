@@ -5,11 +5,6 @@ require File.expand_path('../../thrust', __FILE__)
 
 @thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
-desc "show the current build" # TODO: delete when autotagger is added
-task :current_version do
-  Thrust::Executor.system_or_exit("agvtool what-version -terse")
-end
-
 namespace :testflight do
   android_project = File.exists?('AndroidManifest.xml')
 
