@@ -1,3 +1,5 @@
+require 'colorize'
+
 class Thrust::Config
   attr_reader :project_root, :app_config, :build_dir
   THRUST_VERSION = 0.2
@@ -6,9 +8,14 @@ class Thrust::Config
   def self.make(relative_project_root, config_file)
     begin
       config_file_contents = YAML.load_file(config_file)
-    rescue
-      puts "thrust: ERROR: Missing thrust.yml. Create by running:"
-      puts "thrust: ERROR:    cp #{THRUST_ROOT}/lib/config/example.yml thrust.yml"
+    rescue Errno::ENOENT
+      puts ""
+      puts "  Missing thrust.yml. Create by running:\n".red
+      puts "      cp thrust.example.yml thrust.yml".blue
+      exit 1
+    rescue Psych::SyntaxError
+      puts ""
+      puts "  Malformed thrust.yml.".red
       exit 1
     end
     new(relative_project_root, config_file_contents)
