@@ -39,8 +39,8 @@ end
 
 desc 'Clean all targets'
 task :clean_build do
-  Thrust::XCodeTools.build_configurations(@thrust.app_config['project_name']).each do |config|
-    xcode_tools = Thrust::XCodeTools.new($stdout, config, @thrust.build_dir, @thrust.app_config['project_name'])
+  Thrust::IOS::XCodeTools.build_configurations(@thrust.app_config['project_name']).each do |config|
+    xcode_tools = Thrust::IOS::XCodeTools.new($stdout, config, @thrust.build_dir, @thrust.app_config['project_name'])
     xcode_tools.clean_build
   end
 end
@@ -53,10 +53,10 @@ end
     build_sdk = target_info['build_sdk'] || 'iphonesimulator' #build sdk - version you compile the code with
     runtime_sdk = target_info['runtime_sdk'] #runtime sdk
 
-    xcode_tools = Thrust::XCodeTools.new($stdout, build_configuration, @thrust.build_dir, @thrust.app_config['project_name'])
+    xcode_tools = Thrust::IOS::XCodeTools.new($stdout, build_configuration, @thrust.build_dir, @thrust.app_config['project_name'])
     xcode_tools.clean_and_build_target(target, build_sdk)
 
-    cedar_success = Thrust::Cedar.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
+    cedar_success = Thrust::IOS::Cedar.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
 
 		exit(cedar_success ? 0 : 1)
   end
