@@ -1,9 +1,9 @@
 require 'yaml'
 require 'tmpdir'
+require File.expand_path('../../thrust', __FILE__)
 
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'thrust_config'))
 
-@thrust = ThrustConfig.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 desc 'Trim whitespace'
 task :trim do
@@ -17,7 +17,7 @@ task :trim do
   AWK
   awk_statement.gsub!(%r{\s+}, " ")
 
-  @thrust.system_or_exit %Q[git status --short | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
+  Thrust::Executor.system_or_exit %Q[git status --short | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
 end
 
 desc "Remove any focus from specs"
@@ -27,37 +27,38 @@ task :nof do
     "-e 's/#{method}/#{unfocused_method}/g;'"
   end
 
-  @thrust.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
+  Thrust::Executor.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
 end
 
 desc "Print out names of files containing focused specs"
 task :focused_specs do
   pattern = focused_methods.join("\\|")
-  directories = @thrust.config['spec_targets'].values.map {|h| h['target']}.join(' ')
-  @thrust.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
+  directories = @thrust.app_config['ios_spec_targets'].values.map {|h| h['target']}.join(' ')
+  Thrust::Executor.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
 end
 
 desc 'Clean all targets'
-task :clean do
-  @thrust.xcode_build_configurations.each do |config|
-    @thrust.xcode_clean(config)
+task :clean_build do
+  Thrust::IOS::XCodeTools.build_configurations(@thrust.app_config['project_name']).each do |config|
+    xcode_tools = Thrust::IOS::XCodeTools.new($stdout, config, @thrust.build_dir, @thrust.app_config['project_name'])
+    xcode_tools.clean_build
   end
 end
 
-@thrust.config['spec_targets'].each do |task_name, info|
-  desc "Run #{info['name']}"
+(@thrust.app_config['ios_spec_targets'] || []).each do |task_name, target_info|
+  desc "Run the #{target_info['target']} target"
   task task_name do
-    build_configuration = info['configuration']
-    target = info['target']
-    sdk = info['sdk']
-    os = info['os'] || 'iphonesimulator'
+    build_configuration = target_info['build_configuration']
+    target = target_info['target']
+    build_sdk = target_info['build_sdk'] || 'iphonesimulator' #build sdk - version you compile the code with
+    runtime_sdk = target_info['runtime_sdk'] #runtime sdk
 
-    @thrust.xcode_clean(build_configuration)
-    @thrust.xcode_build(build_configuration, os, target)
-    return_code = @thrust.run_cedar(build_configuration, target, sdk, os, info['device'])
-    if return_code != 0
-		exit(return_code)
-    end
+    xcode_tools = Thrust::IOS::XCodeTools.new($stdout, build_configuration, @thrust.build_dir, @thrust.app_config['project_name'])
+    xcode_tools.clean_and_build_target(target, build_sdk)
+
+    cedar_success = Thrust::IOS::Cedar.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
+
+		exit(cedar_success ? 0 : 1)
   end
 end
 

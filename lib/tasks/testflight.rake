@@ -1,106 +1,41 @@
 require 'yaml'
-require File.expand_path('../../thrust_config', __FILE__)
-require File.expand_path('../../ipa_re_signer', __FILE__)
 require 'tempfile'
+require File.expand_path('../../thrust', __FILE__)
 
 
-@thrust = ThrustConfig.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
-
-desc "show the current build"
-task :current_version do
-  @thrust.system_or_exit("agvtool what-version -terse")
-end
-
-namespace :bump do
-  desc 'Bumps the build'
-  task :build do
-    @thrust.run_git_with_message 'Bumped build to $(agvtool what-version -terse)' do
-      @thrust.system_or_exit 'agvtool bump -all'
-    end
-  end
-
-  namespace :version do
-    desc 'Bumps the major marketing version in (major.minor.patch)'
-    task :major do
-      @thrust.update_version(:major)
-    end
-
-    desc 'Bumps the minor marketing version in (major.minor.patch)'
-    task :minor do
-      @thrust.update_version(:minor)
-    end
-
-    desc 'Bumps the patch marketing version in (major.minor.patch)'
-    task :patch do
-      @thrust.update_version(:patch)
-    end
-  end
-end
+@thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 namespace :testflight do
-  @thrust.config['distributions'].each do |task_name, info|
-    desc "Deploy build to testflight #{info['team']} team (use NOTIFY=false to prevent team notification)"
-    task task_name, :provision_search_query do |task, args|
-      @team_token = info['token']
-      @distribution_list = info['default_list']
-      @configuration = info['configuration']
-      @bumps_build_number = info['increments_build_number'].nil? ? true : info['increments_build_number']
-      @notify = (info['notify'] || true).to_s
-      @configured = true
-      Rake::Task["testflight:deploy"].invoke(args[:provision_search_query])
+  android_project = File.exists?('AndroidManifest.xml')
+
+  @thrust.app_config['deployment_targets'].each do |task_name, deployment_config|
+    if android_project
+      desc "Deploy Android build to #{task_name} (use NOTIFY=false to prevent team notification)"
+      task task_name do |_, _|
+        Thrust::Android::Deploy.make(@thrust, deployment_config, task_name).run
+
+        Rake::Task['autotag:create'].invoke(task_name)
+      end
+    else
+      desc "Deploy iOS build to #{task_name} (use NOTIFY=false to prevent team notification)"
+      task task_name do |_, _|
+        Thrust::IOS::Deploy.make(@thrust, deployment_config, task_name).run
+
+        Rake::Task['autotag:create'].invoke(task_name)
+      end
     end
   end
+end
 
-  task :deploy, :provision_search_query do |task, args|
-    raise "You need to run a distribution configuration." unless @configured
-    team_token = @team_token
-    notify = @notify
-    distribution_list = @distribution_list
-    build_configuration = @configuration
-    build_dir = @thrust.build_dir_for(build_configuration)
-    target = @thrust.config['app_name']
+namespace :autotag do
+  task :create, :stage do |_, args|
+    `autotag create #{args[:stage]}`
+  end
 
-    if @bumps_build_number
-      Rake::Task["bump:build"].invoke
-    else
-      @thrust.check_for_clean_working_tree
+  desc 'Show the commit that is currently deployed to each environment'
+  task :list do
+    @thrust.app_config['deployment_targets'].each do |deployment_target, _|
+      puts Thrust::Git.new($stdout).commit_summary_for_last_deploy(deployment_target)
     end
-
-    STDERR.puts "Cleaning..."
-    @thrust.xcode_clean(build_configuration)
-    @thrust.system_or_exit "rm -r #{build_dir} ; exit 0"
-    STDERR.puts "Killing simulator..."
-    @thrust.kill_simulator
-    STDERR.puts "Building..."
-    @thrust.xcode_build(build_configuration, 'iphoneos', target)
-
-    app_name = @thrust.get_app_name_from(build_dir)
-
-    STDERR.puts "Packaging..."
-    ipa_file = @thrust.xcode_package(build_configuration)
-
-    IpaReSigner.make(ipa_file, @thrust.config['identity'], args[:provision_search_query]).call
-
-    STDERR.puts "Zipping dSYM..."
-    dsym_path = "#{build_dir}/#{app_name}.app.dSYM"
-    zipped_dsym_path = "#{dsym_path}.zip"
-    @thrust.system_or_exit "zip -r -T -y '#{zipped_dsym_path}' '#{dsym_path}'"
-    STDERR.puts "Done!"
-
-    print "Deploy Notes: "
-    message = STDIN.gets
-    message += "\n" + `git log HEAD^..HEAD`
-    message_file = Tempfile.new("deploy_notes")
-    message_file << message
-    @thrust.system_or_exit [
-     "curl http://testflightapp.com/api/builds.json",
-     "-F file=@#{ipa_file}",
-     "-F dsym=@#{zipped_dsym_path}",
-     "-F api_token='#{@thrust.config['api_token']}'",
-     "-F team_token='#{team_token}'",
-     "-F notes=@#{message_file.path}",
-     "-F notify=#{(ENV['NOTIFY'] || notify).downcase.capitalize}",
-     ("-F distribution_lists='#{distribution_list}'" if distribution_list)
-    ].compact.join(' ')
-    end
+  end
 end

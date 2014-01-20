@@ -1,27 +1,33 @@
 #!/usr/bin/env ruby
+
+require 'colorize'
+
+command = ARGV.first
+
+if command != 'install'
+  puts ''
+  puts '  USAGE:    '.yellow + 'thrust install'
+  exit 0
+end
+
+
 require 'fileutils'
 project_root = Dir.pwd
 thrust_root  = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
-if (!Dir.exists?(File.join(project_root, 'thrust', 'lib', 'tasks')))
-  Dir.mkdir(File.join(project_root, 'thrust'))
-  Dir.mkdir(File.join(project_root, 'thrust', 'lib'))
-  Dir.mkdir(File.join(project_root, 'thrust', 'lib', 'tasks'))
-end
-
-FileUtils.cp(Dir.glob(File.join(thrust_root, 'lib', 'tasks', '*.rake')), File.join(project_root, 'thrust', 'lib', 'tasks'))
-FileUtils.cp(File.join(thrust_root, 'lib', 'thrust_config.rb'), File.join(project_root, 'thrust', 'lib'))
-FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'example.yml'), File.join(project_root, 'thrust.example.yml'))
-
 rakefile = File.join(project_root, 'Rakefile')
-if (File.exists?(rakefile))
-  puts "You have an existing rakefile to add thrust tasks you should import its tasks:"
-  puts "Dir.glob('thrust/lib/tasks/*.rake').each { |r| import r }"
-else
-  File.open(rakefile, 'w') do |f|
-    f.puts "Dir.glob('thrust/lib/tasks/*.rake').each { |r| import r }"
-  end
-  puts "a Rakefile was created for you type 'rake -T' to see a list of tasks"
+File.open(rakefile, 'a') do |f|
+  f.puts "Dir.glob('#{thrust_root}/lib/tasks/*.rake').each { |r| import r }"
 end
 
-puts "Rename #{project_root}/thrust.example.yml to #{project_root}/thrust.yml and edit it for your project."
+FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'example.yml'), File.join(project_root, 'thrust.example.yml'))
+puts ''
+puts "  To finish installation of " + "Thrust".green + ", rename:\n\n"
+puts "    #{project_root}/thrust.example.yml\n".blue
+puts "  to:\n\n"
+puts "    #{project_root}/thrust.yml\n".blue
+puts "  and edit it for your project."
+
+puts ''
+puts "  Thrust rake tasks were generated in your Rakefile."
+puts "  Type 'rake -T' to see the list of tasks after you have created your thrust.yml configuration.".green
