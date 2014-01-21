@@ -2,7 +2,6 @@ require 'yaml'
 require 'tempfile'
 require File.expand_path('../../thrust', __FILE__)
 
-
 @thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 namespace :testflight do

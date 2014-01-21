@@ -17,7 +17,7 @@ thrust_root  = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 rakefile = File.join(project_root, 'Rakefile')
 File.open(rakefile, 'a') do |f|
-  f.puts "Dir.glob('#{thrust_root}/lib/tasks/*.rake').each { |r| import r }"
+  f.puts "require 'thrust/tasks'"
 end
 
 FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'example.yml'), File.join(project_root, 'thrust.example.yml'))
