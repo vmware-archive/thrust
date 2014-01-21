@@ -1,5 +1,10 @@
 language: ruby
+rvm:
+  - 2.1.0
+  - 2.0.0
+  - 1.9.3
 
 script: 'rake ci'
+
 notifications:
   webhooks: http://pulse.pivotallabs.com/projects/2cc350f8-8e97-4e36-a656-517e3dd8a5e5/status
