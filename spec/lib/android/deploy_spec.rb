@@ -80,7 +80,7 @@ describe Thrust::Android::Deploy do
 
     it 'updates the version number to the current git SHA' do
       Timecop.freeze(Time.at(1389303568)) do
-        android_tools.should_receive(:change_build_number).with('1401091339', '31758012490')
+        android_tools.should_receive(:change_build_number).with('1401092139', '31758012490')
         deploy.run
       end
     end

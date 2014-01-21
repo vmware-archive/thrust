@@ -23,7 +23,7 @@ class Thrust::Android::Deploy
 
   def run
     @git.ensure_clean
-    @tools.change_build_number(Time.now.strftime('%y%m%d%H%M'), @git.current_commit)
+    @tools.change_build_number(Time.now.utc.strftime('%y%m%d%H%M'), @git.current_commit)
     apk_path = @tools.build_signed_release
 
     @testflight.upload(apk_path, @notify, @distribution_list, @autogenerate_notes, @deployment_target)
