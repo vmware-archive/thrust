@@ -16,7 +16,7 @@ task :trim do
   AWK
   awk_statement.gsub!(%r{\s+}, " ")
 
-  Thrust::Executor.system_or_exit %Q[git status --short | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
+  Thrust::Executor.system_or_exit %Q[git status --porcelain | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
 end
 
 desc "Remove any focus from specs"
