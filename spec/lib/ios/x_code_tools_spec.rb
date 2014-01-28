@@ -34,7 +34,7 @@ describe Thrust::IOS::XCodeTools do
 
   describe '#clean_build' do
     it 'asks xcodebuild to clean' do
-      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release  clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
+      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj  -alltargets -configuration Release  clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
       expected_output = 'build/Release-clean.output'
       Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
 
@@ -54,7 +54,7 @@ describe Thrust::IOS::XCodeTools do
     end
 
     it 'calls xcodebuild with the build command' do
-      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -target AppTarget -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\''
+      expected_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target AppTarget -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\''
       expected_output = 'build/Release-build.output'
       Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
 

@@ -43,14 +43,14 @@ class Thrust::IOS::XCodeTools
 
   def clean_and_build_target(target, build_sdk)
     clean_build
-    build_target(target, build_sdk)
+    build_target(target, build_sdk, 'i386')
   end
 
   private
 
-  def build_target(target, build_sdk)
+  def build_target(target, build_sdk, architecture=nil)
     @out.puts "Building..."
-    run_xcode('build', build_sdk, target)
+    run_xcode('build', build_sdk, target, architecture)
   end
 
   def kill_simulator
@@ -84,15 +84,17 @@ class Thrust::IOS::XCodeTools
   end
 
 
-  def run_xcode(build_command, sdk = nil, target = nil)
+  def run_xcode(build_command, sdk = nil, target = nil, architecture=nil)
     target_flag = target ? "-target #{target}" : "-alltargets"
     sdk_flag = sdk ? "-sdk #{sdk}" : ''
+    architecture_flag = architecture ? "-arch #{architecture}" : ''
 
     Thrust::Executor.system_or_exit(
         [
             'set -o pipefail &&',
             'xcodebuild',
             "-project #{@project_name}.xcodeproj",
+            architecture_flag,
             target_flag,
             "-configuration #{@build_configuration}",
             sdk_flag,
