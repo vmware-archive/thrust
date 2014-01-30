@@ -18,7 +18,7 @@ __Thrust__ is a small project that contains some useful rake tasks to run Cedar 
 
 # Installation
 
-(Note: **Thrust** requires ruby >= 1.9.3)
+(Note: **Thrust** requires ruby >= 2.0.0)
 
 **Thrust** should be installed as a gem.  It comes with an installer that will set up your Rakefile and create an example configuration file.
 
