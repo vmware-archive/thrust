@@ -11,7 +11,8 @@ class Thrust::IOS::XCodeTools
     end
   end
 
-  def initialize(out, build_configuration, build_directory, options = {})
+  def initialize(thrust_executor, out, build_configuration, build_directory, options = {})
+    @thrust_executor = thrust_executor
     @out = out
     @git = Thrust::Git.new(out)
     @build_configuration = build_configuration
@@ -22,7 +23,7 @@ class Thrust::IOS::XCodeTools
   end
 
   def change_build_number(build_number)
-    Thrust::Executor.system_or_exit "agvtool new-version -all '#{build_number}'"
+    @thrust_executor.system_or_exit "agvtool new-version -all '#{build_number}'"
     @git.checkout_file('*.xcodeproj')
   end
 
@@ -57,9 +58,9 @@ class Thrust::IOS::XCodeTools
 
   def kill_simulator
     @out.puts('Killing simulator...')
-    Thrust::Executor.system %q[killall -m -KILL "gdb"]
-    Thrust::Executor.system %q[killall -m -KILL "otest"]
-    Thrust::Executor.system %q[killall -m -KILL "iPhone Simulator"]
+    @thrust_executor.system %q[killall -m -KILL "gdb"]
+    @thrust_executor.system %q[killall -m -KILL "otest"]
+    @thrust_executor.system %q[killall -m -KILL "iPhone Simulator"]
   end
 
   def provision_path(provision_search_query)
@@ -81,13 +82,13 @@ class Thrust::IOS::XCodeTools
         "--sign '#{signing_identity}'",
         "--embed '#{provision_path(provision_search_query)}'"
     ].join(' ')
-    Thrust::Executor.system_or_exit(cmd)
+    @thrust_executor.system_or_exit(cmd)
     ipa_filename
   end
 
   def run_xcode_clean_all
     if @workspace_name
-      output = Thrust::Executor.capture_output_from_system("xcodebuild #{project_or_workspace_flag} -list")
+      output = @thrust_executor.capture_output_from_system("xcodebuild #{project_or_workspace_flag} -list")
       match = /Schemes:(.*)/m.match(output)
       schemes = if match
                   match[1].strip.split("\n").compact.map { |line| line.strip }
@@ -110,7 +111,7 @@ class Thrust::IOS::XCodeTools
   def run_xcode_flags(build_command, sdk = nil, target_flag = nil, architecture=nil)
     sdk_flag = sdk ? "-sdk #{sdk}" : nil
     architecture_flag = architecture ? "-arch #{architecture}" : nil
-    Thrust::Executor.system_or_exit(
+    @thrust_executor.system_or_exit(
         [
             'set -o pipefail &&',
             'xcodebuild',

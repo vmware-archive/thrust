@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Thrust::IOS::XCodeTools do
+  let(:thrust_executor) { Thrust::FakeExecutor.new }
   let(:out) { StringIO.new }
   let(:build_configuration) { 'Release' }
   let(:project_name) { 'AwesomeProject' }
@@ -14,19 +15,16 @@ describe Thrust::IOS::XCodeTools do
   end
 
   before do
-    Thrust::Executor.stub(:system_or_exit)
-    Thrust::Executor.stub(:capture_output_from_system)
-    Thrust::Executor.stub(:system)
     Thrust::Git.stub(:new).and_return(git)
   end
 
   describe '.initialize' do
     it 'requires either a project_name or workspace_name' do
-      expect { Thrust::IOS::XCodeTools.new(out, build_configuration, build_directory) }.to raise_error
+      expect { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory) }.to raise_error
     end
 
     it 'does not allow both a project_name and workspace_name' do
-      expect { Thrust::IOS::XCodeTools.new(out, build_configuration, build_directory, workspace_name: 'workspace', project_name: 'project') }.to raise_error
+      expect { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: 'workspace', project_name: 'project') }.to raise_error
     end
   end
 
@@ -35,14 +33,16 @@ describe Thrust::IOS::XCodeTools do
   end
 
   context 'for an .xcodeproj based project' do
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(out, build_configuration, build_directory, project_name: project_name) }
+    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     describe '#clean_build' do
       it 'asks xcodebuild to clean' do
-        clean_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
-        clean_output = 'build/Release-clean.output'
-        Thrust::Executor.should_receive(:system_or_exit).with(clean_command, clean_output)
         subject.clean_build
+
+        expect(thrust_executor.system_or_exit_history.last).to eq({
+          cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+          output_file: 'build/Release-clean.output'
+        })
       end
 
       it 'deletes the build folder' do
@@ -58,24 +58,22 @@ describe Thrust::IOS::XCodeTools do
       end
 
       it 'calls xcodebuild with the build command' do
-        build_command = 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\''
-        build_output = 'build/Release-build.output'
-
-        Thrust::Executor.should_receive(:system_or_exit).with(build_command, build_output)
-
         subject.clean_and_build_target(target, os)
+
+        expect(thrust_executor.system_or_exit_history.last).to eq({
+          cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+          output_file: 'build/Release-build.output'
+        })
       end
     end
   end
 
   context 'for an .xcworkspace based project' do
     let (:workspace_name) { 'AwesomeWorkspace' }
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(out, build_configuration, build_directory, workspace_name: workspace_name) }
+    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: workspace_name) }
 
     describe '#clean_build' do
-      it 'asks xcodebuild to clean' do
-
-        expected_command = 'xcodebuild -workspace AwesomeWorkspace.xcworkspace -list'
+      before do
         expected_output = <<LIST_OUTPUT
 Information about workspace "AwesomeWorkspace":
     Schemes:
@@ -84,26 +82,19 @@ Information about workspace "AwesomeWorkspace":
         OtherProject
         Specs
 LIST_OUTPUT
+        thrust_executor.register_output_for_cmd(expected_output, 'xcodebuild -workspace AwesomeWorkspace.xcworkspace -list')
+      end
 
-        Thrust::Executor.should_receive(:capture_output_from_system).with(expected_command).and_return(expected_output)
-
-        expected_command = 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "AwesomeProject" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
-        expected_output = 'build/Release-clean.output'
-        Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
-
-        expected_command = 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "Specs (AwesomeProject)" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
-        expected_output = 'build/Release-clean.output'
-        Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
-
-        expected_command = 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "OtherProject" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
-        expected_output = 'build/Release-clean.output'
-        Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
-
-        expected_command = 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "Specs" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\''
-        expected_output = 'build/Release-clean.output'
-        Thrust::Executor.should_receive(:system_or_exit).with(expected_command, expected_output)
-
+      it 'asks xcodebuild to clean' do
         subject.clean_build
+
+        expected_output = 'build/Release-clean.output'
+        expect(thrust_executor.system_or_exit_history).to eq([
+          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "AwesomeProject" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
+          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "Specs (AwesomeProject)" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
+          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "OtherProject" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
+          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "Specs" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
+        ])
       end
 
       it 'deletes the build folder' do
@@ -119,21 +110,22 @@ LIST_OUTPUT
       end
 
       it 'calls xcodebuild with the build command' do
-        build_command = 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -arch i386 -scheme "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\''
-        build_output = 'build/Release-build.output'
-        Thrust::Executor.should_receive(:system_or_exit).with(build_command, build_output)
-
         subject.clean_and_build_target(target, os)
+
+        expect(thrust_executor.system_or_exit_history.last).to eq({
+                                                                    cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -arch i386 -scheme "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+                                                                    output_file: 'build/Release-build.output'
+                                                                  })
       end
     end
   end
 
   describe '#change_build_number' do
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(out, build_configuration, build_directory, project_name: project_name) }
+    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     it 'updates the build number' do
-      Thrust::Executor.should_receive(:system_or_exit).with("agvtool new-version -all 'abcdef'")
       x_code_tools.change_build_number('abcdef')
+      expect(thrust_executor.system_or_exit_history.last).to eq({cmd: "agvtool new-version -all 'abcdef'", output_file: nil})
     end
 
     it 'does not change the project file (only changing Info.plist)' do
@@ -147,7 +139,7 @@ LIST_OUTPUT
     let(:signing_identity) { 'iPhone Distribution' }
     let(:provision_search_query) { 'query' }
     let(:provisioning_path) { 'provisioning-path' }
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(out, build_configuration, build_directory, project_name: project_name) }
+    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     before do
       x_code_tools.stub(:`).and_return(provisioning_path)
@@ -163,11 +155,13 @@ LIST_OUTPUT
     end
 
     it 'kills the simulator' do
-      Thrust::Executor.should_receive(:system).with('killall -m -KILL "gdb"')
-      Thrust::Executor.should_receive(:system).with('killall -m -KILL "otest"')
-      Thrust::Executor.should_receive(:system).with('killall -m -KILL "iPhone Simulator"')
-
       create_ipa
+
+      expect(thrust_executor.system_history).to eq([
+        {cmd: 'killall -m -KILL "gdb"', output_file: nil},
+        {cmd: 'killall -m -KILL "otest"', output_file: nil},
+        {cmd: 'killall -m -KILL "iPhone Simulator"', output_file: nil}
+      ])
     end
 
     it 'builds the app' do
@@ -176,10 +170,8 @@ LIST_OUTPUT
     end
 
     it 'creates the ipa' do
-      expected_command = "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --sign 'iPhone Distribution' --embed '#{provisioning_path}'"
-      Thrust::Executor.should_receive(:system_or_exit).with(expected_command)
-
       create_ipa
+      expect(thrust_executor.system_or_exit_history.last).to eq({cmd: "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --sign 'iPhone Distribution' --embed '#{provisioning_path}'", output_file: nil})
     end
 
     context 'when it can not find the provisioning profile' do
