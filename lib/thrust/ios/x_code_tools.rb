@@ -11,12 +11,14 @@ class Thrust::IOS::XCodeTools
     end
   end
 
-  def initialize(out, build_configuration, build_directory, project_name)
+  def initialize(out, build_configuration, build_directory, options = {})
     @out = out
     @git = Thrust::Git.new(out)
     @build_configuration = build_configuration
     @build_directory = build_directory
-    @project_name = project_name
+    @project_name = options[:project_name]
+    @workspace_name = options[:workspace_name]
+    raise "project_name OR workspace_name required" unless @project_name.nil? ^ @workspace_name.nil?
   end
 
   def change_build_number(build_number)
@@ -37,7 +39,7 @@ class Thrust::IOS::XCodeTools
 
   def clean_build
     @out.puts 'Cleaning...'
-    run_xcode('clean')
+    run_xcode_clean_all
     FileUtils.rm_rf(build_configuration_directory)
   end
 
@@ -83,17 +85,36 @@ class Thrust::IOS::XCodeTools
     ipa_filename
   end
 
+  def run_xcode_clean_all
+    if @workspace_name
+      output = Thrust::Executor.capture_output_from_system("xcodebuild #{project_or_workspace_flag} -list")
+      match = /Schemes:(.*)/m.match(output)
+      schemes = if match
+                  match[1].strip.split("\n").compact.map { |line| line.strip }
+                else
+                  []
+                end
+      schemes.each do |scheme|
+        run_xcode_flags('clean', nil, "-scheme \"#{scheme}\"")
+      end
+    else
+      run_xcode_flags('clean', nil, '-alltargets')
+    end
+  end
 
   def run_xcode(build_command, sdk = nil, target = nil, architecture=nil)
-    target_flag = target ? "-target #{target}" : "-alltargets"
-    sdk_flag = sdk ? "-sdk #{sdk}" : ''
-    architecture_flag = architecture ? "-arch #{architecture}" : ''
+    target_flag = @workspace_name ? "-scheme \"#{target}\"" : "-target \"#{target}\""
+    run_xcode_flags(build_command, sdk, target_flag, architecture)
+  end
 
+  def run_xcode_flags(build_command, sdk = nil, target_flag = nil, architecture=nil)
+    sdk_flag = sdk ? "-sdk #{sdk}" : nil
+    architecture_flag = architecture ? "-arch #{architecture}" : nil
     Thrust::Executor.system_or_exit(
         [
             'set -o pipefail &&',
             'xcodebuild',
-            "-project #{@project_name}.xcodeproj",
+            project_or_workspace_flag,
             architecture_flag,
             target_flag,
             "-configuration #{@build_configuration}",
@@ -102,7 +123,7 @@ class Thrust::IOS::XCodeTools
             "SYMROOT=#{@build_directory.inspect}",
             '2>&1',
             "| grep -v 'backing file'"
-        ].join(' '),
+        ].compact.join(' '),
         output_file("#{@build_configuration}-#{build_command}")
     )
   end
@@ -115,5 +136,9 @@ class Thrust::IOS::XCodeTools
                  end
 
     File.join(output_dir, "#{target}.output").tap { |file| @out.puts "Output: #{file}" }
+  end
+
+  def project_or_workspace_flag
+    @workspace_name ? "-workspace #{@workspace_name}.xcworkspace" : "-project #{@project_name}.xcodeproj"
   end
 end

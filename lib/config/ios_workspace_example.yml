@@ -1,0 +1,36 @@
+thrust_version: 0.2
+workspace_name: My Great Project
+app_name: My Great App
+ios_distribution_certificate: 'Name of Distribution Signing Certificate'
+ios_sim_binary: 'ios-sim' # or wax-sim. iOS only.
+
+testflight:
+  api_token: 'testflight api token'
+  team_token: 'testflight team token'
+
+deployment_targets:
+  staging:
+    distribution_list: Developers
+    notify: true
+    note_generation_method: autotag  # If you set this value, it will auto-generate the deploy notes from the commit history. Optional.
+    ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name. iOS only.
+    ios_build_configuration: Release # iOS only
+    ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
+
+  demo:
+    distribution_list: Beta Testers
+    notify: true
+
+ios_spec_targets:
+  specs:
+    target: UISpecs # name of the build target
+    build_configuration: Debug # name of the build configuration
+    build_sdk: 6.1 # SDK used to build the target. Optional, defaults to iphonesimulator.
+    runtime_sdk: 7.0 # SDK used to run the target. Not optional.
+    device: ipad # Device to run the specs on. Optional, defaults to iPhone.
+
+  integration:
+    target: IntegrationSpecs
+    build_configuration: Release
+    build_sdk: macosx
+    runtime_sdk: macosx

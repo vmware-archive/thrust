@@ -19,7 +19,7 @@ task :trim do
   Thrust::Executor.system_or_exit %Q[git status --porcelain | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
 end
 
-desc "Remove any focus from specs"
+desc 'Remove any focus from specs'
 task :nof do
   substitutions = focused_methods.map do |method|
     unfocused_method = method.sub(/^f/, '')
@@ -29,7 +29,7 @@ task :nof do
   Thrust::Executor.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
 end
 
-desc "Print out names of files containing focused specs"
+desc 'Print out names of files containing focused specs'
 task :focused_specs do
   pattern = focused_methods.join("\\|")
   directories = @thrust.app_config['ios_spec_targets'].values.map {|h| h['target']}.join(' ')
@@ -62,5 +62,5 @@ end
 end
 
 def focused_methods
-  ["fit", "fcontext", "fdescribe"].map { |method| "#{method}(@" }
+  %w(fit fcontext fdescribe).map { |method| "#{method}(@" }
 end
