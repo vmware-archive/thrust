@@ -54,7 +54,7 @@ describe Thrust::IOS::Deploy do
 
     it 'creates a Thrust::Git' do
       fake_git = double
-      Thrust::Git.should_receive(:new).with($stdout).and_return(fake_git)
+      Thrust::Git.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout).and_return(fake_git)
       Thrust::IOS::Deploy.should_receive(:new) do |_, _, git|
         expect(git).to eq(fake_git)
       end
@@ -64,7 +64,7 @@ describe Thrust::IOS::Deploy do
 
     it 'creates a Thrust::Testflight' do
       fake_test_flight = double
-      Thrust::Testflight.should_receive(:new).with($stdout, $stdin, 'api_token', 'team_token').and_return(fake_test_flight)
+      Thrust::Testflight.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout, $stdin, 'api_token', 'team_token').and_return(fake_test_flight)
       Thrust::IOS::Deploy.should_receive(:new) do |*args|
         expect(args[3]).to eq(fake_test_flight)
       end

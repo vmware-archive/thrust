@@ -4,7 +4,7 @@ class Thrust::IOS::XCodeTools
   def initialize(thrust_executor, out, build_configuration, build_directory, options = {})
     @thrust_executor = thrust_executor
     @out = out
-    @git = Thrust::Git.new(out)
+    @git = Thrust::Git.new(@thrust_executor, @out)
     @build_configuration = build_configuration
     @build_directory = build_directory
     @project_name = options[:project_name]
@@ -20,7 +20,7 @@ class Thrust::IOS::XCodeTools
   def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
     clean_build
     kill_simulator
-    build_target(target, 'iphoneos')
+    build_scheme_or_target(target, 'iphoneos')
     create_ipa(app_name, signing_identity, provision_search_query)
   end
 
@@ -33,16 +33,16 @@ class Thrust::IOS::XCodeTools
     FileUtils.rm_rf(@build_directory)
   end
 
-  def clean_and_build_target(target, build_sdk)
+  def clean_and_build_scheme_or_target(scheme_or_target, build_sdk)
     clean_build
-    build_target(target, build_sdk, 'i386')
+    build_scheme_or_target(scheme_or_target, build_sdk, 'i386')
   end
 
   private
 
-  def build_target(target, build_sdk, architecture=nil)
+  def build_scheme_or_target(target_or_scheme, build_sdk, architecture=nil)
     @out.puts "Building..."
-    run_xcode('build', build_sdk, target, architecture)
+    run_xcode('build', build_sdk, target_or_scheme, architecture)
   end
 
   def kill_simulator
@@ -75,9 +75,9 @@ class Thrust::IOS::XCodeTools
     ipa_filename
   end
 
-  def run_xcode(build_command, sdk = nil, target = nil, architecture=nil)
+  def run_xcode(build_command, sdk = nil, scheme_or_target = nil, architecture=nil)
     architecture_flag = architecture ? "-arch #{architecture}" : nil
-    target_flag = @workspace_name ? "-scheme \"#{target}\"" : "-target \"#{target}\""
+    target_flag = @workspace_name ? "-scheme \"#{scheme_or_target}\"" : "-target \"#{scheme_or_target}\""
     sdk_flag = sdk ? "-sdk #{sdk}" : nil
     @thrust_executor.system_or_exit(
       [

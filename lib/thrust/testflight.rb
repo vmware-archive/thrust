@@ -1,8 +1,9 @@
 class Thrust::Testflight
-  def initialize(out, input, api_token, team_token)
+  def initialize(thrust_executor, out, input, api_token, team_token)
+    @thrust_executor = thrust_executor
     @out = out
     @in = input
-    @git = Thrust::Git.new(@out)
+    @git = Thrust::Git.new(@thrust_executor, @out)
     @api_token = api_token
     @team_token = team_token
   end
@@ -11,7 +12,7 @@ class Thrust::Testflight
     if dsym_path
       @out.puts 'Zipping dSYM...'
       zipped_dsym_path = "#{dsym_path}.zip"
-      Thrust::Executor.system_or_exit "zip -r -T -y '#{zipped_dsym_path}' '#{dsym_path}'"
+      @thrust_executor.system_or_exit "zip -r -T -y '#{zipped_dsym_path}' '#{dsym_path}'"
       @out.puts 'Done!'
     end
 
@@ -22,7 +23,7 @@ class Thrust::Testflight
     end
 
 
-    Thrust::Executor.system_or_exit [
+    @thrust_executor.system_or_exit [
                                       'curl http://testflightapp.com/api/builds.json',
                                       "-F file=@#{package_file}",
                                       ("-F dsym=@#{zipped_dsym_path}" if dsym_path),

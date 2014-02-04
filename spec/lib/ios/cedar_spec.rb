@@ -9,22 +9,24 @@ describe Thrust::IOS::Cedar do
   let(:build_dir) { 'build_dir' }
   let(:out) { StringIO.new }
   let(:sim_binary) { 'ios-sim' }
+  let(:thrust_executor) { Thrust::Executor.new }
+  let(:cedar) { Thrust::IOS::Cedar.new(thrust_executor) }
 
-  subject { Thrust::IOS::Cedar.run(out, build_configuration, target, sdk, os, device, build_dir, sim_binary) }
+  subject { cedar.run(out, build_configuration, target, sdk, os, device, build_dir, sim_binary) }
 
   before do
-    Thrust::Executor.stub(:check_command_for_failure)
+    thrust_executor.stub(:check_command_for_failure)
   end
 
   describe 'run' do
     it 'returns true when the cmd works' do
-      Thrust::Executor.stub(:check_command_for_failure).and_return(true)
+      thrust_executor.stub(:check_command_for_failure).and_return(true)
 
       expect(subject).to be_true
     end
 
     it 'returns false when the cmd fails' do
-      Thrust::Executor.stub(:check_command_for_failure).and_return(false)
+      thrust_executor.stub(:check_command_for_failure).and_return(false)
 
       expect(subject).to be_false
     end

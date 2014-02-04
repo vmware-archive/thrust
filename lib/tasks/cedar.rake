@@ -44,17 +44,18 @@ task :clean_build do
 end
 
 (@thrust.app_config['ios_spec_targets'] || []).each do |task_name, target_info|
-  desc "Run the #{target_info['target']} target"
+  desc "Run the #{target_info['target'].inspect} target with scheme #{(target_info['scheme'] || target_info['target']).inspect}"
   task task_name do
     build_configuration = target_info['build_configuration']
     target = target_info['target']
+    scheme = target_info['scheme']
     build_sdk = target_info['build_sdk'] || 'iphonesimulator' #build sdk - version you compile the code with
     runtime_sdk = target_info['runtime_sdk'] #runtime sdk
 
     xcode_tools = xcode_tools_instance(build_configuration)
-    xcode_tools.clean_and_build_target(target, build_sdk)
+    xcode_tools.clean_and_build_scheme_or_target(scheme || target, build_sdk)
 
-    cedar_success = Thrust::IOS::Cedar.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
+    cedar_success = Thrust::IOS::Cedar.new.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
 
 		exit(cedar_success ? 0 : 1)
   end

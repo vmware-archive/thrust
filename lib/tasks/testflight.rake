@@ -34,7 +34,7 @@ namespace :autotag do
   desc 'Show the commit that is currently deployed to each environment'
   task :list do
     @thrust.app_config['deployment_targets'].each do |deployment_target, _|
-      puts Thrust::Git.new($stdout).commit_summary_for_last_deploy(deployment_target)
+      puts Thrust::Git.new(Thrust::Executor.new, $stdout).commit_summary_for_last_deploy(deployment_target)
     end
   end
 end

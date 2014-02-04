@@ -1,6 +1,6 @@
 class Thrust::Executor
   def system_or_exit(cmd, output_file = nil)
-    self.system(cmd, output_file) or raise '******** Build failed ********'
+    system(cmd, output_file) or raise '******** Build failed ********'
   end
 
   def system(cmd, output_file = nil)

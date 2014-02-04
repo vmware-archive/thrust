@@ -43,11 +43,11 @@ describe Thrust::IOS::XCodeTools do
     describe '#clean_and_build_target' do
       it 'cleans the build' do
         subject.should_receive(:clean_build)
-        subject.clean_and_build_target(target, os)
+        subject.clean_and_build_scheme_or_target(target, os)
       end
 
       it 'calls xcodebuild with the build command' do
-        subject.clean_and_build_target(target, os)
+        subject.clean_and_build_scheme_or_target(target, os)
 
         expect(thrust_executor.system_or_exit_history.last).to eq({
           cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
@@ -64,11 +64,11 @@ describe Thrust::IOS::XCodeTools do
     describe '#clean_and_build_scheme' do
       it 'cleans the build' do
         subject.should_receive(:clean_build)
-        subject.clean_and_build_target(target, os)
+        subject.clean_and_build_scheme_or_target(target, os)
       end
 
       it 'calls xcodebuild with the build command' do
-        subject.clean_and_build_target(target, os)
+        subject.clean_and_build_scheme_or_target(target, os)
 
         expect(thrust_executor.system_or_exit_history.last).to eq({
                                                                     cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -arch i386 -scheme "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
@@ -123,7 +123,7 @@ describe Thrust::IOS::XCodeTools do
     end
 
     it 'builds the app' do
-      subject.should_receive(:build_target).with(target, os)
+      subject.should_receive(:build_scheme_or_target).with(target, os)
       create_ipa
     end
 

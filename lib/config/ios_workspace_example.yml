@@ -23,7 +23,8 @@ deployment_targets:
 
 ios_spec_targets:
   specs:
-    target: UISpecs # name of the build target
+    target: Specs # name of the build target
+    scheme: Specs (My Great App) # optional scheme (useful when workspace contains multiple targets with the same name)
     build_configuration: Debug # name of the build configuration
     build_sdk: 6.1 # SDK used to build the target. Optional, defaults to iphonesimulator.
     runtime_sdk: 7.0 # SDK used to run the target. Not optional.
