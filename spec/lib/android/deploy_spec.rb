@@ -15,52 +15,6 @@ describe Thrust::Android::Deploy do
   let(:distribution_config) { {'notify' => 'true', 'distribution_list' => 'devs', 'note_generation_method' => 'autotag' } }
   let(:deployment_target) { 'production' }
 
-  describe ".make" do
-    before do
-      Thrust::Testflight.stub(:new)
-    end
-
-    subject(:make) { Thrust::Android::Deploy.make(thrust_config, distribution_config, deployment_target) }
-
-    it 'returns a new Thrust::Android::Deploy' do
-      expect(make).to be_instance_of(Thrust::Android::Deploy)
-    end
-
-    it 'passes app_config, and distribution_config to the Thrust::Android::Deploy' do
-      Thrust::Android::Deploy.should_receive(:new).with($stdout, anything, anything, anything, 'true', 'devs', true, deployment_target)
-      make
-    end
-
-    it 'creates a Thrust::AndroidTools' do
-      fake_android_tools = double
-      Thrust::Android::Tools.should_receive(:new).with($stdout).and_return(fake_android_tools)
-      Thrust::Android::Deploy.should_receive(:new) do |_, tools|
-        expect(tools).to eq(fake_android_tools)
-      end
-
-      make
-    end
-
-    it 'creates a Thrust::Git' do
-      fake_git = double
-      Thrust::Git.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout).and_return(fake_git)
-      Thrust::Android::Deploy.should_receive(:new) do |_, _, git|
-        expect(git).to eq(fake_git)
-      end
-
-      make
-    end
-
-    it 'creates a Thrust::Testflight' do
-      fake_test_flight = double
-      Thrust::Testflight.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout, $stdin, 'api_token', 'team_token').and_return(fake_test_flight)
-      Thrust::Android::Deploy.should_receive(:new) do |*args|
-        expect(args[3]).to eq(fake_test_flight)
-      end
-
-      make
-    end
-  end
 
   describe "#run" do
     let(:out) { StringIO.new }
