@@ -78,20 +78,6 @@ describe Thrust::IOS::XCodeTools do
     end
   end
 
-  describe '#change_build_number' do
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
-
-    it 'updates the build number' do
-      x_code_tools.change_build_number('abcdef')
-      expect(thrust_executor.system_or_exit_history.last).to eq({cmd: "agvtool new-version -all 'abcdef'", output_file: nil})
-    end
-
-    it 'does not change the project file (only changing Info.plist)' do
-      git.should_receive(:checkout_file).with('*.xcodeproj')
-      x_code_tools.change_build_number('abcdef')
-    end
-  end
-
   describe '#cleanly_create_ipa' do
     let(:app_name) { 'AppName' }
     let(:signing_identity) { 'iPhone Distribution' }

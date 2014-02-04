@@ -25,60 +25,13 @@ describe Thrust::IOS::Deploy do
   end
   let(:deployment_target) { 'production' }
 
-  describe ".make" do
-    subject(:make) { Thrust::IOS::Deploy.make(thrust_config, distribution_config, deployment_target) }
-
-    before do
-      Thrust::IOS::XCodeTools.stub(:new)
-      Thrust::Testflight.stub(:new)
-    end
-
-    it 'returns a new Thrust::IOS::Deploy' do
-      expect(make).to be_instance_of(Thrust::IOS::Deploy)
-    end
-
-    it 'passes provisioning search query, thrust config, and distribution_config to the Thrust::IOS::Deploy' do
-      Thrust::IOS::Deploy.should_receive(:new).with($stdout, anything, anything, anything, thrust_config, distribution_config, deployment_target)
-      make
-    end
-
-    it 'gets a Thrust::IOS::XCodeTools from the provider' do
-      fake_xcode_tools = double
-      Thrust::IOS::XCodeToolsProvider.any_instance.should_receive(:instance).with($stdout, 'configuration', 'build_dir', { project_name: 'project_name', workspace_name: 'workspace_name' }).and_return(fake_xcode_tools)
-      Thrust::IOS::Deploy.should_receive(:new) do |_, xcode_tools|
-        expect(xcode_tools).to eq(fake_xcode_tools)
-      end
-
-      make
-    end
-
-    it 'creates a Thrust::Git' do
-      fake_git = double
-      Thrust::Git.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout).and_return(fake_git)
-      Thrust::IOS::Deploy.should_receive(:new) do |_, _, git|
-        expect(git).to eq(fake_git)
-      end
-
-      make
-    end
-
-    it 'creates a Thrust::Testflight' do
-      fake_test_flight = double
-      Thrust::Testflight.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout, $stdin, 'api_token', 'team_token').and_return(fake_test_flight)
-      Thrust::IOS::Deploy.should_receive(:new) do |*args|
-        expect(args[3]).to eq(fake_test_flight)
-      end
-
-      make
-    end
-  end
-
   describe "#run" do
     let(:out) { StringIO.new }
     let(:x_code_tools) { double(Thrust::IOS::XCodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
+    let(:agv_tool) { double(Thrust::IOS::AgvTool).as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
     let(:testflight) { double(Thrust::Testflight).as_null_object }
-    subject(:deploy) { Thrust::IOS::Deploy.new(out, x_code_tools, git, testflight, thrust_config, distribution_config, deployment_target) }
+    subject(:deploy) { Thrust::IOS::Deploy.new(out, x_code_tools, agv_tool, git, testflight, thrust_config, distribution_config, deployment_target) }
 
     before do
       git.stub(:current_commit).and_return('31758012490')
@@ -90,7 +43,7 @@ describe Thrust::IOS::Deploy do
     end
 
     it 'updates the version number to the current git SHA' do
-      x_code_tools.should_receive(:change_build_number).with('31758012490')
+      agv_tool.should_receive(:change_build_number).with('31758012490')
       deploy.run
     end
 

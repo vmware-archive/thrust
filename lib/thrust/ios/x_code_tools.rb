@@ -12,11 +12,6 @@ class Thrust::IOS::XCodeTools
     raise "project_name OR workspace_name required" unless @project_name.nil? ^ @workspace_name.nil?
   end
 
-  def change_build_number(build_number)
-    @thrust_executor.system_or_exit "agvtool new-version -all '#{build_number}'"
-    @git.checkout_file('*.xcodeproj')
-  end
-
   def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
     clean_build
     kill_simulator
