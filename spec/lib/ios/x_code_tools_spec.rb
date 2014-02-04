@@ -28,28 +28,17 @@ describe Thrust::IOS::XCodeTools do
     end
   end
 
-  describe '.build_configurations' do
+  describe '#clean_build' do
+    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
+    it 'deletes the build folder' do
+      subject.clean_build
+      expect(File.directory?('build')).to be_false
+    end
   end
 
   context 'for an .xcodeproj based project' do
     subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
-
-    describe '#clean_build' do
-      it 'asks xcodebuild to clean' do
-        subject.clean_build
-
-        expect(thrust_executor.system_or_exit_history.last).to eq({
-          cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -alltargets -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'',
-          output_file: 'build/Release-clean.output'
-        })
-      end
-
-      it 'deletes the build folder' do
-        subject.clean_build
-        expect(File.directory?('build/Release-iphoneos')).to be_false
-      end
-    end
 
     describe '#clean_and_build_target' do
       it 'cleans the build' do
@@ -71,37 +60,6 @@ describe Thrust::IOS::XCodeTools do
   context 'for an .xcworkspace based project' do
     let (:workspace_name) { 'AwesomeWorkspace' }
     subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: workspace_name) }
-
-    describe '#clean_build' do
-      before do
-        expected_output = <<LIST_OUTPUT
-Information about workspace "AwesomeWorkspace":
-    Schemes:
-        AwesomeProject
-        Specs (AwesomeProject)
-        OtherProject
-        Specs
-LIST_OUTPUT
-        thrust_executor.register_output_for_cmd(expected_output, 'xcodebuild -workspace AwesomeWorkspace.xcworkspace -list')
-      end
-
-      it 'asks xcodebuild to clean' do
-        subject.clean_build
-
-        expected_output = 'build/Release-clean.output'
-        expect(thrust_executor.system_or_exit_history).to eq([
-          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "AwesomeProject" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
-          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "Specs (AwesomeProject)" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
-          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "OtherProject" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
-          { cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -scheme "Specs" -configuration Release clean SYMROOT="build" 2>&1 | grep -v \'backing file\'', output_file: expected_output },
-        ])
-      end
-
-      it 'deletes the build folder' do
-        subject.clean_build
-        expect(File.directory?('build/Release-iphoneos')).to be_false
-      end
-    end
 
     describe '#clean_and_build_scheme' do
       it 'cleans the build' do

@@ -5,6 +5,6 @@ class Thrust::IOS::XCodeToolsProvider
   end
 
   def instance(out, build_configuration, build_directory, options)
-    XCodeTools.new(@thrust_executor, out, build_configuration, build_directory, options)
+    Thrust::IOS::XCodeTools.new(@thrust_executor, out, build_configuration, build_directory, options)
   end
 end

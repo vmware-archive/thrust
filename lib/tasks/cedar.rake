@@ -3,6 +3,8 @@ require 'tmpdir'
 require File.expand_path('../../thrust', __FILE__)
 
 @thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@xcode_tools_provider = Thrust::IOS::XCodeToolsProvider.new
+@executor = Thrust::Executor.new
 
 desc 'Trim whitespace'
 task :trim do
@@ -16,7 +18,7 @@ task :trim do
   AWK
   awk_statement.gsub!(%r{\s+}, " ")
 
-  Thrust::Executor.system_or_exit %Q[git status --porcelain | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
+  @executor.system_or_exit %Q[git status --porcelain | awk '#{awk_statement}' | grep -e '.*\.[cmh]$' | xargs sed -i '' -e 's/	/    /g;s/ *$//g;']
 end
 
 desc 'Remove any focus from specs'
@@ -26,22 +28,19 @@ task :nof do
     "-e 's/#{method}/#{unfocused_method}/g;'"
   end
 
-  Thrust::Executor.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
+  @executor.system_or_exit %Q[ rake focused_specs | xargs -I filename sed -i '' #{substitutions.join(' ')} "filename" ]
 end
 
 desc 'Print out names of files containing focused specs'
 task :focused_specs do
   pattern = focused_methods.join("\\|")
   directories = @thrust.app_config['ios_spec_targets'].values.map {|h| h['target']}.join(' ')
-  Thrust::Executor.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
+  @executor.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
 end
 
 desc 'Clean all targets'
 task :clean_build do
-  Thrust::IOS::XCodeTools.build_configurations(@thrust.app_config['project_name']).each do |config|
-    xcode_tools = Thrust::IOS::XCodeToolsProvider.new.instance($stdout, config, @thrust.build_dir, @thrust.app_config['project_name'])
-    xcode_tools.clean_build
-  end
+  xcode_tools_instance(nil).clean_build
 end
 
 (@thrust.app_config['ios_spec_targets'] || []).each do |task_name, target_info|
@@ -52,7 +51,7 @@ end
     build_sdk = target_info['build_sdk'] || 'iphonesimulator' #build sdk - version you compile the code with
     runtime_sdk = target_info['runtime_sdk'] #runtime sdk
 
-    xcode_tools = Thrust::IOS::XCodeToolsProvider.new.instance($stdout, build_configuration, @thrust.build_dir, @thrust.app_config['project_name'])
+    xcode_tools = xcode_tools_instance(build_configuration)
     xcode_tools.clean_and_build_target(target, build_sdk)
 
     cedar_success = Thrust::IOS::Cedar.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
@@ -63,4 +62,9 @@ end
 
 def focused_methods
   %w(fit fcontext fdescribe).map { |method| "#{method}(@" }
+end
+
+def xcode_tools_instance(build_configuration)
+  tools_options = { project_name: @thrust.app_config['project_name'], workspace_name: @thrust.app_config['workspace_name'] }
+  @xcode_tools_provider.instance($stdout, build_configuration, @thrust.build_dir, tools_options)
 end

@@ -1,16 +1,6 @@
 class Thrust::IOS::XCodeTools
   ProvisioningProfileNotFound = Class.new(StandardError)
 
-  def self.build_configurations(project_name) #TODO:  Backfill a test
-    output = Thrust::Executor.capture_output_from_system("xcodebuild -project #{project_name}.xcodeproj -list")
-    match = /Build Configurations:(.+?)\n\n/m.match(output)
-    if match
-      match[1].strip.split("\n").map { |line| line.strip }
-    else
-      []
-    end
-  end
-
   def initialize(thrust_executor, out, build_configuration, build_directory, options = {})
     @thrust_executor = thrust_executor
     @out = out
@@ -40,8 +30,7 @@ class Thrust::IOS::XCodeTools
 
   def clean_build
     @out.puts 'Cleaning...'
-    run_xcode_clean_all
-    FileUtils.rm_rf(build_configuration_directory)
+    FileUtils.rm_rf(@build_directory)
   end
 
   def clean_and_build_target(target, build_sdk)
@@ -86,46 +75,25 @@ class Thrust::IOS::XCodeTools
     ipa_filename
   end
 
-  def run_xcode_clean_all
-    if @workspace_name
-      output = @thrust_executor.capture_output_from_system("xcodebuild #{project_or_workspace_flag} -list")
-      match = /Schemes:(.*)/m.match(output)
-      schemes = if match
-                  match[1].strip.split("\n").compact.map { |line| line.strip }
-                else
-                  []
-                end
-      schemes.each do |scheme|
-        run_xcode_flags('clean', nil, "-scheme \"#{scheme}\"")
-      end
-    else
-      run_xcode_flags('clean', nil, '-alltargets')
-    end
-  end
-
   def run_xcode(build_command, sdk = nil, target = nil, architecture=nil)
-    target_flag = @workspace_name ? "-scheme \"#{target}\"" : "-target \"#{target}\""
-    run_xcode_flags(build_command, sdk, target_flag, architecture)
-  end
-
-  def run_xcode_flags(build_command, sdk = nil, target_flag = nil, architecture=nil)
-    sdk_flag = sdk ? "-sdk #{sdk}" : nil
     architecture_flag = architecture ? "-arch #{architecture}" : nil
+    target_flag = @workspace_name ? "-scheme \"#{target}\"" : "-target \"#{target}\""
+    sdk_flag = sdk ? "-sdk #{sdk}" : nil
     @thrust_executor.system_or_exit(
-        [
-            'set -o pipefail &&',
-            'xcodebuild',
-            project_or_workspace_flag,
-            architecture_flag,
-            target_flag,
-            "-configuration #{@build_configuration}",
-            sdk_flag,
-            "#{build_command}",
-            "SYMROOT=#{@build_directory.inspect}",
-            '2>&1',
-            "| grep -v 'backing file'"
-        ].compact.join(' '),
-        output_file("#{@build_configuration}-#{build_command}")
+      [
+        'set -o pipefail &&',
+        'xcodebuild',
+        project_or_workspace_flag,
+        architecture_flag,
+        target_flag,
+        "-configuration #{@build_configuration}",
+        sdk_flag,
+        "#{build_command}",
+        "SYMROOT=#{@build_directory.inspect}",
+        '2>&1',
+        "| grep -v 'backing file'"
+      ].compact.join(' '),
+      output_file("#{@build_configuration}-#{build_command}")
     )
   end
 

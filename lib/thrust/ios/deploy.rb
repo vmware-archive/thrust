@@ -1,7 +1,8 @@
 class Thrust::IOS::Deploy
   def self.make(thrust_config, deployment_config, deployment_target)
     build_configuration = deployment_config['ios_build_configuration']
-    x_code_tools = Thrust::IOS::XCodeTools.new($stdout, build_configuration, thrust_config.build_dir, thrust_config.app_config['project_name'])
+    tools_options = { project_name: thrust_config.app_config['project_name'], workspace_name: thrust_config.app_config['workspace_name'] }
+    x_code_tools = Thrust::IOS::XCodeToolsProvider.new.instance($stdout, build_configuration, thrust_config.build_dir, tools_options)
     git = Thrust::Git.new($stdout)
     testflight_config = thrust_config.app_config['testflight']
     testflight = Thrust::Testflight.new($stdout, $stdin, testflight_config['api_token'], testflight_config['team_token'])

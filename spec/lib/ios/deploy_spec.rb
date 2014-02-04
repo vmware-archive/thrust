@@ -6,6 +6,7 @@ describe Thrust::IOS::Deploy do
         'app_name' => 'AppName',
         'ios_distribution_certificate' => 'signing_identity',
         'project_name' => 'project_name',
+        'workspace_name' => 'workspace_name',
         'testflight' => {
             'team_token' => 'team_token',
             'api_token' => 'api_token'
@@ -41,9 +42,9 @@ describe Thrust::IOS::Deploy do
       make
     end
 
-    it 'creates a Thrust::IOS::XCodeTools' do
+    it 'gets a Thrust::IOS::XCodeTools from the provider' do
       fake_xcode_tools = double
-      Thrust::IOS::XCodeTools.should_receive(:new).with($stdout, 'configuration', 'build_dir', 'project_name').and_return(fake_xcode_tools)
+      Thrust::IOS::XCodeToolsProvider.any_instance.should_receive(:instance).with($stdout, 'configuration', 'build_dir', { project_name: 'project_name', workspace_name: 'workspace_name' }).and_return(fake_xcode_tools)
       Thrust::IOS::Deploy.should_receive(:new) do |_, xcode_tools|
         expect(xcode_tools).to eq(fake_xcode_tools)
       end
