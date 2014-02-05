@@ -28,9 +28,9 @@ class Thrust::IOS::XCodeTools
     FileUtils.rm_rf(@build_directory)
   end
 
-  def build_scheme_or_target(target_or_scheme, build_sdk, architecture=nil)
+  def build_scheme_or_target(scheme_or_target, build_sdk, architecture=nil)
     @out.puts "Building..."
-    run_xcode('build', build_sdk, target_or_scheme, architecture)
+    run_xcode('build', build_sdk, scheme_or_target, architecture)
   end
 
   private
