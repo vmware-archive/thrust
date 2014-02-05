@@ -69,22 +69,26 @@ class Thrust::IOS::XCodeTools
     architecture_flag = architecture ? "-arch #{architecture}" : nil
     target_flag = @workspace_name ? "-scheme \"#{scheme_or_target}\"" : "-target \"#{scheme_or_target}\""
     sdk_flag = sdk ? "-sdk #{sdk}" : nil
-    @thrust_executor.system_or_exit(
-      [
-        'set -o pipefail &&',
-        'xcodebuild',
-        project_or_workspace_flag,
-        architecture_flag,
-        target_flag,
-        "-configuration #{@build_configuration}",
-        sdk_flag,
-        "#{build_command}",
-        "SYMROOT=#{@build_directory.inspect}",
-        '2>&1',
-        "| grep -v 'backing file'"
-      ].compact.join(' '),
-      output_file("#{@build_configuration}-#{build_command}")
-    )
+    command = [
+      'set -o pipefail &&',
+      'xcodebuild',
+      project_or_workspace_flag,
+      architecture_flag,
+      target_flag,
+      "-configuration #{@build_configuration}",
+      sdk_flag,
+      "#{build_command}",
+      "SYMROOT=#{@build_directory.inspect}",
+      '2>&1',
+      "| grep -v 'backing file'"
+    ].compact.join(' ')
+    output_file = output_file("#{@build_configuration}-#{build_command}")
+    begin
+      @thrust_executor.system_or_exit(command, output_file)
+    rescue Thrust::Executor::CommandFailed => e
+      @out.write File.read(output_file)
+      raise e
+    end
   end
 
   def output_file(target)

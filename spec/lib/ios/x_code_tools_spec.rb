@@ -41,14 +41,32 @@ describe Thrust::IOS::XCodeTools do
   context 'for an .xcodeproj based project' do
     subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
-    describe '#build_target' do
-      it 'calls xcodebuild with the build command' do
-        subject.build_scheme_or_target(target, os, arch)
+    describe '#build_scheme_or_target' do
+      context 'when the build succeeds' do
+        it 'calls xcodebuild with the build command' do
+          subject.build_scheme_or_target(target, os, arch)
 
-        expect(thrust_executor.system_or_exit_history.last).to eq({
-          cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
-          output_file: 'build/Release-build.output'
-        })
+          expect(thrust_executor.system_or_exit_history.last).to eq({
+                                                                      cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+                                                                      output_file: 'build/Release-build.output'
+                                                                    })
+        end
+      end
+
+      context 'when the build fails' do
+        before do
+          thrust_executor.on_next_system_or_exit do |cmd, output_file|
+            File.open(output_file, 'w') {|f| f.write('build facepalm') }
+            raise(Thrust::Executor::CommandFailed, 'build no worky')
+          end
+        end
+
+        it 'prints the build log' do
+          expect {
+            subject.build_scheme_or_target(target, os, arch)
+          }.to raise_error Thrust::Executor::CommandFailed
+          expect(out.string).to include('build facepalm')
+        end
       end
     end
   end
@@ -57,7 +75,7 @@ describe Thrust::IOS::XCodeTools do
     let (:workspace_name) { 'AwesomeWorkspace' }
     subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: workspace_name) }
 
-    describe '#build_target' do
+    describe '#build_scheme_or_target' do
       it 'calls xcodebuild with the build command' do
         subject.build_scheme_or_target(target, os, arch)
 

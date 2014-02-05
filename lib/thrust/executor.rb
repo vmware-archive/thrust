@@ -1,6 +1,8 @@
 class Thrust::Executor
+  CommandFailed = Class.new(StandardError)
+
   def system_or_exit(cmd, output_file = nil)
-    system(cmd, output_file) or raise '******** Build failed ********'
+    system(cmd, output_file) or raise(CommandFailed, '******** Build failed ********')
   end
 
   def system(cmd, output_file = nil)
@@ -11,7 +13,7 @@ class Thrust::Executor
 
   def capture_output_from_system(cmd)
     captured_output = `#{cmd}`
-    raise '******** Build failed ********' if $?.exitstatus > 0
+    raise(CommandFailed, '******** Build failed ********') if $?.exitstatus > 0
 
     captured_output
   end
