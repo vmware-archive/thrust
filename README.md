@@ -6,15 +6,17 @@
 
 __Thrust__ is a small project that contains some useful rake tasks to run Cedar specs and deploy your iOS or Android application to TestFlight.
 
-    rake autotag:list           # Show the commit that is currently deployed to each environment
-    rake clean_build            # Clean all targets
-    rake focused_specs          # Print out names of files containing focused specs
-    rake nof                    # Remove any focus from specs
-    rake specs                  # Run specs
-    rake testflight:demo        # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
-    rake testflight:production  # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
-    rake testflight:staging     # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
-    rake trim                   # Trim whitespace
+    rake autotag:list                    # Show the commit that is currently deployed to each environment
+    rake clean                           # Clean all targets
+    rake clean_build                     # Clean all targets (deprecated, use "clean")
+    rake focused_specs                   # Print out names of files containing focused specs
+    rake nof                             # Remove any focus from specs
+    rake set_build_number[build_number]  # Set build number
+    rake specs                           # Run specs
+    rake testflight:demo                 # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
+    rake testflight:production           # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
+    rake testflight:staging              # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
+    rake trim                            # Trim whitespace
 
 # Installation
 
