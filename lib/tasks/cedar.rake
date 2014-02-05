@@ -39,9 +39,12 @@ task :focused_specs do
 end
 
 desc 'Clean all targets'
-task :clean_build do
+task :clean do
   xcode_tools_instance(nil).clean_build
 end
+
+desc 'Clean all targets (deprecated, use "clean")'
+task :clean_build => :clean
 
 (@thrust.app_config['ios_spec_targets'] || []).each do |task_name, target_info|
   desc "Run the #{target_info['target'].inspect} target with scheme #{(target_info['scheme'] || target_info['target']).inspect}"
@@ -53,7 +56,7 @@ end
     runtime_sdk = target_info['runtime_sdk'] #runtime sdk
 
     xcode_tools = xcode_tools_instance(build_configuration)
-    xcode_tools.clean_and_build_scheme_or_target(scheme || target, build_sdk)
+    xcode_tools.build_scheme_or_target(scheme || target, build_sdk, 'i386')
 
     cedar_success = Thrust::IOS::Cedar.new.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
 

@@ -7,6 +7,7 @@ describe Thrust::IOS::XCodeTools do
   let(:project_name) { 'AwesomeProject' }
   let(:os) { 'iphoneos' }
   let(:target) { 'AppTarget' }
+  let(:arch) { 'i386' }
   let(:git) { double(Thrust::Git, checkout_file: 'checkout_file') }
   let(:build_directory) do
     FileUtils.mkdir_p('build').first.tap do |build_dir|
@@ -40,14 +41,9 @@ describe Thrust::IOS::XCodeTools do
   context 'for an .xcodeproj based project' do
     subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
-    describe '#clean_and_build_target' do
-      it 'cleans the build' do
-        subject.should_receive(:clean_build)
-        subject.clean_and_build_scheme_or_target(target, os)
-      end
-
+    describe '#build_target' do
       it 'calls xcodebuild with the build command' do
-        subject.clean_and_build_scheme_or_target(target, os)
+        subject.build_scheme_or_target(target, os, arch)
 
         expect(thrust_executor.system_or_exit_history.last).to eq({
           cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
@@ -61,14 +57,9 @@ describe Thrust::IOS::XCodeTools do
     let (:workspace_name) { 'AwesomeWorkspace' }
     subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: workspace_name) }
 
-    describe '#clean_and_build_scheme' do
-      it 'cleans the build' do
-        subject.should_receive(:clean_build)
-        subject.clean_and_build_scheme_or_target(target, os)
-      end
-
+    describe '#build_target' do
       it 'calls xcodebuild with the build command' do
-        subject.clean_and_build_scheme_or_target(target, os)
+        subject.build_scheme_or_target(target, os, arch)
 
         expect(thrust_executor.system_or_exit_history.last).to eq({
                                                                     cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -arch i386 -scheme "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
