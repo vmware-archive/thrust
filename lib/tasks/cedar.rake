@@ -48,12 +48,12 @@ task :clean_build => :clean
 
 (@thrust.app_config['ios_spec_targets'] || []).each do |task_name, target_info|
   desc "Run the #{target_info['target'].inspect} target with scheme #{(target_info['scheme'] || target_info['target']).inspect}"
-  task task_name do
+  task task_name, :runtime_sdk do |_, args|
     build_configuration = target_info['build_configuration']
     target = target_info['target']
     scheme = target_info['scheme']
     build_sdk = target_info['build_sdk'] || 'iphonesimulator' #build sdk - version you compile the code with
-    runtime_sdk = target_info['runtime_sdk'] #runtime sdk
+    runtime_sdk = args[:runtime_sdk] || target_info['runtime_sdk'] #runtime sdk
 
     xcode_tools = xcode_tools_instance(build_configuration)
     xcode_tools.build_scheme_or_target(scheme || target, build_sdk, 'i386')
