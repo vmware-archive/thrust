@@ -6,7 +6,25 @@ Gem::Specification.new do |s|
   s.date        = '2013-07-24'
   s.summary     = 'Thrust is a collection of rake tasks for iOS/Android development and deployment'
   s.description = 'Thrust provides a collection of rake tasks for iOS and Android projects.  These include tasks for running Cedar test suites (iOS) and for deploying apps to Testflight (iOS and Android).'
-  s.authors     = ['Michael McCormick', 'Johnathon Britz', 'Jonathan Barnes', 'Andrew Kitchen', 'Tyler Schultz', 'Wiley Kestner', 'Brandon Liu', 'Jeff Hui', 'Philip Kuryloski', 'Andrew Bruce', 'Aaron Levine', 'Eugenia Dellapenna', 'Aaron VonderHaar', 'Sheel Choksi', 'Rachel Bobbins', 'Molly Trombley-McCann']
+  s.authors = [
+    'Aaron Levine',
+    'Aaron VonderHaar',
+    'Andrew Bruce',
+    'Andrew Kitchen',
+    'Brandon Liu',
+    'Can Berk Güder',
+    'Eugenia Dellapenna',
+    'Jeff Hui',
+    'Johnathon Britz',
+    'Jonathan Barnes',
+    'Michael McCormick',
+    'Molly Trombley-McCann',
+    'Philip Kuryloski',
+    'Rachel Bobbins',
+    'Sheel Choksi',
+    'Tyler Schultz',
+    'Wiley Kestner'
+  ]
   s.email       = 'mc+jbritz@pivotallabs.com'
   s.files       = FileList['lib/**/**.rb', 'lib/**/*.rake', 'lib/**/*.yml'].to_a
   s.homepage    = 'http://github.com/pivotal/thrust'

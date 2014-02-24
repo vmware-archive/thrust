@@ -60,7 +60,7 @@ task :clean_build => :clean
 
     cedar_success = Thrust::IOS::Cedar.new.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
 
-		exit(cedar_success ? 0 : 1)
+    exit(1) unless cedar_success
   end
 end
 
