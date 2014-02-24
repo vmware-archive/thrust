@@ -2,7 +2,7 @@ require 'colorize'
 
 class Thrust::Config
   attr_reader :project_root, :app_config, :build_dir
-  THRUST_VERSION = 0.2
+  THRUST_VERSION = 0.3
   THRUST_ROOT = File.expand_path('../..', __FILE__)
 
   def self.make(relative_project_root, config_file)

@@ -20,7 +20,14 @@ File.open(rakefile, 'a') do |f|
   f.puts "require 'thrust/tasks'"
 end
 
-FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'example.yml'), File.join(project_root, 'thrust.example.yml'))
+if File.exists?('AndroidManifest.xml')
+  example_file_name = 'android_example.yml'
+else
+  example_file_name = 'ios_example.yml'
+end
+
+
+FileUtils.cp(File.join(thrust_root, 'lib', 'config', example_file_name), File.join(project_root, 'thrust.example.yml'))
 puts ''
 puts "  To finish installation of " + "Thrust".green + ", rename:\n\n"
 puts "    #{project_root}/thrust.example.yml\n".blue

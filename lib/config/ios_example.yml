@@ -1,5 +1,6 @@
-thrust_version: 0.2
-workspace_name: My Great Project
+thrust_version: 0.3
+project_name: My Great Project # do not use if building with an xcode workspace
+# workspace_name: My Workspace # use if building with an xcode workspace
 app_name: My Great App
 ios_distribution_certificate: 'Name of Distribution Signing Certificate'
 ios_sim_binary: 'ios-sim' # or wax-sim. iOS only.
@@ -23,8 +24,8 @@ deployment_targets:
 
 ios_spec_targets:
   specs:
-    target: Specs # name of the build target
-    scheme: Specs (My Great App) # optional scheme (useful when workspace contains multiple targets with the same name)
+    target: UISpecs # name of the build target
+#    scheme: Specs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
     build_configuration: Debug # name of the build configuration
     build_sdk: 6.1 # SDK used to build the target. Optional, defaults to iphonesimulator.
     runtime_sdk: 7.0 # SDK used to run the target. Not optional.
@@ -32,6 +33,7 @@ ios_spec_targets:
 
   integration:
     target: IntegrationSpecs
+#    scheme: IntegrationSpecs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
     build_configuration: Release
     build_sdk: macosx
     runtime_sdk: macosx

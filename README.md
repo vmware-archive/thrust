@@ -20,7 +20,7 @@ __Thrust__ is a small project that contains some useful rake tasks to run Cedar 
 
 # Installation
 
-(Note: **Thrust** requires ruby >= 2.0.0)
+(Note: **Thrust** requires ruby >= 1.9.3)
 
 **Thrust** should be installed as a gem.  It comes with an installer that will set up your Rakefile and create an example configuration file.
 
@@ -32,6 +32,18 @@ After installation, change the name of `thrust.example.yml` to `thrust.yml` and 
 If you had **Thrust** previously installed as a submodule, we recommend that you remove the submodule and now use **Thrust** as a gem.  This is because there are runtime dependencies that will not get installed properly if **Thrust** is installed as a submodule.
 
 # Changelog
+
+## Version 0.3
+
+* **Thrust** can now build against Xcode workspaces. In your `thrust.yml` file:
+
+  * Replace the `project_name` with a `workspace_name`.
+
+  * For each build in your `ios_spec_targets`, include `scheme` to specify the scheme to use along with the target.
+
+* If you are upgrading from Version 0.2 or for an example, run `thrust install` and look at the generated `thrust.example.yml`.
+
+
 
 ## Version 0.2
 
