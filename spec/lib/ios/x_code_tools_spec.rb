@@ -47,7 +47,7 @@ describe Thrust::IOS::XCodeTools do
           subject.build_scheme_or_target(target, os, arch)
 
           expect(thrust_executor.system_or_exit_history.last).to eq({
-                                                                      cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+                                                                      cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" CONFIGURATION_BUILD_DIR="build/Release-iphoneos" 2>&1 | grep -v \'backing file\'',
                                                                       output_file: 'build/Release-build.output'
                                                                     })
         end
@@ -80,7 +80,7 @@ describe Thrust::IOS::XCodeTools do
         subject.build_scheme_or_target(target, os, arch)
 
         expect(thrust_executor.system_or_exit_history.last).to eq({
-                                                                    cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -arch i386 -scheme "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+                                                                    cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -arch i386 -scheme "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" CONFIGURATION_BUILD_DIR="build/Release-iphoneos" 2>&1 | grep -v \'backing file\'',
                                                                     output_file: 'build/Release-build.output'
                                                                   })
       end

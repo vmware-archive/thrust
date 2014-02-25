@@ -69,6 +69,8 @@ class Thrust::IOS::XCodeTools
     architecture_flag = architecture ? "-arch #{architecture}" : nil
     target_flag = @workspace_name ? "-scheme \"#{scheme_or_target}\"" : "-target \"#{scheme_or_target}\""
     sdk_flag = sdk ? "-sdk #{sdk}" : nil
+    configuration_build_dir = File.join(@build_directory, "#{@build_configuration}-#{sdk}")
+
     command = [
       'set -o pipefail &&',
       'xcodebuild',
@@ -79,6 +81,7 @@ class Thrust::IOS::XCodeTools
       sdk_flag,
       "#{build_command}",
       "SYMROOT=#{@build_directory.inspect}",
+      "CONFIGURATION_BUILD_DIR=#{configuration_build_dir.inspect}",
       '2>&1',
       "| grep -v 'backing file'"
     ].compact.join(' ')
