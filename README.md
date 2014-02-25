@@ -29,6 +29,10 @@ __Thrust__ is a small project that contains some useful rake tasks to run Cedar 
 
 After installation, change the name of `thrust.example.yml` to `thrust.yml` and update the configuration as needed.
 
+If you're using Thrust to run specs for an iOS app and do not have **ios-sim** installed, you can find it at the following link https://github.com/phonegap/ios-sim or follow the instructions below:
+* `git clone git://github.com/phonegap/ios-sim.git`
+* `rake install prefix=/usr/local/`
+
 If you had **Thrust** previously installed as a submodule, we recommend that you remove the submodule and now use **Thrust** as a gem.  This is because there are runtime dependencies that will not get installed properly if **Thrust** is installed as a submodule.
 
 # Changelog
