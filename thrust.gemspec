@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
     'Can Berk Güder',
     'Eugenia Dellapenna',
     'Jeff Hui',
+    'Joe Masilotti',
     'Johnathon Britz',
     'Jonathan Barnes',
     'Michael McCormick',
