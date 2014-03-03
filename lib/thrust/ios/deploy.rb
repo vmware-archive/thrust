@@ -12,7 +12,11 @@ class Thrust::IOS::Deploy
 
   def run
     @git.ensure_clean
-    @agv_tool.change_build_number(@git.current_commit)
+    if (@deployment_config['versioning_method'] == "commits")
+      @agv_tool.change_build_number(@git.commit_count)
+    else
+      @agv_tool.change_build_number(@git.current_commit)
+    end
 
     app_name = @thrust_config.app_config['app_name']
     target = @deployment_config['ios_target'] || app_name

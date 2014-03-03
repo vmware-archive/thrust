@@ -35,6 +35,7 @@ describe Thrust::IOS::Deploy do
 
     before do
       git.stub(:current_commit).and_return('31758012490')
+      git.stub(:commit_count).and_return(149)
     end
 
     it 'ensures the working directory is clean' do
@@ -42,14 +43,34 @@ describe Thrust::IOS::Deploy do
       deploy.run
     end
 
-    it 'updates the version number to the current git SHA' do
-      agv_tool.should_receive(:change_build_number).with('31758012490')
-      deploy.run
-    end
-
     it 'resets the changes after the deploy' do
       git.should_receive(:reset)
       deploy.run
+    end
+
+    context "when versioning method is set to commits" do
+      let(:distribution_config) do
+        {
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag',
+            'versioning_method' => 'commits'
+        }
+      end
+
+      it "updates the version number to the number of commits on the current branch" do
+        agv_tool.should_receive(:change_build_number).with(149)
+        deploy.run
+      end
+    end
+
+    context "when versioning method is set to anything else" do
+      it 'updates the version number to the current git SHA' do
+        agv_tool.should_receive(:change_build_number).with('31758012490')
+        deploy.run
+      end
     end
 
     context 'when note generation method is set to autotag' do

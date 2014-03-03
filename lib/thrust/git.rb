@@ -52,6 +52,10 @@ class Thrust::Git
     notes.path
   end
 
+  def commit_count
+    @thrust_executor.capture_output_from_system("git rev-list HEAD | wc -l").strip
+  end
+
   private
 
   def summary_for_commit(sha)
