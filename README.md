@@ -86,18 +86,64 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * Adds support for disabling incrementing the build number during a TestFlight deploy. This is via the 'increments_build_number' configuration setting under a distribution in your thrust.yml.
 
+# Configuration
 
-# Overriding config options
+## Example thrust.yml for iOS
 
-## Specifying API Token at deploy time
+```yaml
+thrust_version: 0.3
+project_name: My Great Project # do not use if building with an xcode workspace
+# workspace_name: My Workspace # use if building with an xcode workspace
+app_name: My Great App
+ios_distribution_certificate: 'Name of Distribution Signing Certificate'
+ios_sim_binary: 'ios-sim' # or wax-sim. iOS only.
+
+testflight:
+  api_token: 'testflight api token' # To find your App Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829956-what-does-the-api-token-do-
+  team_token: 'testflight team token' # To find your Team Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829942-how-do-i-find-my-team-token-
+
+deployment_targets:
+  staging:
+    distribution_list: Developers # This is the name of a TestFlight distribution list
+    notify: true # Whether to notify people on the distribution list about this deployment
+    note_generation_method: autotag  # If you set this value, it will auto-generate the deploy notes from the commit history. Optional.
+    ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name. iOS only.
+    ios_build_configuration: Release # iOS only
+    ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
+
+  demo:
+    distribution_list: Beta Testers
+    notify: true
+
+ios_spec_targets:
+  specs: # This is the name of the rake task: `rake specs`
+    target: UISpecs # name of the build target
+#    scheme: Specs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
+    build_configuration: Debug # name of the build configuration
+    build_sdk: iphonesimulator7.0 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
+    runtime_sdk: 7.0 # SDK used to run the target. Not optional.
+    device: ipad # Device to run the specs on. Optional, defaults to iPhone.
+
+  integration:
+    target: IntegrationSpecs
+#    scheme: IntegrationSpecs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
+    build_configuration: Release
+    build_sdk: macosx
+    runtime_sdk: macosx
+```
+
+
+## Overriding config options
+
+### Specifying API Token at deploy time
 
 You can change the API token for a TestFlight upload with the `TESTFLIGHT_API_TOKEN` environment variable. This is useful when different members want to use their own tokens to deploy without having to change `thrust.yml` and commiting again.
 
-## Ignoring Git during deploys
+### Ignoring Git during deploys
 
 TestFlight deployment requires you to be in a clean git repo and to be at the head of your current branch. You can disable this by setting the environment variable `IGNORE_GIT=1`. **We do not recommend this.** If your git repository is not clean, deployment will discard all your uncommitted changes.
 
-## Notifying distribution lists
+### Notifying distribution lists
 
 Deploying to TestFlight will automatically notify all of the people on your TestFlight distribution list.  If you would prefer not to notify them, then you can change the 'notify' value in `thrust.yml` for that distribution list. You can also set the environment variable `NOTIFY` to false.
 
