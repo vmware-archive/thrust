@@ -27,7 +27,7 @@ class Thrust::Testflight
                                       'curl http://testflightapp.com/api/builds.json',
                                       "-F file=@#{package_file}",
                                       ("-F dsym=@#{zipped_dsym_path}" if dsym_path),
-                                      "-F api_token='#{@api_token}'",
+                                      "-F api_token='#{(ENV['TESTFLIGHT_API_TOKEN'] || @api_token)}'",
                                       "-F team_token='#{@team_token}'",
                                       "-F notes=@#{message_file_path}",
                                       "-F notify=#{(ENV['NOTIFY'] || notify).to_s.downcase.capitalize}",

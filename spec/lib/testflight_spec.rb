@@ -89,8 +89,18 @@ describe Thrust::Testflight do
     end
 
     it 'respects the environment variable around notifications' do
+      ENV.stub(:[]).and_return(nil)
       ENV.stub(:[]).with('NOTIFY').and_return('FALSE')
       expected_command = "curl http://testflightapp.com/api/builds.json -F file=@ipa_file -F api_token='api_token' -F team_token='team_token' -F notes=@ -F notify=False -F distribution_lists='developers'"
+      thrust_executor.should_receive(:system_or_exit).with(expected_command)
+
+      upload
+    end
+
+    it 'respects the environment variable around api token' do
+      ENV.stub(:[]).and_return(nil)
+      ENV.stub(:[]).with('TESTFLIGHT_API_TOKEN').and_return('i_just_wanted_to_change_my_token')
+      expected_command = "curl http://testflightapp.com/api/builds.json -F file=@ipa_file -F api_token='i_just_wanted_to_change_my_token' -F team_token='team_token' -F notes=@ -F notify=True -F distribution_lists='developers'"
       thrust_executor.should_receive(:system_or_exit).with(expected_command)
 
       upload

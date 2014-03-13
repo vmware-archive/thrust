@@ -86,13 +86,12 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * Adds support for disabling incrementing the build number during a TestFlight deploy. This is via the 'increments_build_number' configuration setting under a distribution in your thrust.yml.
 
-# Upgrading
 
-Periodically new thrust versions will require changes to your `thrust.yml` configuration.  Look in the ***Upgrading Instructions*** section below for guidance on how to upgrade from the previous version.  If you need to upgrade multiple versions, you may want to just re-create your configuration from the `example.yml`.
+# Overriding config options
 
-Once you upgrade make sure to add/update the 'thrust_version' key in the configuration to the new version.
+## Specifying API Token at deploy time
 
-# Misc
+You can change the API token for a TestFlight upload with the `TESTFLIGHT_API_TOKEN` environment variable. This is useful when different members want to use their own tokens to deploy without having to change `thrust.yml` and commiting again.
 
 ## Ignoring Git during deploys
 
@@ -101,6 +100,13 @@ TestFlight deployment requires you to be in a clean git repo and to be at the he
 ## Notifying distribution lists
 
 Deploying to TestFlight will automatically notify all of the people on your TestFlight distribution list.  If you would prefer not to notify them, then you can change the 'notify' value in `thrust.yml` for that distribution list. You can also set the environment variable `NOTIFY` to false.
+
+# Upgrading
+
+Periodically new thrust versions will require changes to your `thrust.yml` configuration.  Look in the ***Upgrading Instructions*** section below for guidance on how to upgrade from the previous version.  If you need to upgrade multiple versions, you may want to just re-create your configuration from the `example.yml`.
+
+Once you upgrade make sure to add/update the 'thrust_version' key in the configuration to the new version.
+
 
 ## Upgrading Instructions
 
