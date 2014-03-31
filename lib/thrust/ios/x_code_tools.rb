@@ -33,6 +33,22 @@ class Thrust::IOS::XCodeTools
     run_xcode('build', build_sdk, scheme_or_target, architecture)
   end
 
+  def test(scheme, build_configuration, runtime_sdk, build_dir)
+    destination = "OS=#{runtime_sdk},name=iPhone Retina (3.5-inch)"
+
+    cmd = [
+      "xcodebuild",
+      "test",
+      "-scheme #{scheme}",
+      "-configuration #{build_configuration}",
+      "-destination '#{destination}'",
+      "ARCHS=i386",
+      "SYMROOT='#{build_dir}'"
+    ].join(' ')
+
+    @thrust_executor.check_command_for_failure(cmd)
+  end
+
   private
 
   def kill_simulator
@@ -53,19 +69,19 @@ class Thrust::IOS::XCodeTools
     @out.puts 'Packaging...'
     ipa_filename = "#{build_configuration_directory}/#{app_name}.ipa"
     cmd = [
-        "xcrun",
-        "-sdk iphoneos",
-        "-v PackageApplication",
-        "'#{build_configuration_directory}/#{app_name}.app'",
-        "-o '#{ipa_filename}'",
-        "--sign '#{signing_identity}'",
-        "--embed '#{provision_path(provision_search_query)}'"
+      "xcrun",
+      "-sdk iphoneos",
+      "-v PackageApplication",
+      "'#{build_configuration_directory}/#{app_name}.app'",
+      "-o '#{ipa_filename}'",
+      "--sign '#{signing_identity}'",
+      "--embed '#{provision_path(provision_search_query)}'"
     ].join(' ')
     @thrust_executor.system_or_exit(cmd)
     ipa_filename
   end
 
-  def run_xcode(build_command, sdk = nil, scheme_or_target = nil, architecture=nil)
+  def run_xcode(build_command, sdk = nil, scheme_or_target = nil, architecture = nil)
     architecture_flag = architecture ? "-arch #{architecture}" : nil
     target_flag = @workspace_name ? "-scheme \"#{scheme_or_target}\"" : "-target \"#{scheme_or_target}\""
     sdk_flag = sdk ? "-sdk #{sdk}" : nil

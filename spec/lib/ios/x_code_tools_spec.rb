@@ -30,7 +30,7 @@ describe Thrust::IOS::XCodeTools do
   end
 
   describe '#clean_build' do
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     it 'deletes the build folder' do
       subject.clean_build
@@ -38,8 +38,20 @@ describe Thrust::IOS::XCodeTools do
     end
   end
 
+  describe '#test' do
+    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+
+    it 'delegates to thrust executor' do
+      command_result = double()
+
+      thrust_executor.stub(:check_command_for_failure).and_return(command_result)
+
+      subject.test('scheme', 'build_configuration', 'runtime_sdk', 'build_dir').should == command_result
+    end
+  end
+
   context 'for an .xcodeproj based project' do
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     describe '#build_scheme_or_target' do
       context 'when the build succeeds' do
@@ -73,7 +85,7 @@ describe Thrust::IOS::XCodeTools do
 
   context 'for an .xcworkspace based project' do
     let (:workspace_name) { 'AwesomeWorkspace' }
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: workspace_name) }
+    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: workspace_name) }
 
     describe '#build_scheme_or_target' do
       it 'calls xcodebuild with the build command' do
@@ -92,14 +104,14 @@ describe Thrust::IOS::XCodeTools do
     let(:signing_identity) { 'iPhone Distribution' }
     let(:provision_search_query) { 'query' }
     let(:provisioning_path) { 'provisioning-path' }
-    subject(:x_code_tools) { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     before do
-      x_code_tools.stub(:`).and_return(provisioning_path)
+      subject.stub(:`).and_return(provisioning_path)
     end
 
     def create_ipa
-      x_code_tools.cleanly_create_ipa(target, app_name, signing_identity, provision_search_query)
+      subject.cleanly_create_ipa(target, app_name, signing_identity, provision_search_query)
     end
 
     it 'cleans the build' do
@@ -131,7 +143,7 @@ describe Thrust::IOS::XCodeTools do
       let(:provisioning_path) { 'nonexistent-file' }
 
       it 'raises an error' do
-        x_code_tools.cleanly_create_ipa(target, app_name, signing_identity, provisioning_path)
+        subject.cleanly_create_ipa(target, app_name, signing_identity, provisioning_path)
       end
     end
   end

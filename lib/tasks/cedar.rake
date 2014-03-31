@@ -34,7 +34,7 @@ end
 desc 'Print out names of files containing focused specs'
 task :focused_specs do
   pattern = focused_methods.join("\\|")
-  directories = @thrust.app_config['ios_spec_targets'].values.map {|h| h['target']}.join(' ')
+  directories = @thrust.app_config['ios_spec_targets'].values.map { |h| h['target'] }.join(' ')
   @executor.system_or_exit %Q[ grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks' ; exit 0 ]
 end
 
@@ -47,18 +47,23 @@ desc 'Clean all targets (deprecated, use "clean")'
 task :clean_build => :clean
 
 (@thrust.app_config['ios_spec_targets'] || []).each do |task_name, target_info|
-  desc target_info['scheme'] ? "Run the #{target_info['scheme'].inspect} scheme" :  "Run the #{target_info['target'].inspect} target"
+  desc target_info['scheme'] ? "Run the #{target_info['scheme'].inspect} scheme" : "Run the #{target_info['target'].inspect} target"
   task task_name, :runtime_sdk do |_, args|
     build_configuration = target_info['build_configuration']
     target = target_info['target']
     scheme = target_info['scheme']
+    type = target_info['type'] || 'app'
     build_sdk = target_info['build_sdk'] || 'iphonesimulator' #build sdk - version you compile the code with
     runtime_sdk = args[:runtime_sdk] || target_info['runtime_sdk'] #runtime sdk
 
     xcode_tools = xcode_tools_instance(build_configuration)
     xcode_tools.build_scheme_or_target(scheme || target, build_sdk, 'i386')
 
-    cedar_success = Thrust::IOS::Cedar.new.run(build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
+    if type == 'app'
+      cedar_success = Thrust::IOS::Cedar.new.run(type, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
+    else
+      cedar_success = xcode_tools.test(target || scheme, build_configuration, runtime_sdk, @thrust.build_dir)
+    end
 
     exit(1) unless cedar_success
   end
@@ -69,6 +74,6 @@ def focused_methods
 end
 
 def xcode_tools_instance(build_configuration)
-  tools_options = { project_name: @thrust.app_config['project_name'], workspace_name: @thrust.app_config['workspace_name'] }
+  tools_options = {project_name: @thrust.app_config['project_name'], workspace_name: @thrust.app_config['workspace_name']}
   @xcode_tools_provider.instance($stdout, build_configuration, @thrust.build_dir, tools_options)
 end
