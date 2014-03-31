@@ -58,7 +58,7 @@ task :clean_build => :clean
     xcode_tools = xcode_tools_instance(build_configuration)
     xcode_tools.build_scheme_or_target(scheme || target, build_sdk, 'i386')
 
-    cedar_success = Thrust::IOS::Cedar.new.run($stdout, build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
+    cedar_success = Thrust::IOS::Cedar.new.run(build_configuration, target, runtime_sdk, build_sdk, target_info['device'], @thrust.build_dir, @thrust.app_config['ios_sim_binary'])
 
     exit(1) unless cedar_success
   end
