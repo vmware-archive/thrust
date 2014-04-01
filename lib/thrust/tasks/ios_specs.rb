@@ -1,7 +1,9 @@
 module Thrust
   module Tasks
     class IOSSpecs
-      def initialize(out = $stdout, xcode_tools_provider = Thrust::IOS::XCodeToolsProvider.new, cedar = Thrust::IOS::Cedar.new)
+      def initialize(out = $stdout,
+                     xcode_tools_provider = Thrust::IOS::XCodeToolsProvider.new,
+                     cedar = Thrust::IOS::Cedar.new)
         @xcode_tools_provider = xcode_tools_provider
         @cedar = cedar
         @out = out
@@ -24,12 +26,10 @@ module Thrust
         xcode_tools.build_scheme_or_target(scheme || target, build_sdk, 'i386')
 
         if type == 'app'
-          cedar_success = @cedar.run(build_configuration, target, runtime_sdk, build_sdk, target_info['device'], thrust.build_dir, thrust.app_config['ios_sim_binary'])
+          @cedar.run(build_configuration, target, runtime_sdk, build_sdk, target_info['device'], thrust.build_dir, thrust.app_config['ios_sim_binary'])
         else
-          cedar_success = xcode_tools.test(target || scheme, build_configuration, runtime_sdk, thrust.build_dir)
+          xcode_tools.test(target || scheme, build_configuration, runtime_sdk, thrust.build_dir)
         end
-
-        exit(1) unless cedar_success
       end
     end
   end
