@@ -1,7 +1,9 @@
+require 'yaml'
 require 'colorize'
 
 class Thrust::Config
   attr_reader :project_root, :app_config, :build_dir
+
   THRUST_VERSION = 0.3
   THRUST_ROOT = File.expand_path('../..', __FILE__)
 

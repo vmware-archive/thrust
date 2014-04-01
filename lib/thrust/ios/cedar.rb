@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 class Thrust::IOS::Cedar
   def initialize(out = $stdout, thrust_executor = Thrust::Executor.new)
     @thrust_executor = thrust_executor

@@ -1,6 +1,4 @@
-require 'yaml'
-require 'tempfile'
-require File.expand_path('../../thrust', __FILE__)
+require_relative '../thrust'
 
 @thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
@@ -22,19 +20,6 @@ namespace :testflight do
 
         Rake::Task['autotag:create'].invoke(task_name)
       end
-    end
-  end
-end
-
-namespace :autotag do
-  task :create, :stage do |_, args|
-    `autotag create #{args[:stage]}`
-  end
-
-  desc 'Show the commit that is currently deployed to each environment'
-  task :list do
-    @thrust.app_config['deployment_targets'].each do |deployment_target, _|
-      puts Thrust::Git.new(Thrust::Executor.new, $stdout).commit_summary_for_last_deploy(deployment_target)
     end
   end
 end
