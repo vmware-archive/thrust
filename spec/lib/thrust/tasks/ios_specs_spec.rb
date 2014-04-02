@@ -1,11 +1,9 @@
-require_relative '../../../lib/thrust/tasks/ios_specs'
-require_relative '../../../lib/thrust/app_config'
-require_relative '../../../lib/thrust/ios_spec_target'
+require 'spec_helper'
 
 describe Thrust::Tasks::IOSSpecs do
   let(:out) { double(:out) }
-  let(:xcode_tools_provider) { double('Thrust::IOS::XCodeToolsProvider') }
-  let(:cedar) { double('Thrust::IOS::Cedar') }
+  let(:xcode_tools_provider) { double(Thrust::IOS::XCodeToolsProvider) }
+  let(:cedar) { double(Thrust::IOS::Cedar) }
 
   subject { Thrust::Tasks::IOSSpecs.new(out, xcode_tools_provider, cedar) }
 
@@ -18,7 +16,7 @@ describe Thrust::Tasks::IOSSpecs do
           'ios_sim_binary' => 'ios-sim'
         )
 
-        thrust = double('Thrust::Config')
+        thrust = double(Thrust::Config)
         thrust.stub(:build_dir).and_return('build-dir')
         thrust.stub(:app_config).and_return(app_config)
 
@@ -39,7 +37,7 @@ describe Thrust::Tasks::IOSSpecs do
 
         args = {}
 
-        xcode_tools = double('Thrust::IOS::XCodeTools')
+        xcode_tools = double(Thrust::IOS::XCodeTools)
 
         xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
 
@@ -59,7 +57,7 @@ describe Thrust::Tasks::IOSSpecs do
           'ios_sim_binary' => 'ios-sim'
         )
 
-        thrust = double('Thrust::Config')
+        thrust = double(Thrust::Config)
         thrust.stub(:build_dir).and_return('build-dir')
         thrust.stub(:app_config).and_return(app_config)
 
@@ -80,7 +78,7 @@ describe Thrust::Tasks::IOSSpecs do
 
         args = {}
 
-        xcode_tools = double('Thrust::IOS::XCodeTools')
+        xcode_tools = double(Thrust::IOS::XCodeTools)
 
         xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
 

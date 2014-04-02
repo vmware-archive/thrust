@@ -1,4 +1,4 @@
-require_relative '../../../lib/thrust/testflight_credentials'
+require 'spec_helper'
 
 describe Thrust::TestflightCredentials do
   it 'exposes the api_token' do

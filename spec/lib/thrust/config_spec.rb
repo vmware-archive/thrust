@@ -1,4 +1,4 @@
-require_relative '../../../lib/thrust/config'
+require 'spec_helper'
 
 describe Thrust::Config do
   describe 'initializing' do

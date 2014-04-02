@@ -1,4 +1,4 @@
-require_relative '../../../lib/thrust/ios_spec_target'
+require 'spec_helper'
 
 describe Thrust::IOSSpecTarget do
   it 'exposes the build configuration' do

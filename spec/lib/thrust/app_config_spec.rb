@@ -1,4 +1,4 @@
-require_relative '../../../lib/thrust/app_config'
+require 'spec_helper'
 
 describe Thrust::AppConfig do
   it 'exposes the ios sim binary' do

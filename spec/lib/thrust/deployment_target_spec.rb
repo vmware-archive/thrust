@@ -1,4 +1,4 @@
-require_relative '../../../lib/thrust/deployment_target'
+require 'spec_helper'
 
 describe Thrust::DeploymentTarget do
   it 'exposes the distribution_list' do
