@@ -46,7 +46,7 @@ describe Thrust::IOS::DeployProvider do
       xcode_tools_provider.should_receive(:instance).with($stdout, 'configuration', 'build_dir', { project_name: 'project_name', workspace_name: 'workspace_name' }).and_return(xcode_tools)
       Thrust::IOS::AgvTool.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout).and_return(agv_tool)
       Thrust::Testflight.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout, $stdin, 'api_token', 'team_token').and_return(testflight)
-      Thrust::Git.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout).and_return(git)
+      Thrust::Git.should_receive(:new).with($stdout, an_instance_of(Thrust::Executor)).and_return(git)
 
       Thrust::IOS::Deploy.should_receive(:new).with($stdout, xcode_tools, agv_tool, git, testflight,
                                                     thrust_config, distribution_config, deployment_target).and_call_original

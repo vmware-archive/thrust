@@ -3,7 +3,7 @@ class Thrust::Testflight
     @thrust_executor = thrust_executor
     @out = out
     @in = input
-    @git = Thrust::Git.new(@thrust_executor, @out)
+    @git = Thrust::Git.new(@out, @thrust_executor)
     @api_token = api_token
     @team_token = team_token
   end

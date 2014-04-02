@@ -4,7 +4,7 @@ class Thrust::IOS::XCodeTools
   def initialize(thrust_executor, out, build_configuration, build_directory, options = {})
     @thrust_executor = thrust_executor
     @out = out
-    @git = Thrust::Git.new(@thrust_executor, @out)
+    @git = Thrust::Git.new(@out, @thrust_executor)
     @build_configuration = build_configuration
     @build_directory = build_directory
     @project_name = options[:project_name]

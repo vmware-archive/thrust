@@ -31,7 +31,7 @@ describe Thrust::Android::DeployProvider do
 
     it 'builds the dependencies and passes thrust config, distribution_config and deployment_target to the Thrust::Android::Deploy' do
       Thrust::Testflight.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout, $stdin, 'api_token', 'team_token').and_return(testflight)
-      Thrust::Git.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout).and_return(git)
+      Thrust::Git.should_receive(:new).with($stdout, an_instance_of(Thrust::Executor)).and_return(git)
       Thrust::Android::Tools.should_receive(:new).with(an_instance_of(Thrust::Executor), $stdout).and_return(tools)
 
       Thrust::Android::Deploy.should_receive(:new).with($stdout,
