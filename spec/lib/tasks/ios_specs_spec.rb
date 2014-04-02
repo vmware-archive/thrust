@@ -1,4 +1,6 @@
 require_relative '../../../lib/thrust/tasks/ios_specs'
+require_relative '../../../lib/thrust/app_config'
+require_relative '../../../lib/thrust/ios_spec_target'
 
 describe Thrust::Tasks::IOSSpecs do
   let(:out) { double(:out) }
@@ -10,11 +12,11 @@ describe Thrust::Tasks::IOSSpecs do
   describe '#run' do
     context 'when the target type is app' do
       it 'runs the specs' do
-        app_config = {
+        app_config = Thrust::AppConfig.new(
           'project_name' => 'project-name',
           'workspace_name' => 'workspace-name',
           'ios_sim_binary' => 'ios-sim'
-        }
+        )
 
         thrust = double('Thrust::Config')
         thrust.stub(:build_dir).and_return('build-dir')
@@ -25,26 +27,24 @@ describe Thrust::Tasks::IOSSpecs do
           workspace_name: 'workspace-name'
         }
 
-        build_configuration = double(:build_configuration)
-
-        target_info = {
+        target_info = Thrust::IOSSpecTarget.new(
           'type' => 'app',
           'device' => 'device',
           'target' => 'some-target',
           'scheme' => 'some-scheme',
           'build_sdk' => 'build-sdk',
           'runtime_sdk' => 'runtime-sdk',
-          'build_configuration' => build_configuration
-        }
+          'build_configuration' => 'build-configuration'
+        )
 
         args = {}
 
         xcode_tools = double('Thrust::IOS::XCodeTools')
 
-        xcode_tools_provider.stub(:instance).with(out, build_configuration, 'build-dir', tools_options).and_return(xcode_tools)
+        xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
 
         expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk', 'i386')
-        expect(cedar).to receive(:run).with(build_configuration, 'some-target', 'runtime-sdk', 'build-sdk', 'device', 'build-dir', 'ios-sim').and_return(:success)
+        expect(cedar).to receive(:run).with('build-configuration', 'some-target', 'runtime-sdk', 'build-sdk', 'device', 'build-dir', 'ios-sim').and_return(:success)
 
         result = subject.run(thrust, target_info, args)
         expect(result).to eq(:success)
@@ -53,11 +53,11 @@ describe Thrust::Tasks::IOSSpecs do
 
     context 'when the target type is bundle' do
       it 'runs the specs' do
-        app_config = {
+        app_config = Thrust::AppConfig.new(
           'project_name' => 'project-name',
           'workspace_name' => 'workspace-name',
           'ios_sim_binary' => 'ios-sim'
-        }
+        )
 
         thrust = double('Thrust::Config')
         thrust.stub(:build_dir).and_return('build-dir')
@@ -68,26 +68,24 @@ describe Thrust::Tasks::IOSSpecs do
           workspace_name: 'workspace-name'
         }
 
-        build_configuration = double(:build_configuration)
-
-        target_info = {
+        target_info = Thrust::IOSSpecTarget.new(
           'type' => 'bundle',
           'device' => 'device',
           'target' => 'some-target',
           'scheme' => 'some-scheme',
           'build_sdk' => 'build-sdk',
           'runtime_sdk' => 'runtime-sdk',
-          'build_configuration' => build_configuration
-        }
+          'build_configuration' => 'build-configuration'
+        )
 
         args = {}
 
         xcode_tools = double('Thrust::IOS::XCodeTools')
 
-        xcode_tools_provider.stub(:instance).with(out, build_configuration, 'build-dir', tools_options).and_return(xcode_tools)
+        xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
 
         expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk', 'i386')
-        expect(xcode_tools).to receive(:test).with('some-target', build_configuration, 'runtime-sdk', 'build-dir').and_return(:success)
+        expect(xcode_tools).to receive(:test).with('some-target', 'build-configuration', 'runtime-sdk', 'build-dir').and_return(:success)
 
         result = subject.run(thrust, target_info, args)
         expect(result).to eq(:success)

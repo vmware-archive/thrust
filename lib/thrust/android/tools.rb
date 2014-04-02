@@ -1,7 +1,7 @@
 require 'colorize'
 
 class Thrust::Android::Tools
-  def initialize(thrust_executor, out)
+  def initialize(out = $stdout, thrust_executor = Thrust::Executor.new)
     @thrust_executor = thrust_executor
     @out = out
   end

@@ -1,3 +1,4 @@
+require_relative '../../../lib/thrust/app_config'
 require_relative '../../../lib/thrust/tasks/clean'
 
 describe Thrust::Tasks::Clean do
@@ -8,10 +9,10 @@ describe Thrust::Tasks::Clean do
 
   describe '#run' do
     it 'cleans the build' do
-      app_config = {
+      app_config = Thrust::AppConfig.new(
         'project_name' => 'project-name',
         'workspace_name' => 'workspace-name'
-      }
+      )
 
       thrust = double('Thrust::Config')
       thrust.stub(:build_dir).and_return('build-dir')

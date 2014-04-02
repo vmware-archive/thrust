@@ -2,26 +2,26 @@ require 'spec_helper'
 
 describe Thrust::IOS::Deploy do
   let(:app_config) do
-    {
-        'app_name' => 'AppName',
-        'ios_distribution_certificate' => 'signing_identity',
-        'project_name' => 'project_name',
-        'workspace_name' => 'workspace_name',
-        'testflight' => {
-            'team_token' => 'team_token',
-            'api_token' => 'api_token'
-        }
-    }
+    Thrust::AppConfig.new(
+      'app_name' => 'AppName',
+      'ios_distribution_certificate' => 'signing_identity',
+      'project_name' => 'project_name',
+      'workspace_name' => 'workspace_name',
+      'testflight' => {
+        'team_token' => 'team_token',
+        'api_token' => 'api_token'
+      }
+    )
   end
   let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
   let(:distribution_config) do
-    {
-        'notify' => 'true',
-        'distribution_list' => 'devs',
-        'ios_build_configuration' => 'configuration',
-        'ios_provisioning_search_query' => 'Provisioning Profile query',
-        'note_generation_method' => 'autotag'
-    }
+    Thrust::DeploymentTarget.new(
+      'notify' => 'true',
+      'distribution_list' => 'devs',
+      'ios_build_configuration' => 'configuration',
+      'ios_provisioning_search_query' => 'Provisioning Profile query',
+      'note_generation_method' => 'autotag'
+    )
   end
   let(:deployment_target) { 'production' }
 
@@ -50,14 +50,14 @@ describe Thrust::IOS::Deploy do
 
     context "when versioning method is set to commits" do
       let(:distribution_config) do
-        {
-            'notify' => 'true',
-            'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
-            'note_generation_method' => 'autotag',
-            'versioning_method' => 'commits'
-        }
+        Thrust::DeploymentTarget.new(
+          'notify' => 'true',
+          'distribution_list' => 'devs',
+          'ios_build_configuration' => 'configuration',
+          'ios_provisioning_search_query' => 'Provisioning Profile query',
+          'note_generation_method' => 'autotag',
+          'versioning_method' => 'commits'
+        )
       end
 
       it "updates the version number to the number of commits on the current branch" do
@@ -75,13 +75,13 @@ describe Thrust::IOS::Deploy do
 
     context 'when note generation method is set to autotag' do
       let(:distribution_config) do
-        {
-            'notify' => 'true',
-            'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
-            'note_generation_method' => 'autotag'
-        }
+        Thrust::DeploymentTarget.new(
+          'notify' => 'true',
+          'distribution_list' => 'devs',
+          'ios_build_configuration' => 'configuration',
+          'ios_provisioning_search_query' => 'Provisioning Profile query',
+          'note_generation_method' => 'autotag'
+        )
       end
 
       it 'uploads to TestFlight, telling it to auto-generate the deployment notes' do
@@ -92,13 +92,13 @@ describe Thrust::IOS::Deploy do
 
     context 'when note generation is set to anything else' do
       let(:distribution_config) do
-        {
-            'notify' => 'true',
-            'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
-            'note_generation_method' => 'ask'
-        }
+        Thrust::DeploymentTarget.new(
+          'notify' => 'true',
+          'distribution_list' => 'devs',
+          'ios_build_configuration' => 'configuration',
+          'ios_provisioning_search_query' => 'Provisioning Profile query',
+          'note_generation_method' => 'ask'
+        )
       end
 
       it 'uploads to TestFlight, telling it not to auto-generate deployment notes' do
@@ -109,13 +109,13 @@ describe Thrust::IOS::Deploy do
 
     context 'when the target is set' do
       let(:distribution_config) do
-        {
-            'notify' => 'true',
-            'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
-            'ios_target' => 'TargetName'
-        }
+        Thrust::DeploymentTarget.new(
+          'notify' => 'true',
+          'distribution_list' => 'devs',
+          'ios_build_configuration' => 'configuration',
+          'ios_provisioning_search_query' => 'Provisioning Profile query',
+          'ios_target' => 'TargetName'
+        )
       end
 
       it 'creates the ipa, using the target' do
@@ -126,12 +126,12 @@ describe Thrust::IOS::Deploy do
 
     context 'when the target is not set' do
       let(:distribution_config) do
-        {
-            'notify' => 'true',
-            'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
-        }
+        Thrust::DeploymentTarget.new(
+          'notify' => 'true',
+          'distribution_list' => 'devs',
+          'ios_build_configuration' => 'configuration',
+          'ios_provisioning_search_query' => 'Provisioning Profile query',
+        )
       end
 
       it 'defaults to the app name as the target when building the ipa' do

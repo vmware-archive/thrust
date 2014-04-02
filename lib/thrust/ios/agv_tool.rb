@@ -1,9 +1,7 @@
 class Thrust::IOS::AgvTool
-
-  def initialize(thrust_executor, out)
+  def initialize(thrust_executor = Thrust::Executor.new, git = Thrust::Git.new)
     @thrust_executor = thrust_executor
-    @out = out
-    @git = Thrust::Git.new(@out, @thrust_executor)
+    @git = git
   end
 
   def change_build_number(build_number)

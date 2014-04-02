@@ -1,5 +1,4 @@
 class Thrust::IOS::XCodeToolsProvider
-
   def initialize(thrust_executor = Thrust::Executor.new)
     @thrust_executor = thrust_executor
   end

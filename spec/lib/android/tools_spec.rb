@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe Thrust::Android::Tools do
   let (:thrust_executor) { Thrust::FakeExecutor.new }
-  subject { Thrust::Android::Tools.new(thrust_executor, StringIO.new) }
+
+  subject { Thrust::Android::Tools.new(StringIO.new, thrust_executor) }
 
   describe 'building a signed release' do
     context 'when android home is not set' do
