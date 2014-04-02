@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
     'Andrew Bruce',
     'Andrew Kitchen',
     'Brandon Liu',
+    'Brian Butz',
     'Can Berk Güder',
     'Eugenia Dellapenna',
     'Jeff Hui',
