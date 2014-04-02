@@ -1,4 +1,4 @@
-require File.expand_path('../../thrust', __FILE__)
+require_relative '../thrust'
 
 desc 'Set build number'
 task :set_build_number, :build_number do |_, args|
