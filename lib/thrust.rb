@@ -1,7 +1,3 @@
-module Thrust; end
-module Thrust::Android; end
-module Thrust::IOS; end
-
 require 'thrust/config'
 require 'thrust/executor'
 require 'thrust/git'
