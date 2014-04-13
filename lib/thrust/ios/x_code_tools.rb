@@ -1,5 +1,6 @@
 class Thrust::IOS::XCodeTools
   ProvisioningProfileNotFound = Class.new(StandardError)
+  ProvisioningProfileNotEmbedded = Class.new(StandardError)
 
   def initialize(thrust_executor, out, build_configuration, build_directory, options = {})
     @thrust_executor = thrust_executor
@@ -17,6 +18,7 @@ class Thrust::IOS::XCodeTools
     kill_simulator
     build_scheme_or_target(target, 'iphoneos')
     create_ipa(app_name, signing_identity, provision_search_query)
+    verify_provision(app_name, provision_search_query)
   end
 
   def build_configuration_directory
@@ -79,6 +81,16 @@ class Thrust::IOS::XCodeTools
     ].join(' ')
     @thrust_executor.system_or_exit(cmd)
     ipa_filename
+  end
+
+  def verify_provision(app_name, provision_search_query)
+    @out.puts 'Verifying provisioning profile...'
+    embedded_filename = "#{build_configuration_directory}/#{app_name}.app/embedded.mobileprovision"
+    correct_provision_filename = provision_path(provision_search_query)
+
+    if !FileUtils.cmp(embedded_filename, correct_provision_filename)
+      raise(ProvisioningProfileNotEmbedded, "Wrong mobile provision embedded by xcrun. Check your xcode provisioning profile settings.")
+    end
   end
 
   def run_xcode(build_command, sdk = nil, scheme_or_target = nil, architecture = nil)

@@ -17,6 +17,7 @@ describe Thrust::IOS::XCodeTools do
 
   before do
     Thrust::Git.stub(:new).and_return(git)
+    FileUtils.stub(:cmp).and_return(true)
   end
 
   describe '.initialize' do
@@ -144,6 +145,15 @@ describe Thrust::IOS::XCodeTools do
 
       it 'raises an error' do
         subject.cleanly_create_ipa(target, app_name, signing_identity, provisioning_path)
+      end
+    end
+
+    context 'when xcrun embeds the wrong provisioning profile' do
+      it 'raises an error' do
+        expect do
+        FileUtils.stub(:cmp).and_return(false)
+        create_ipa
+        end.to raise_error(Thrust::IOS::XCodeTools::ProvisioningProfileNotEmbedded)
       end
     end
   end
