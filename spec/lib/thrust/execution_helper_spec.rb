@@ -3,11 +3,11 @@ require 'spec_helper'
 describe Thrust::ExecutionHelper do
   describe '#capture_status_from_command' do
     it 'returns true when the command succeeds' do
-      subject.capture_status_from_command('exit 0').should == true
+      subject.capture_status_from_command('sh -c "exit 0"').should == true
     end
 
     it 'returns false when the command fails' do
-      subject.capture_status_from_command('exit 1').should == false
+      subject.capture_status_from_command('sh -c "exit 1"').should == false
     end
   end
 
