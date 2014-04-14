@@ -2,16 +2,17 @@ require 'spec_helper'
 
 describe Thrust::IOS::AgvTool do
   let(:thrust_executor) { Thrust::FakeExecutor.new }
-  let(:out) { StringIO.new }
-  let(:git) { double(Thrust::Git, checkout_file: 'checkout_file') }
+  let(:git) { double(Thrust::Git) }
+
+  subject { Thrust::IOS::AgvTool.new(thrust_executor, git) }
 
   before do
-    Thrust::Git.stub(:new).and_return(git)
+    git.stub(:checkout_file)
   end
 
   describe '#change_build_number' do
     before do
-      Thrust::IOS::AgvTool.new(thrust_executor, out).change_build_number(1000)
+      subject.change_build_number(1000)
     end
 
     it 'instructs agvtool to change the version' do

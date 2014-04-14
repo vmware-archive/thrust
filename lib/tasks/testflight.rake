@@ -5,7 +5,7 @@ require_relative '../thrust'
 namespace :testflight do
   android_project = File.exists?('AndroidManifest.xml')
 
-  @thrust.app_config['deployment_targets'].each do |task_name, deployment_config|
+  @thrust.app_config.deployment_targets.each do |task_name, deployment_config|
     if android_project
       desc "Deploy Android build to #{task_name} (use NOTIFY=false to prevent team notification)"
       task task_name do |_, _|

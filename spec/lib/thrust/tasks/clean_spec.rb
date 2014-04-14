@@ -1,19 +1,19 @@
-require_relative '../../../lib/thrust/tasks/clean'
+require 'spec_helper'
 
 describe Thrust::Tasks::Clean do
   let(:out) { double(:out) }
-  let(:xcode_tools_provider) { double('Thrust::IOS::XCodeToolsProvider') }
+  let(:xcode_tools_provider) { double(Thrust::IOS::XCodeToolsProvider) }
 
   subject { Thrust::Tasks::Clean.new(out, xcode_tools_provider) }
 
   describe '#run' do
     it 'cleans the build' do
-      app_config = {
+      app_config = Thrust::AppConfig.new(
         'project_name' => 'project-name',
         'workspace_name' => 'workspace-name'
-      }
+      )
 
-      thrust = double('Thrust::Config')
+      thrust = double(Thrust::Config)
       thrust.stub(:build_dir).and_return('build-dir')
       thrust.stub(:app_config).and_return(app_config)
 
@@ -22,7 +22,7 @@ describe Thrust::Tasks::Clean do
         workspace_name: 'workspace-name'
       }
 
-      xcode_tools = double('Thrust::IOS::XCodeTools')
+      xcode_tools = double(Thrust::IOS::XCodeTools)
 
       xcode_tools_provider.stub(:instance).with(out, nil, 'build-dir', tools_options).and_return(xcode_tools)
 

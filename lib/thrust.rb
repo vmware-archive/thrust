@@ -1,9 +1,6 @@
-module Thrust; end
-module Thrust::Android; end
-module Thrust::IOS; end
-
 require 'thrust/config'
 require 'thrust/executor'
+require 'thrust/execution_helper'
 require 'thrust/git'
 require 'thrust/testflight'
 require 'thrust/user_prompt'

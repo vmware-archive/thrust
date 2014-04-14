@@ -1,10 +1,13 @@
-class Thrust::IOS::XCodeToolsProvider
+module Thrust
+  module IOS
+    class XCodeToolsProvider
+      def initialize(thrust_executor = Thrust::Executor.new)
+        @thrust_executor = thrust_executor
+      end
 
-  def initialize(thrust_executor = Thrust::Executor.new)
-    @thrust_executor = thrust_executor
-  end
-
-  def instance(out, build_configuration, build_directory, options)
-    Thrust::IOS::XCodeTools.new(@thrust_executor, out, build_configuration, build_directory, options)
+      def instance(out, build_configuration, build_directory, options)
+        Thrust::IOS::XCodeTools.new(@thrust_executor, out, build_configuration, build_directory, options)
+      end
+    end
   end
 end
