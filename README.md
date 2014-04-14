@@ -2,7 +2,9 @@
 
 # ![Thrust](thrust.png)
 
-[![Build Status](https://travis-ci.org/pivotal/thrust.png?branch=master)](https://travis-ci.org/pivotal/thrust) [Tracker](https://www.pivotaltracker.com/projects/987818) (contact av@pivotallabs.com if you need access)
+[![Build Status](https://travis-ci.org/pivotal/thrust.png?branch=master)](https://travis-ci.org/pivotal/thrust)
+[![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
+[Tracker](https://www.pivotaltracker.com/projects/987818) (contact av@pivotallabs.com if you need access)
 
 __Thrust__ is a small project that contains some useful rake tasks to run Cedar specs and deploy your iOS or Android application to TestFlight.
 
