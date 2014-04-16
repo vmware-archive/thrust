@@ -16,9 +16,11 @@ module Thrust
         @git.ensure_clean
 
         if (@deployment_config.versioning_method == 'commits')
-          @agv_tool.change_build_number(@git.commit_count)
+          @agv_tool.change_build_number(build_number: @git.commit_count)
+        elsif (@deployment_config.versioning_method == 'timestamp-sha')
+          @agv_tool.change_build_number(timestamp: Time.now.utc.strftime('%y%m%d%H%M'), build_number: @git.current_commit)
         else
-          @agv_tool.change_build_number(@git.current_commit)
+          @agv_tool.change_build_number(build_number: @git.current_commit)
         end
 
         app_name = @thrust_config.app_config.app_name

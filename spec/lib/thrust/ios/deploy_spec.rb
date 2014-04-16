@@ -61,14 +61,34 @@ describe Thrust::IOS::Deploy do
       end
 
       it "updates the version number to the number of commits on the current branch" do
-        agv_tool.should_receive(:change_build_number).with(149)
+        agv_tool.should_receive(:change_build_number).with(build_number: 149)
+        deploy.run
+      end
+    end
+
+    context "when versioning method is set to timestamp-sha" do
+      let(:distribution_config) do
+        Thrust::DeploymentTarget.new(
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag',
+            'versioning_method' => 'timestamp-sha'
+        )
+      end
+
+      it "updates the version number to the current git SHA and a timestamp in UTC" do
+        mocked_time = Time.parse("Thu Mar 29 22:33:20 PST 2014")
+        Time.stub(:now).and_return(mocked_time)
+        agv_tool.should_receive(:change_build_number).with(timestamp: '1403300633', build_number: '31758012490')
         deploy.run
       end
     end
 
     context "when versioning method is set to anything else" do
       it 'updates the version number to the current git SHA' do
-        agv_tool.should_receive(:change_build_number).with('31758012490')
+        agv_tool.should_receive(:change_build_number).with(build_number: '31758012490')
         deploy.run
       end
     end

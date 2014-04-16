@@ -6,8 +6,8 @@ module Thrust
         @git = git
       end
 
-      def change_build_number(build_number)
-        @thrust_executor.system_or_exit "agvtool new-version -all '#{build_number}'"
+      def change_build_number(build_number:, timestamp: nil)
+        @thrust_executor.system_or_exit "agvtool new-version -all '#{timestamp ? timestamp + '-' : ''}#{build_number}'"
         @git.checkout_file('*.xcodeproj')
       end
     end
