@@ -27,15 +27,15 @@ describe Thrust::ExecutionHelper do
 
   describe '#capture_status_and_output_from_command' do
     it 'returns the output and the return status of the command when the command succeeds' do
-      subject.capture_status_and_output_from_command('echo foo').should == [true, "foo\n"]
+      subject.capture_status_and_output_from_command('echo foo').should == {success: true, output: "foo\n"}
     end
 
     it 'returns the output and the return status of the command when the command fails' do
-      subject.capture_status_and_output_from_command('echo foo; exit 1').should == [false, "foo\n"]
+      subject.capture_status_and_output_from_command('echo foo; exit 1').should == {success: false, output: "foo\n"}
     end
 
     it 'uses the passed-in env vars' do
-      subject.capture_status_and_output_from_command('if [[ -z $VAR ]]; then echo noooooo && exit 1; else echo yes && exit 0; fi', {'VAR' => 'something'}).should == [true, "yes\n"]
+      subject.capture_status_and_output_from_command('if [[ -z $VAR ]]; then echo noooooo && exit 1; else echo yes && exit 0; fi', {'VAR' => 'something'}).should == {success: true, output: "yes\n"}
     end
 
     it 'unsets the variables upon completion' do
