@@ -7,26 +7,27 @@ module Thrust
       @out = out
     end
 
-    def system_or_exit(cmd, output_file = nil)
+    def system_or_exit(cmd, output_file = nil, env = {})
       @out.puts "Executing #{cmd}"
       cmd += " > #{output_file}" if output_file
 
-      unless @execution_helper.capture_status_from_command(cmd)
+      unless @execution_helper.capture_status_from_command(cmd, env)
         raise(CommandFailed, '******** Build failed ********')
       end
     end
 
-    def capture_output_from_system(cmd)
-      captured_output = `#{cmd}`
+    def capture_output_from_system(cmd, env = {})
+      execution = @execution_helper.capture_status_and_output_from_command(cmd, env)
 
-      raise(CommandFailed, '******** Build failed ********') if $?.exitstatus > 0
+      raise(CommandFailed, '******** Build failed ********') unless execution[:success]
 
-      captured_output
+      execution[:output]
     end
 
     def check_command_for_failure(cmd)
       @out.puts "Executing #{cmd} and checking for FAILURE"
-      result = %x[#{cmd} 2>&1]
+      execution = @execution_helper.capture_status_and_output_from_command("#{cmd} 2>&1")
+      result = execution[:output]
       @out.puts "Results:"
       @out.puts result
 
