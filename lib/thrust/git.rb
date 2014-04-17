@@ -1,4 +1,5 @@
 require 'colorize'
+require 'tempfile'
 
 module Thrust
   class Git

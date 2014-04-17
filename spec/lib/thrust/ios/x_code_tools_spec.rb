@@ -140,6 +140,12 @@ describe Thrust::IOS::XCodeTools do
       expect(thrust_executor.system_or_exit_history.last).to eq({cmd: "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --sign 'iPhone Distribution' --embed '#{provisioning_path}'", output_file: nil})
     end
 
+    it 'returns the name of the ipa' do
+      ipa_name = create_ipa
+
+      expect(ipa_name).to eq('build/Release-iphoneos/AppName.ipa')
+    end
+
     context 'when it can not find the provisioning profile' do
       let(:provisioning_path) { 'nonexistent-file' }
 

@@ -19,8 +19,10 @@ module Thrust
         clean_build
         kill_simulator
         build_scheme_or_target(target, 'iphoneos')
-        create_ipa(app_name, signing_identity, provision_search_query)
+        ipa_name = create_ipa(app_name, signing_identity, provision_search_query)
         verify_provision(app_name, provision_search_query)
+
+        return ipa_name
       end
 
       def build_configuration_directory

@@ -16,6 +16,13 @@ module Thrust
       end
     end
 
+    def system(cmd, output_file = nil)
+      @out.puts "Executing #{cmd}"
+      cmd += " > #{output_file}" if output_file
+
+      @execution_helper.capture_status_from_command(cmd)
+    end
+
     def capture_output_from_system(cmd, env = {})
       execution = @execution_helper.capture_status_and_output_from_command(cmd, env)
 
