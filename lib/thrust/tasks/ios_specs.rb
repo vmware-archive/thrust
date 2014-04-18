@@ -23,7 +23,7 @@ module Thrust
         }
 
         xcode_tools = @xcode_tools_provider.instance(@out, build_configuration, thrust.build_dir, tools_options)
-        xcode_tools.build_scheme_or_target(scheme || target, build_sdk, 'i386')
+        xcode_tools.build_scheme_or_target(scheme || target, build_sdk)
 
         if type == 'app'
           @cedar.run(build_configuration, target, runtime_sdk, build_sdk, target_info.device, thrust.build_dir, thrust.app_config.ios_sim_binary)

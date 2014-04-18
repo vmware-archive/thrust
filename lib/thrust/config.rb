@@ -36,7 +36,7 @@ module Thrust
 
     def verify_configuration
       if @app_config.thrust_version != THRUST_VERSION
-        fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies version #{config['thrust_version']}, but thrust is at version #{THRUST_VERSION}. See README for details.".red
+        fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies an out-of-date version, and thrust is at version: #{THRUST_VERSION}. See README for details.".red
       end
     end
   end

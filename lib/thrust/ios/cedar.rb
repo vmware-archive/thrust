@@ -12,7 +12,7 @@ module Thrust
         if build_sdk == 'macosx'
           build_path = File.join(build_dir, build_configuration)
           app_dir = File.join(build_path, target)
-          @thrust_executor.check_command_for_failure("DYLD_FRAMEWORK_PATH=#{build_path.inspect} #{app_dir}")
+          @thrust_executor.check_command_for_failure(app_dir.inspect, {'DYLD_FRAMEWORK_PATH' => build_path.inspect})
         else
           app_executable = File.join(build_dir, "#{build_configuration}-#{build_sdk}", "#{target}.app")
 

@@ -5,7 +5,7 @@ describe Thrust::IOS::XCodeTools do
   let(:out) { StringIO.new }
   let(:build_configuration) { 'Release' }
   let(:project_name) { 'AwesomeProject' }
-  let(:os) { 'iphoneos' }
+  let(:build_sdk) { 'iphoneos' }
   let(:target) { 'AppTarget' }
   let(:arch) { 'i386' }
   let(:git) { double(Thrust::Git, checkout_file: 'checkout_file') }
@@ -56,13 +56,28 @@ describe Thrust::IOS::XCodeTools do
 
     describe '#build_scheme_or_target' do
       context 'when the build succeeds' do
-        it 'calls xcodebuild with the build command' do
-          subject.build_scheme_or_target(target, os, arch)
+        before do
+          subject.build_scheme_or_target(target, build_sdk, arch)
+        end
 
-          expect(thrust_executor.system_or_exit_history.last).to eq({
-                                                                      cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" CONFIGURATION_BUILD_DIR="build/Release-iphoneos" 2>&1 | grep -v \'backing file\'',
-                                                                      output_file: 'build/Release-build.output'
-                                                                    })
+        context 'when the build_sdk is not macosx' do
+          it 'calls xcodebuild with the build command' do
+            expect(thrust_executor.system_or_exit_history.last).to eq({
+              cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" CONFIGURATION_BUILD_DIR="build/Release-iphoneos" 2>&1 | grep -v \'backing file\'',
+              output_file: 'build/Release-build.output'
+            })
+          end
+        end
+
+        context 'when the build_sdk is macosx' do
+          let(:build_sdk) { 'macosx' }
+
+          it 'does not include CONFIGURATION_BUILD_DIR' do
+            expect(thrust_executor.system_or_exit_history.last).to eq({
+              cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -arch i386 -target "AppTarget" -configuration Release -sdk macosx build SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+              output_file: 'build/Release-build.output'
+            })
+          end
         end
       end
 
@@ -76,7 +91,7 @@ describe Thrust::IOS::XCodeTools do
 
         it 'prints the build log' do
           expect {
-            subject.build_scheme_or_target(target, os, arch)
+            subject.build_scheme_or_target(target, build_sdk, arch)
           }.to raise_error Thrust::Executor::CommandFailed
           expect(out.string).to include('build facepalm')
         end
@@ -90,7 +105,7 @@ describe Thrust::IOS::XCodeTools do
 
     describe '#build_scheme_or_target' do
       it 'calls xcodebuild with the build command' do
-        subject.build_scheme_or_target(target, os, arch)
+        subject.build_scheme_or_target(target, build_sdk, arch)
 
         expect(thrust_executor.system_or_exit_history.last).to eq({
                                                                     cmd: 'set -o pipefail && xcodebuild -workspace AwesomeWorkspace.xcworkspace -arch i386 -scheme "AppTarget" -configuration Release -sdk iphoneos build SYMROOT="build" CONFIGURATION_BUILD_DIR="build/Release-iphoneos" 2>&1 | grep -v \'backing file\'',
@@ -131,7 +146,7 @@ describe Thrust::IOS::XCodeTools do
     end
 
     it 'builds the app' do
-      subject.should_receive(:build_scheme_or_target).with(target, os)
+      subject.should_receive(:build_scheme_or_target).with(target, build_sdk)
       create_ipa
     end
 

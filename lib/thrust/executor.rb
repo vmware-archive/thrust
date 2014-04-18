@@ -31,9 +31,9 @@ module Thrust
       execution[:output]
     end
 
-    def check_command_for_failure(cmd)
+    def check_command_for_failure(cmd, env = {})
       @out.puts "Executing #{cmd} and checking for FAILURE"
-      execution = @execution_helper.capture_status_and_output_from_command("#{cmd} 2>&1")
+      execution = @execution_helper.capture_status_and_output_from_command("#{cmd} 2>&1", env)
       result = execution[:output]
       @out.puts "Results:"
       @out.puts result

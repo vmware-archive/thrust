@@ -78,7 +78,7 @@ describe Thrust::Executor do
     end
 
     context 'with env vars' do
-      it 'runs the command with the env variables' do
+      it 'tells the execution helper to run the command with the env variables' do
         execution_helper.stub(:capture_status_and_output_from_command).and_return({success: true, output: 'foobar'})
         subject.capture_output_from_system('does_foo', {'FOO' => 'bar'})
 
@@ -120,6 +120,24 @@ describe Thrust::Executor do
       subject.check_command_for_failure('does_bar')
 
       out.string.should include(output)
+    end
+
+    it 'should pipe err into the output stream' do
+      output = 'Finished with errouts'
+      execution_helper.stub(:capture_status_and_output_from_command).and_return({success: true, output: output})
+      subject.check_command_for_failure('does_foo')
+
+      execution_helper.should have_received(:capture_status_and_output_from_command).with('does_foo 2>&1', {})
+    end
+
+    context 'with env vars' do
+      it 'tells the execution helper to run the command with the env variables' do
+        output = 'Finished with vars'
+        execution_helper.stub(:capture_status_and_output_from_command).and_return({success: true, output: output})
+        subject.check_command_for_failure('does_foo', {'FOO' => 'bar'})
+
+        execution_helper.should have_received(:capture_status_and_output_from_command).with(an_instance_of(String), {'FOO' => 'bar'})
+      end
     end
   end
 end
