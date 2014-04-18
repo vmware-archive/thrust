@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
     'Andrew Kitchen',
     'Brandon Liu',
     'Brian Butz',
-    'Can Berk Güder',
+    'Can Berk Guder',
     'Eugenia Dellapenna',
     'Jeff Hui',
     'Joe Masilotti',
