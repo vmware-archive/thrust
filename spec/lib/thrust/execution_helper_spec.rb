@@ -35,7 +35,7 @@ describe Thrust::ExecutionHelper do
     end
 
     it 'uses the passed-in env vars' do
-      subject.capture_status_and_output_from_command('sh -c "if [[ -z $VAR ]]; then echo noooooo && exit 1; else echo yes && exit 0; fi"', {'VAR' => 'something'}).should == {success: true, output: "yes\n"}
+      subject.capture_status_and_output_from_command("sh -c 'if [[ -z $VAR ]]; then echo noooooo && exit 1; else echo yes && exit 0; fi'", {'VAR' => 'something'}).should == {success: true, output: "yes\n"}
     end
 
     it 'unsets the variables upon completion' do
