@@ -42,6 +42,7 @@ describe Thrust::Tasks::IOSSpecs do
         xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
 
         expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk')
+        expect(xcode_tools).to receive(:kill_simulator)
         expect(cedar).to receive(:run).with('build-configuration', 'some-target', 'runtime-sdk', 'build-sdk', 'device', 'build-dir', 'ios-sim').and_return(:success)
 
         result = subject.run(thrust, target_info, args)
