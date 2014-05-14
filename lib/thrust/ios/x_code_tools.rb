@@ -55,14 +55,14 @@ module Thrust
         @thrust_executor.check_command_for_failure(cmd)
       end
 
-      private
-
       def kill_simulator
         @out.puts('Killing simulator...')
         @thrust_executor.system %q[killall -m -KILL "gdb"]
         @thrust_executor.system %q[killall -m -KILL "otest"]
         @thrust_executor.system %q[killall -m -KILL "iPhone Simulator"]
       end
+
+      private
 
       def provision_path(provision_search_query)
         provision_search_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/")
