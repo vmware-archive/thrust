@@ -13,6 +13,7 @@ require 'thrust/ios/agv_tool'
 require 'thrust/ios/cedar'
 require 'thrust/ios/deploy'
 require 'thrust/ios/deploy_provider'
+require 'thrust/ios/synx'
 require 'thrust/ios/x_code_tools'
 require 'thrust/ios/x_code_tools_provider'
 
