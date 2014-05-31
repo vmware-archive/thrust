@@ -38,6 +38,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'colorize', '~> 0.6'
   s.add_runtime_dependency 'auto_tagger', '~> 0.2'
   s.add_runtime_dependency 'rake', '~> 10.1'
+  s.add_runtime_dependency 'synx', '~> 0.0.4'
   s.add_development_dependency 'fakefs', '~> 0.5'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'timecop'
