@@ -61,14 +61,14 @@ describe Thrust::IOS::Deploy do
       end
 
       it "updates the version number to the number of commits on the current branch" do
-        agv_tool.should_receive(:change_build_number).with(149)
+        agv_tool.should_receive(:change_build_number).with(149, nil)
         deploy.run
       end
     end
 
     context "when versioning method is set to anything else" do
       it 'updates the version number to the current git SHA' do
-        agv_tool.should_receive(:change_build_number).with('31758012490')
+        agv_tool.should_receive(:change_build_number).with('31758012490', nil)
         deploy.run
       end
     end
