@@ -57,4 +57,9 @@ describe Thrust::AppConfig do
     config = Thrust::AppConfig.new({'ios_distribution_certificate' => 'some-cert'})
     expect(config.ios_distribution_certificate).to eq('some-cert')
   end
+
+  it 'exposes the path to the .xcodeproj file' do
+    config = Thrust::AppConfig.new({'path_to_xcodeproj' => '../foo/bar.xcodeproj'})
+    expect(config.path_to_xcodeproj).to eq('../foo/bar.xcodeproj')
+  end
 end

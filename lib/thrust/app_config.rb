@@ -12,7 +12,8 @@ module Thrust
                 :project_name,
                 :testflight,
                 :thrust_version,
-                :workspace_name
+                :workspace_name,
+                :path_to_xcodeproj
 
     def initialize(attributes)
       @app_name = attributes['app_name']
@@ -24,6 +25,7 @@ module Thrust
       @testflight = generate_testflight_credentials(attributes['testflight'])
       @thrust_version = attributes['thrust_version'].to_s
       @workspace_name = attributes['workspace_name']
+      @path_to_xcodeproj = attributes['path_to_xcodeproj']
     end
 
     private
