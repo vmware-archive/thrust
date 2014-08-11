@@ -18,6 +18,7 @@ deployment_targets:
     ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name. iOS only.
     ios_build_configuration: Release # iOS only
     ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
+    versioning_method: 'none' # Optional. Leave blank to use Git commit sha's for build numbers.
 
   demo:
     distribution_list: Beta Testers

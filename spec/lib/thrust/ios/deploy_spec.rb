@@ -66,6 +66,24 @@ describe Thrust::IOS::Deploy do
       end
     end
 
+    context "when versioning method is set to none" do
+      let(:distribution_config) do
+        Thrust::DeploymentTarget.new(
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag',
+            'versioning_method' => 'none'
+        )
+      end
+
+      it "does not update the version number" do
+        expect(agv_tool).to_not receive(:change_build_number)
+        deploy.run
+      end
+    end
+
     context "when versioning method is set to anything else" do
       it 'updates the version number to the current git SHA' do
         agv_tool.should_receive(:change_build_number).with('31758012490', nil)
