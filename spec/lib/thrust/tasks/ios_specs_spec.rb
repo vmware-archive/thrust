@@ -28,6 +28,7 @@ describe Thrust::Tasks::IOSSpecs do
         target_info = Thrust::IOSSpecTarget.new(
           'type' => 'app',
           'device' => 'device',
+          'device_type_id' => 'device-type-id',
           'target' => 'some-target',
           'scheme' => 'some-scheme',
           'build_sdk' => 'build-sdk',
@@ -43,7 +44,7 @@ describe Thrust::Tasks::IOSSpecs do
 
         expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk')
         expect(xcode_tools).to receive(:kill_simulator)
-        expect(cedar).to receive(:run).with('build-configuration', 'some-target', 'runtime-sdk', 'build-sdk', 'device', 'build-dir', 'ios-sim').and_return(:success)
+        expect(cedar).to receive(:run).with('build-configuration', 'some-target', 'runtime-sdk', 'build-sdk', 'device', 'device-type-id', 'build-dir', 'ios-sim').and_return(:success)
 
         result = subject.run(thrust, target_info, args)
         expect(result).to eq(:success)
@@ -70,6 +71,7 @@ describe Thrust::Tasks::IOSSpecs do
         target_info = Thrust::IOSSpecTarget.new(
           'type' => 'bundle',
           'device' => 'device',
+          'device_type_id' => 'device-type-id',
           'target' => 'some-target',
           'scheme' => 'some-scheme',
           'build_sdk' => 'build-sdk',

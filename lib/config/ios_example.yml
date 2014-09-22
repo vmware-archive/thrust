@@ -33,6 +33,7 @@ ios_spec_targets:
     build_sdk: iphonesimulator7.0 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
     runtime_sdk: 7.0 # SDK used to run the target. Not optional.
     device: ipad # Device to run the specs on. Optional, defaults to iPhone.
+#    device_type_id: com.apple.CoreSimulator.SimDeviceType.iPad-Retina # required if using the 3.x version of ios-sim with Xcode 6+
 
   integration:
     target: IntegrationSpecs
