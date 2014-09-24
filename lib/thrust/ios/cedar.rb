@@ -26,7 +26,7 @@ module Thrust
                 @thrust_executor.check_command_for_failure(%Q[#{simulator_binary} launch #{app_executable} --sdk #{runtime_sdk} --family #{device} --retina --tall --setenv CFFIXED_USER_HOME=#{Dir.tmpdir} --setenv CEDAR_HEADLESS_SPECS=1 --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter])
               end
             else
-              @thrust_executor.check_command_for_failure(%Q[#{simulator_binary} launch #{app_executable} --devicetypeid '#{device_type_id}' --sdk #{runtime_sdk} --setenv CFFIXED_USER_HOME=#{Dir.tmpdir} --setenv CEDAR_HEADLESS_SPECS=1 --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter])
+              @thrust_executor.check_command_for_failure(%Q[#{simulator_binary} launch #{app_executable} --devicetypeid '#{device_type_id}' --setenv CFFIXED_USER_HOME=#{Dir.tmpdir} --setenv CEDAR_HEADLESS_SPECS=1 --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter])
             end
 
           else
