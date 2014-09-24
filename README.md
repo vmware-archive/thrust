@@ -121,10 +121,12 @@ ios_spec_targets:
   specs: # This is the name of the rake task: `rake specs`
     target: UISpecs # name of the build target
 #    scheme: Specs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
+    type: app # Spec target type: app or bundle. Optional, defaults to app.
     build_configuration: Debug # name of the build configuration
     build_sdk: iphonesimulator7.0 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
     runtime_sdk: 7.0 # SDK used to run the target. Not optional.
-    device: ipad # Device to run the specs on. Optional, defaults to iPhone.
+#    device: ipad # Device to run the specs on. Deprecated in ios-sim 3.0+, use device_type_id instead.
+    device_type_id: com.apple.CoreSimulator.SimDeviceType.iPad-Retina, 7.0 # required if using ios-sim 3.0
 
   integration:
     target: IntegrationSpecs
