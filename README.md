@@ -39,6 +39,10 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 # Changelog
 
+## Version 0.4
+
+* Added support for Xcode 6 and ios-sim 3.x.  You should now specify `device_type_id` in your `thrust.yml` instead of `device`.
+
 ## Version 0.3
 
 * **Thrust** can now build against Xcode workspaces. In your `thrust.yml` file:
@@ -93,7 +97,7 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 ## Example thrust.yml for iOS
 
 ```yaml
-thrust_version: 0.3
+thrust_version: 0.4
 project_name: My Great Project # do not use if building with an xcode workspace
 # workspace_name: My Workspace # use if building with an xcode workspace
 app_name: My Great App

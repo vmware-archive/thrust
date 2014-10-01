@@ -2,7 +2,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name        = 'thrust'
-  s.version     = '0.3.1'
+  s.version     = '0.4.0'
   s.date        = '2013-07-24'
   s.summary     = 'Thrust is a collection of rake tasks for iOS/Android development and deployment'
   s.description = 'Thrust provides a collection of rake tasks for iOS and Android projects.  These include tasks for running Cedar test suites (iOS) and for deploying apps to Testflight (iOS and Android).'
