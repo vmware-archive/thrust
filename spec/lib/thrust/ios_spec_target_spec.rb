@@ -26,6 +26,11 @@ describe Thrust::IOSSpecTarget do
     expect(target.device).to eq('some-device')
   end
 
+  it 'exposes the device type id' do
+    target = Thrust::IOSSpecTarget.new('device_type_id' => 'some-device-id')
+    expect(target.device_type_id).to eq('some-device-id')
+  end
+
   it 'defaults the device type to iphone' do
     target = Thrust::IOSSpecTarget.new({})
     expect(target.device).to eq('iphone')

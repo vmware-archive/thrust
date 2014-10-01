@@ -6,6 +6,7 @@ describe Thrust::IOS::Cedar do
   let(:runtime_sdk) { 'sdk' }
   let(:build_sdk) { 'os' }
   let(:device) { 'device' }
+  let(:device_type_id) { 'device_type_id' }
   let(:build_dir) { 'build_dir' }
   let(:out) { StringIO.new }
   let(:sim_binary) { 'ios-sim' }
@@ -21,13 +22,13 @@ describe Thrust::IOS::Cedar do
     it 'returns true when the cmd works' do
       thrust_executor.stub(:check_command_for_failure).and_return(true)
 
-      subject.run(build_configuration, target, runtime_sdk, build_sdk, device, build_dir, sim_binary).should be_true
+      subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary).should be_true
     end
 
     it 'returns false when the cmd fails' do
       thrust_executor.stub(:check_command_for_failure).and_return(false)
 
-      subject.run(build_configuration, target, runtime_sdk, build_sdk, device, build_dir, sim_binary).should be_false
+      subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary).should be_false
     end
 
     context 'with macosx as the build_sdk' do
@@ -35,7 +36,7 @@ describe Thrust::IOS::Cedar do
 
       it 'should (safely) pass thrust the build path as an env variable' do
         thrust_executor.stub(:check_command_for_failure).and_return(false)
-        subject.run(build_configuration, target, runtime_sdk, build_sdk, device, build_dir, sim_binary)
+        subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary)
 
         build_path = File.join(build_dir, build_configuration)
         app_dir = File.join(build_path, target)
@@ -47,7 +48,7 @@ describe Thrust::IOS::Cedar do
       let(:sim_binary) { 'invalid-binary' }
 
       it 'returns false when the binary is not recognized' do
-        subject.run(build_configuration, target, runtime_sdk, build_sdk, device, build_dir, sim_binary).should be_false
+        subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary).should be_false
 
         expect(out.string).to include('Unknown binary for running specs')
       end
