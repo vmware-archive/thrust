@@ -36,7 +36,7 @@ module Thrust
 
       def build_scheme_or_target(scheme_or_target, build_sdk, architecture=nil)
         @out.puts "Building..."
-        run_xcode('build', build_sdk, scheme_or_target, architecture)
+        run_xcode(build_sdk, scheme_or_target, architecture)
       end
 
       def test(scheme, build_configuration, runtime_sdk, build_dir)
@@ -97,7 +97,7 @@ module Thrust
         end
       end
 
-      def run_xcode(build_command, sdk = nil, scheme_or_target = nil, architecture = nil)
+      def run_xcode(sdk = nil, scheme_or_target = nil, architecture = nil)
         architecture_flag = architecture ? "-arch #{architecture}" : nil
         target_flag = @workspace_name ? "-scheme \"#{scheme_or_target}\"" : "-target \"#{scheme_or_target}\""
         sdk_flag = sdk ? "-sdk #{sdk}" : nil
@@ -112,13 +112,13 @@ module Thrust
           target_flag,
           "-configuration #{@build_configuration}",
           sdk_flag,
-          "#{build_command}",
+          "clean build",
           "SYMROOT=#{@build_directory.inspect}",
           configuration_build_dir_option,
           '2>&1',
           "| grep -v 'backing file'"
         ].compact.join(' ')
-        output_file = output_file("#{@build_configuration}-#{build_command}")
+        output_file = output_file("#{@build_configuration}-build")
         begin
           @thrust_executor.system_or_exit(command, output_file)
         rescue Thrust::Executor::CommandFailed => e
