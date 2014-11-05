@@ -36,6 +36,11 @@ describe Thrust::IOSSpecTarget do
     expect(target.os_version).to eq('some-os-version')
   end
 
+  it 'exposes the timeout' do
+    target = Thrust::IOSSpecTarget.new('timeout' => '45')
+    expect(target.timeout).to eq('45')
+  end
+
   it 'defaults the device type to iphone' do
     target = Thrust::IOSSpecTarget.new({})
     expect(target.device).to eq('iphone')

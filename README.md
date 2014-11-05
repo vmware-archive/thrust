@@ -138,6 +138,7 @@ ios_spec_targets:
     build_sdk: iphonesimulator7.0 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
     device_name: iPhone-4s # device name as suggested by ios-sim showdevicetypes
     os_version: 7.1 # OS version to run. Defaults to latest available version.
+    timeout: 90 # Optional. Destination timeout defaults to 30 seconds
 
   integration:
     target: IntegrationSpecs

@@ -47,8 +47,15 @@ describe Thrust::IOS::XCodeTools do
 
       thrust_executor.stub(:check_command_for_failure).and_return(command_result)
 
-      subject.test('scheme', 'build_configuration', 'os_version', 'device_name', 'build_dir').should == command_result
-      expect(thrust_executor).to have_received(:check_command_for_failure).with("xcodebuild test -scheme scheme -configuration build_configuration -destination 'OS=os_version,name=device_name' SYMROOT='build_dir'")
+      subject.test('scheme', 'build_configuration', 'os_version', 'device_name', '33', 'build_dir').should == command_result
+      expect(thrust_executor).to have_received(:check_command_for_failure).with("xcodebuild test -scheme scheme -configuration build_configuration -destination 'OS=os_version,name=device_name' -destination-timeout '33' SYMROOT='build_dir'")
+    end
+
+    it 'defaults destination-timeout to 30' do
+      thrust_executor.stub(:check_command_for_failure)
+
+      subject.test('scheme', 'build_configuration', 'os_version', 'device_name', nil, 'build_dir')
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/-destination-timeout '30'/)
     end
   end
 

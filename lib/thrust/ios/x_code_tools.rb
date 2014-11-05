@@ -39,8 +39,9 @@ module Thrust
         run_xcode(build_sdk, scheme_or_target, architecture)
       end
 
-      def test(scheme, build_configuration, os_version, device_name, build_dir)
+      def test(scheme, build_configuration, os_version, device_name, timeout, build_dir)
         destination = "OS=#{os_version},name=#{device_name}"
+        timeout ||= "30"
 
         cmd = [
           "xcodebuild",
@@ -48,6 +49,7 @@ module Thrust
           "-scheme #{scheme}",
           "-configuration #{build_configuration}",
           "-destination '#{destination}'",
+          "-destination-timeout '#{timeout}'",
           "SYMROOT='#{build_dir}'"
         ].join(' ')
 

@@ -7,7 +7,8 @@ module Thrust
                 :os_version,
                 :scheme,
                 :target,
-                :type
+                :type,
+                :timeout
 
     def initialize(attributes)
       @build_configuration = attributes['build_configuration']
@@ -18,6 +19,7 @@ module Thrust
       @scheme = attributes['scheme']
       @target = attributes['target']
       @type = attributes['type'] || 'app'
+      @timeout = attributes['timeout']
     end
   end
 end
