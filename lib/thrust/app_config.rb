@@ -7,7 +7,7 @@ module Thrust
     attr_reader :app_name,
                 :deployment_targets,
                 :ios_distribution_certificate,
-                :ios_sim_binary,
+                :ios_sim_path,
                 :ios_spec_targets,
                 :project_name,
                 :testflight,
@@ -19,7 +19,7 @@ module Thrust
       @app_name = attributes['app_name']
       @deployment_targets = generate_deployment_targets(attributes['deployment_targets'])
       @ios_distribution_certificate = attributes['ios_distribution_certificate']
-      @ios_sim_binary = attributes['ios_sim_binary']
+      @ios_sim_path = attributes['ios_sim_path']
       @ios_spec_targets = generate_ios_spec_targets(attributes['ios_spec_targets'])
       @project_name = attributes['project_name']
       @testflight = generate_testflight_credentials(attributes['testflight'])

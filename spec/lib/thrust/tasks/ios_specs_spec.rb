@@ -13,7 +13,7 @@ describe Thrust::Tasks::IOSSpecs do
         app_config = Thrust::AppConfig.new(
           'project_name' => 'project-name',
           'workspace_name' => 'workspace-name',
-          'ios_sim_binary' => 'ios-sim'
+          'ios_sim_path' => '/path/to/ios-sim'
         )
 
         thrust = double(Thrust::Config)
@@ -28,11 +28,11 @@ describe Thrust::Tasks::IOSSpecs do
         target_info = Thrust::IOSSpecTarget.new(
           'type' => 'app',
           'device' => 'device',
-          'device_type_id' => 'device-type-id',
+          'device_name' => 'device-name',
+          'os_version' => 'os-version',
           'target' => 'some-target',
           'scheme' => 'some-scheme',
           'build_sdk' => 'build-sdk',
-          'runtime_sdk' => 'runtime-sdk',
           'build_configuration' => 'build-configuration'
         )
 
@@ -44,7 +44,7 @@ describe Thrust::Tasks::IOSSpecs do
 
         expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk')
         expect(xcode_tools).to receive(:kill_simulator)
-        expect(cedar).to receive(:run).with('build-configuration', 'some-target', 'runtime-sdk', 'build-sdk', 'device', 'device-type-id', 'build-dir', 'ios-sim').and_return(:success)
+        expect(cedar).to receive(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version','device-name', 'build-dir', '/path/to/ios-sim').and_return(:success)
 
         result = subject.run(thrust, target_info, args)
         expect(result).to eq(:success)
@@ -56,7 +56,7 @@ describe Thrust::Tasks::IOSSpecs do
         app_config = Thrust::AppConfig.new(
           'project_name' => 'project-name',
           'workspace_name' => 'workspace-name',
-          'ios_sim_binary' => 'ios-sim'
+          'ios_sim_path' => 'ios-sim'
         )
 
         thrust = double(Thrust::Config)
@@ -71,11 +71,11 @@ describe Thrust::Tasks::IOSSpecs do
         target_info = Thrust::IOSSpecTarget.new(
           'type' => 'bundle',
           'device' => 'device',
-          'device_type_id' => 'device-type-id',
+          'device_name' => 'device-name',
+          'os_version' => 'os-version',
           'target' => 'some-target',
           'scheme' => 'some-scheme',
           'build_sdk' => 'build-sdk',
-          'runtime_sdk' => 'runtime-sdk',
           'build_configuration' => 'build-configuration'
         )
 
@@ -86,7 +86,7 @@ describe Thrust::Tasks::IOSSpecs do
         xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
 
         expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk')
-        expect(xcode_tools).to receive(:test).with('some-target', 'build-configuration', 'runtime-sdk', 'build-dir').and_return(:success)
+        expect(xcode_tools).to receive(:test).with('some-target', 'build-configuration', 'os-version', 'device-name', 'build-dir').and_return(:success)
 
         result = subject.run(thrust, target_info, args)
         expect(result).to eq(:success)

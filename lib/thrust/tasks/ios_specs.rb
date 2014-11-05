@@ -15,7 +15,7 @@ module Thrust
         target = target_info.target
         scheme = target_info.scheme
         build_sdk = target_info.build_sdk
-        runtime_sdk = args[:runtime_sdk] || target_info.runtime_sdk
+        os_version = args[:os_version] || target_info.os_version
 
         tools_options = {
           project_name: thrust.app_config.project_name,
@@ -27,9 +27,9 @@ module Thrust
 
         if type == 'app'
           xcode_tools.kill_simulator
-          @cedar.run(build_configuration, target, runtime_sdk, build_sdk, target_info.device, target_info.device_type_id, thrust.build_dir, thrust.app_config.ios_sim_binary)
+          @cedar.run(build_configuration, target, build_sdk, os_version, target_info.device_name, thrust.build_dir, thrust.app_config.ios_sim_path)
         else
-          xcode_tools.test(target || scheme, build_configuration, runtime_sdk, thrust.build_dir)
+          xcode_tools.test(target || scheme, build_configuration, os_version, target_info.device_name, thrust.build_dir)
         end
       end
     end

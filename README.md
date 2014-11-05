@@ -39,6 +39,14 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 # Changelog
 
+## Version 0.5
+
+* Removes support for waxsim
+* Unifies configuration of Cedar Spec Suites and Cedar/iOS/OSX test bundles in thrust.yml (breaking configuration changes) 
+* Fixes hardcoded bundle test destination which was broken in Xcode 6+
+* Allows bundles to be built for architectures specified in Xcode project (removes hardcoded ARCHS flag)
+* Adds support for specifying an alternate path to ios-sim
+ 
 ## Version 0.4
 
 * Added support for Xcode 6 and ios-sim 3.x.  You should now specify `device_type_id` in your `thrust.yml` instead of `device`.
@@ -97,12 +105,12 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 ## Example thrust.yml for iOS
 
 ```yaml
-thrust_version: 0.4
+thrust_version: 0.5
 project_name: My Great Project # do not use if building with an xcode workspace
 # workspace_name: My Workspace # use if building with an xcode workspace
 app_name: My Great App
 ios_distribution_certificate: 'Name of Distribution Signing Certificate'
-ios_sim_binary: 'ios-sim' # or wax-sim. iOS only.
+ios_sim_path: '/path/to/ios-sim' # Optional. Use to prefer a specific ios-sim binary (e.g. within project directory) over a system-installed version (homebrew)
 
 testflight:
   api_token: 'testflight api token' # To find your App Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829956-what-does-the-api-token-do-
@@ -128,16 +136,14 @@ ios_spec_targets:
     type: app # Spec target type: app or bundle. Optional, defaults to app.
     build_configuration: Debug # name of the build configuration
     build_sdk: iphonesimulator7.0 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
-    runtime_sdk: 7.0 # SDK used to run the target. Not optional.
-#    device: ipad # Device to run the specs on. Deprecated in ios-sim 3.0+, use device_type_id instead.
-    device_type_id: com.apple.CoreSimulator.SimDeviceType.iPad-Retina, 7.0 # required if using ios-sim 3.0
+    device_name: iPhone-4s # device name as suggested by ios-sim showdevicetypes
+    os_version: 7.1 # OS version to run. Defaults to latest available version.
 
   integration:
     target: IntegrationSpecs
 #    scheme: IntegrationSpecs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
     build_configuration: Release
     build_sdk: macosx
-    runtime_sdk: macosx
 ```
 
 

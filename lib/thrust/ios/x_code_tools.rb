@@ -39,8 +39,8 @@ module Thrust
         run_xcode(build_sdk, scheme_or_target, architecture)
       end
 
-      def test(scheme, build_configuration, runtime_sdk, build_dir)
-        destination = "OS=#{runtime_sdk},name=iPhone Retina (3.5-inch)"
+      def test(scheme, build_configuration, os_version, device_name, build_dir)
+        destination = "OS=#{os_version},name=#{device_name}"
 
         cmd = [
           "xcodebuild",
@@ -48,7 +48,6 @@ module Thrust
           "-scheme #{scheme}",
           "-configuration #{build_configuration}",
           "-destination '#{destination}'",
-          "ARCHS=i386",
           "SYMROOT='#{build_dir}'"
         ].join(' ')
 
