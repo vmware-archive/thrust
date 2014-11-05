@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Thrust::AppConfig do
   it 'exposes the ios sim binary' do
-    config = Thrust::AppConfig.new('ios_sim_binary' => 'ios-sim-binary')
-    expect(config.ios_sim_binary).to eq('ios-sim-binary')
+    config = Thrust::AppConfig.new('ios_sim_path' => 'ios-sim-binary')
+    expect(config.ios_sim_path).to eq('ios-sim-binary')
   end
 
   it 'exposes the ios_spec_targets when passed in' do

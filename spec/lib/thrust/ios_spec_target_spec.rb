@@ -26,19 +26,19 @@ describe Thrust::IOSSpecTarget do
     expect(target.device).to eq('some-device')
   end
 
-  it 'exposes the device type id' do
-    target = Thrust::IOSSpecTarget.new('device_type_id' => 'some-device-id')
-    expect(target.device_type_id).to eq('some-device-id')
+  it 'exposes the device name' do
+    target = Thrust::IOSSpecTarget.new('device_name' => 'some-device-name')
+    expect(target.device_name).to eq('some-device-name')
+  end
+
+  it 'exposes the os version' do
+    target = Thrust::IOSSpecTarget.new('os_version' => 'some-os-version')
+    expect(target.os_version).to eq('some-os-version')
   end
 
   it 'defaults the device type to iphone' do
     target = Thrust::IOSSpecTarget.new({})
     expect(target.device).to eq('iphone')
-  end
-
-  it 'exposes the runtime sdk' do
-    target = Thrust::IOSSpecTarget.new('runtime_sdk' => 'some-sdk')
-    expect(target.runtime_sdk).to eq('some-sdk')
   end
 
   it 'exposes the scheme name' do

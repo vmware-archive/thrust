@@ -3,32 +3,28 @@ require 'spec_helper'
 describe Thrust::IOS::Cedar do
   let(:build_configuration) { 'build_configuration' }
   let(:target) { 'target' }
-  let(:runtime_sdk) { 'sdk' }
   let(:build_sdk) { 'os' }
-  let(:device) { 'device' }
-  let(:device_type_id) { 'device_type_id' }
+  let(:device_name) { 'device-name' }
+  let(:os_version) { 'os-version' }
   let(:build_dir) { 'build_dir' }
   let(:out) { StringIO.new }
-  let(:sim_binary) { 'ios-sim' }
+  let(:ios_sim_path) { '/path/to/my/ios-sim' }
   let(:thrust_executor) { double(Thrust::Executor) }
 
   subject { Thrust::IOS::Cedar.new(out, thrust_executor) }
-
-  before do
-    thrust_executor.stub(:check_command_for_failure)
-  end
 
   describe 'run' do
     it 'returns true when the cmd works' do
       thrust_executor.stub(:check_command_for_failure).and_return(true)
 
-      subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary).should be_true
+      subject.run(build_configuration, target, build_sdk, os_version, device_name, build_dir, ios_sim_path).should be_true
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/com.apple.CoreSimulator.SimDeviceType.device-name, os-version/)
     end
 
     it 'returns false when the cmd fails' do
       thrust_executor.stub(:check_command_for_failure).and_return(false)
 
-      subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary).should be_false
+      subject.run(build_configuration, target, build_sdk, os_version, device_name, build_dir, ios_sim_path).should be_false
     end
 
     context 'with macosx as the build_sdk' do
@@ -36,7 +32,7 @@ describe Thrust::IOS::Cedar do
 
       it 'should (safely) pass thrust the build path as an env variable' do
         thrust_executor.stub(:check_command_for_failure).and_return(false)
-        subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary)
+        subject.run(build_configuration, target, build_sdk, os_version, device_name, build_dir, ios_sim_path)
 
         build_path = File.join(build_dir, build_configuration)
         app_dir = File.join(build_path, target)
@@ -44,13 +40,14 @@ describe Thrust::IOS::Cedar do
       end
     end
 
-    context 'the binary is not valid' do
-      let(:sim_binary) { 'invalid-binary' }
+    describe 'when no ios_sim_path is provided' do
+      let(:ios_sim_path) { nil }
 
-      it 'returns false when the binary is not recognized' do
-        subject.run(build_configuration, target, runtime_sdk, build_sdk, device, device_type_id, build_dir, sim_binary).should be_false
+      it 'defaults to system-installed ios-sim' do
+        thrust_executor.stub(:check_command_for_failure)
+        subject.run(build_configuration, target, build_sdk, os_version, device_name, build_dir, ios_sim_path)
 
-        expect(out.string).to include('Unknown binary for running specs')
+        expect(thrust_executor).to have_received(:check_command_for_failure).with(/ios-sim/)
       end
     end
   end
