@@ -7,91 +7,84 @@ describe Thrust::Tasks::IOSSpecs do
 
   subject { Thrust::Tasks::IOSSpecs.new(out, xcode_tools_provider, cedar) }
 
+  before :each do
+    allow(cedar).to receive(:run)
+  end
+
   describe '#run' do
+    let(:xcode_tools) { double(Thrust::IOS::XCodeTools) }
+    let(:target_info) { Thrust::IOSSpecTarget.new(
+      'type' => 'app',
+      'device' => 'device',
+      'device_name' => 'device-name',
+      'os_version' => 'os-version',
+      'target' => 'some-target',
+      'scheme' => 'some-scheme',
+      'timeout' => '45',
+      'build_sdk' => 'build-sdk',
+      'build_configuration' => 'build-configuration'
+    ) }
+
+    let(:thrust) {
+      app_config = Thrust::AppConfig.new(
+        'project_name' => 'project-name',
+        'workspace_name' => 'workspace-name',
+        'ios_sim_path' => '/path/to/ios-sim')
+
+      double(Thrust::Config, build_dir: 'build-dir', app_config: app_config)
+    }
+
+    before :each do
+      xcode_tools_provider.stub(:instance).and_return(xcode_tools)
+      xcode_tools.stub(:build_scheme_or_target)
+      xcode_tools.stub(:kill_simulator)
+    end
+
+    it 'instantiates, and builds the xcode tools correctly' do
+      subject.run(thrust, target_info, {})
+
+      expect(xcode_tools_provider).to have_received(:instance).with(
+        out,
+        'build-configuration',
+        'build-dir',
+        {project_name: 'project-name', workspace_name: 'workspace-name'}
+      )
+      expect(xcode_tools).to have_received(:build_scheme_or_target).with('some-scheme', 'build-sdk')
+    end
+
     context 'when the target type is app' do
-      it 'runs the specs' do
-        app_config = Thrust::AppConfig.new(
-          'project_name' => 'project-name',
-          'workspace_name' => 'workspace-name',
-          'ios_sim_path' => '/path/to/ios-sim'
-        )
+      it 'kills the xcode tools simulator and runs the cedar suite' do
+        subject.run(thrust, target_info, {})
 
-        thrust = double(Thrust::Config)
-        thrust.stub(:build_dir).and_return('build-dir')
-        thrust.stub(:app_config).and_return(app_config)
+        expect(xcode_tools).to have_received(:kill_simulator)
+        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
+      end
 
-        tools_options = {
-          project_name: 'project-name',
-          workspace_name: 'workspace-name'
-        }
+      it 'returns the cedar return value' do
+        cedar.stub(run: :success)
 
-        target_info = Thrust::IOSSpecTarget.new(
-          'type' => 'app',
-          'device' => 'device',
-          'device_name' => 'device-name',
-          'os_version' => 'os-version',
-          'target' => 'some-target',
-          'scheme' => 'some-scheme',
-          'timeout' => '45',
-          'build_sdk' => 'build-sdk',
-          'build_configuration' => 'build-configuration'
-        )
+        expect(subject.run(thrust, target_info, {})).to eq(:success)
+      end
 
-        args = {}
+      context 'when there are args' do
+        it 'passes the os version and device name from the arguments to the cedar runner' do
+          subject.run(thrust, target_info, {os_version: 'args-os-version', device_name: 'args-device-name'})
 
-        xcode_tools = double(Thrust::IOS::XCodeTools)
-
-        xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
-
-        expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk')
-        expect(xcode_tools).to receive(:kill_simulator)
-        expect(cedar).to receive(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version','device-name', '45', 'build-dir', '/path/to/ios-sim').and_return(:success)
-
-        result = subject.run(thrust, target_info, args)
-        expect(result).to eq(:success)
+          expect(cedar).to have_received(:run).with(anything, anything, anything, 'args-os-version', 'args-device-name', anything, anything, anything)
+        end
       end
     end
 
     context 'when the target type is bundle' do
-      it 'runs the specs' do
-        app_config = Thrust::AppConfig.new(
-          'project_name' => 'project-name',
-          'workspace_name' => 'workspace-name',
-          'ios_sim_path' => 'ios-sim'
-        )
+      before :each do
+        xcode_tools.stub(:test)
+        target_info.stub(type: 'bundle')
+      end
 
-        thrust = double(Thrust::Config)
-        thrust.stub(:build_dir).and_return('build-dir')
-        thrust.stub(:app_config).and_return(app_config)
+      it 'calls through to test the xcode tools' do
+        subject.run(thrust, target_info, {})
 
-        tools_options = {
-          project_name: 'project-name',
-          workspace_name: 'workspace-name'
-        }
-
-        target_info = Thrust::IOSSpecTarget.new(
-          'type' => 'bundle',
-          'device' => 'device',
-          'device_name' => 'device-name',
-          'os_version' => 'os-version',
-          'timeout' => '19',
-          'target' => 'some-target',
-          'scheme' => 'some-scheme',
-          'build_sdk' => 'build-sdk',
-          'build_configuration' => 'build-configuration'
-        )
-
-        args = {}
-
-        xcode_tools = double(Thrust::IOS::XCodeTools)
-
-        xcode_tools_provider.stub(:instance).with(out, 'build-configuration', 'build-dir', tools_options).and_return(xcode_tools)
-
-        expect(xcode_tools).to receive(:build_scheme_or_target).with('some-scheme', 'build-sdk')
-        expect(xcode_tools).to receive(:test).with('some-target', 'build-configuration', 'os-version', 'device-name', '19', 'build-dir').and_return(:success)
-
-        result = subject.run(thrust, target_info, args)
-        expect(result).to eq(:success)
+        expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device-name', '45', 'build-dir')
       end
     end
   end

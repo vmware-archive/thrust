@@ -27,7 +27,7 @@ task :clean_build => :clean
 
 @thrust.app_config.ios_spec_targets.each do |target_name, target_info|
   desc target_info.scheme ? "Run the #{target_info.scheme} scheme" : "Run the #{target_info.target} target"
-  task target_name, :os_version do |_, args|
+  task target_name, :os_version, :device_name do |_, args|
     exit(1) unless Thrust::Tasks::IOSSpecs.new.run(@thrust, target_info, args)
   end
 end
