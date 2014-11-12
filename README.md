@@ -73,8 +73,6 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * If you are upgrading from Version 0.2 or for an example, run `thrust install` and look at the generated `thrust.example.yml`.
 
-
-
 ## Version 0.2
 
 * **Thrust** should now be installed as a gem, not a submodule.  Running `thrust install` after installation sets up the `Rakefile` and creates an example `thrust.yml`.
@@ -93,7 +91,6 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * You no longer have to be in sync with _origin_ to deploy to TestFlight.
 
-
 ## Version 0.1
 
 * The 'specs' configuration has been replaced by an array of specs configurations, called 'spec_targets'. This is to allow you to specify multiple targets to be run as specs - for instance, you may wish to run a set of integration tests separately from your unit tests. Running one of these commands will clean the default build configuration list (AdHoc, Debug, Release).
@@ -104,9 +101,7 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * TestFlight deploys now prompt the user for a deployment message
 
-* Removes adding to default tasks. This is now your responsibility - please define in your own Rakefile if you need to add to the default task. e.g.
-
-	<code>task :default => [:specs :something_random]</code>
+* Removes adding to default tasks. This is now your responsibility - please define in your own Rakefile if you need to add to the default task. e.g. `task :default => [:specs :something_random]`
 
 * Adds support for non-standard app names defined in your XCode project. These are determined by looking for the first ".app" file it can find in the build folder and basing the name off that file.
 
@@ -134,9 +129,9 @@ deployment_targets:
     distribution_list: Developers # This is the name of a TestFlight distribution list
     notify: true # Whether to notify people on the distribution list about this deployment
     note_generation_method: autotag  # If you set this value, it will auto-generate the deploy notes from the commit history. Optional.
-    ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name. iOS only.
-    ios_build_configuration: Release # iOS only
-    ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
+    ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name.
+    ios_build_configuration: Release
+    ios_provisioning_search_query: 'query to find Provisioning Profile' # Otherwise, it will use the first provisioning profile in ~/Library/MobileDevice/Provisioning Profiles/
     versioning_method: 'none' # or 'timestamp-sha' or 'commits'. Leave blank to use Git commit SHAs for build numbers.
 
   demo:
