@@ -42,15 +42,22 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 ## Version 0.5
 
 * Removes support for waxsim
-* Unifies configuration of Cedar Spec Suites and Cedar/iOS/OSX test bundles in thrust.yml (breaking configuration changes) 
+
+* Unifies configuration of Cedar Spec Suites and Cedar/iOS/OSX test bundles in thrust.yml (breaking configuration changes)
+
 * Fixes hardcoded bundle test destination which was broken in Xcode 6+
+
 * Allows bundles to be built for architectures specified in Xcode project (removes hardcoded ARCHS flag)
+
 * Adds support for specifying an alternate path to ios-sim
+
 * Adds additional options for setting build numbers when deploying to Testflight by setting the `versioning_method` key in the `thrust.yml`.  The options are:
     * 'timestamp-sha': Sets the build number to a combo of the current date and the SHA of the current commit.  e.g. '1402021234-f57bea'
     * 'commits': Sets the build number to the number of commits in the commit history
     * 'none': Does not update the build number during deploy
     * Default: When you leave the key blank, it defaults to setting the build number to the SHA of the current commit.
+
+* Adds support for setting the Testflight api token from the command line: `TESTFLIGHT_API_TOKEN='your-api-token' rake testflight:deploy`
  
 ## Version 0.4
 
