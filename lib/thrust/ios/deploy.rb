@@ -16,13 +16,14 @@ module Thrust
         @git.ensure_clean
 
         if @deployment_config.versioning_method != 'none'
-          if (@deployment_config.versioning_method == 'commits')
-            @agv_tool.change_build_number(@git.commit_count, @thrust_config.app_config.path_to_xcodeproj)
+          if @deployment_config.versioning_method == 'commits'
+            @agv_tool.change_build_number(@git.commit_count, nil, @thrust_config.app_config.path_to_xcodeproj)
+          elsif @deployment_config.versioning_method == 'timestamp-sha'
+            @agv_tool.change_build_number(@git.current_commit, Time.now.utc.strftime('%y%m%d%H%M'), @thrust_config.app_config.path_to_xcodeproj)
           else
-            @agv_tool.change_build_number(@git.current_commit, @thrust_config.app_config.path_to_xcodeproj)
+            @agv_tool.change_build_number(@git.current_commit, nil, @thrust_config.app_config.path_to_xcodeproj)
           end
         end
-
 
         app_name = @thrust_config.app_config.app_name
         target = @deployment_config.ios_target || app_name

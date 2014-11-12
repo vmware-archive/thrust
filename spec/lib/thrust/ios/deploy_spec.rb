@@ -3,24 +3,24 @@ require 'spec_helper'
 describe Thrust::IOS::Deploy do
   let(:app_config) do
     Thrust::AppConfig.new(
-      'app_name' => 'AppName',
-      'ios_distribution_certificate' => 'signing_identity',
-      'project_name' => 'project_name',
-      'workspace_name' => 'workspace_name',
-      'testflight' => {
-        'team_token' => 'team_token',
-        'api_token' => 'api_token'
-      }
+        'app_name' => 'AppName',
+        'ios_distribution_certificate' => 'signing_identity',
+        'project_name' => 'project_name',
+        'workspace_name' => 'workspace_name',
+        'testflight' => {
+            'team_token' => 'team_token',
+            'api_token' => 'api_token'
+        }
     )
   end
   let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
   let(:distribution_config) do
     Thrust::DeploymentTarget.new(
-      'notify' => 'true',
-      'distribution_list' => 'devs',
-      'ios_build_configuration' => 'configuration',
-      'ios_provisioning_search_query' => 'Provisioning Profile query',
-      'note_generation_method' => 'autotag'
+        'notify' => 'true',
+        'distribution_list' => 'devs',
+        'ios_build_configuration' => 'configuration',
+        'ios_provisioning_search_query' => 'Provisioning Profile query',
+        'note_generation_method' => 'autotag'
     )
   end
   let(:deployment_target) { 'production' }
@@ -51,17 +51,17 @@ describe Thrust::IOS::Deploy do
     context "when versioning method is set to commits" do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
-          'notify' => 'true',
-          'distribution_list' => 'devs',
-          'ios_build_configuration' => 'configuration',
-          'ios_provisioning_search_query' => 'Provisioning Profile query',
-          'note_generation_method' => 'autotag',
-          'versioning_method' => 'commits'
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag',
+            'versioning_method' => 'commits'
         )
       end
 
       it "updates the version number to the number of commits on the current branch" do
-        agv_tool.should_receive(:change_build_number).with(149, nil)
+        agv_tool.should_receive(:change_build_number).with(149, nil, nil)
         deploy.run
       end
     end
@@ -84,9 +84,29 @@ describe Thrust::IOS::Deploy do
       end
     end
 
+    context "when versioning method is set to timestamp-sha" do
+      let(:distribution_config) do
+        Thrust::DeploymentTarget.new(
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag',
+            'versioning_method' => 'timestamp-sha'
+        )
+      end
+
+      it "updates the version number to the current git SHA and a timestamp in UTC" do
+        mocked_time = Time.parse("Thu Mar 29 22:33:20 PST 2014")
+        Time.stub(:now).and_return(mocked_time)
+        agv_tool.should_receive(:change_build_number).with('31758012490', '1403300633', nil)
+        deploy.run
+      end
+    end
+
     context "when versioning method is set to anything else" do
       it 'updates the version number to the current git SHA' do
-        agv_tool.should_receive(:change_build_number).with('31758012490', nil)
+        agv_tool.should_receive(:change_build_number).with('31758012490', nil, nil)
         deploy.run
       end
     end
@@ -94,11 +114,11 @@ describe Thrust::IOS::Deploy do
     context 'when note generation method is set to autotag' do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
-          'notify' => 'true',
-          'distribution_list' => 'devs',
-          'ios_build_configuration' => 'configuration',
-          'ios_provisioning_search_query' => 'Provisioning Profile query',
-          'note_generation_method' => 'autotag'
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag'
         )
       end
 
@@ -111,11 +131,11 @@ describe Thrust::IOS::Deploy do
     context 'when note generation is set to anything else' do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
-          'notify' => 'true',
-          'distribution_list' => 'devs',
-          'ios_build_configuration' => 'configuration',
-          'ios_provisioning_search_query' => 'Provisioning Profile query',
-          'note_generation_method' => 'ask'
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'ask'
         )
       end
 
@@ -128,11 +148,11 @@ describe Thrust::IOS::Deploy do
     context 'when the target is set' do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
-          'notify' => 'true',
-          'distribution_list' => 'devs',
-          'ios_build_configuration' => 'configuration',
-          'ios_provisioning_search_query' => 'Provisioning Profile query',
-          'ios_target' => 'TargetName'
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'ios_target' => 'TargetName'
         )
       end
 
@@ -145,10 +165,10 @@ describe Thrust::IOS::Deploy do
     context 'when the target is not set' do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
-          'notify' => 'true',
-          'distribution_list' => 'devs',
-          'ios_build_configuration' => 'configuration',
-          'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
         )
       end
 

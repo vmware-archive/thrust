@@ -46,6 +46,11 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 * Fixes hardcoded bundle test destination which was broken in Xcode 6+
 * Allows bundles to be built for architectures specified in Xcode project (removes hardcoded ARCHS flag)
 * Adds support for specifying an alternate path to ios-sim
+* Adds additional options for setting build numbers when deploying to Testflight by setting the `versioning_method` key in the `thrust.yml`.  The options are:
+    * 'timestamp-sha': Sets the build number to a combo of the current date and the SHA of the current commit.  e.g. '1402021234-f57bea'
+    * 'commits': Sets the build number to the number of commits in the commit history
+    * 'none': Does not update the build number during deploy
+    * Default: When you leave the key blank, it defaults to setting the build number to the SHA of the current commit.
  
 ## Version 0.4
 
@@ -108,9 +113,10 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 thrust_version: 0.5
 project_name: My Great Project # do not use if building with an xcode workspace
 # workspace_name: My Workspace # use if building with an xcode workspace
+# path_to_xcodeproj: 'App/MyApp.xcodeproj' # use if xcodeproj is not in the same directory as this yaml file. Optional.
 app_name: My Great App
 ios_distribution_certificate: 'Name of Distribution Signing Certificate'
-ios_sim_path: '/path/to/ios-sim' # Optional. Use to prefer a specific ios-sim binary (e.g. within project directory) over a system-installed version (homebrew)
+#ios_sim_path: '/path/to/ios-sim' # Optional. Use to prefer a specific ios-sim binary (e.g. within project directory) over a system-installed version (homebrew)
 
 testflight:
   api_token: 'testflight api token' # To find your App Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829956-what-does-the-api-token-do-
@@ -124,6 +130,7 @@ deployment_targets:
     ios_target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name. iOS only.
     ios_build_configuration: Release # iOS only
     ios_provisioning_search_query: 'query to find Provisioning Profile' # iOS only. Optional.
+    versioning_method: 'none' # or 'timestamp-sha' or 'commits'. Leave blank to use Git commit SHAs for build numbers.
 
   demo:
     distribution_list: Beta Testers
