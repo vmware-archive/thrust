@@ -158,9 +158,12 @@ describe Thrust::IOS::XCodeTools do
       create_ipa
     end
 
-    it 'creates the ipa' do
+    it 'creates the ipa and then resigns it' do
       create_ipa
-      expect(thrust_executor.system_or_exit_history.last).to eq({cmd: "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --sign 'iPhone Distribution' --embed '#{provisioning_path}'", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[1]).to eq({cmd: "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --embed '#{provisioning_path}'", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[2]).to eq({cmd: "cd 'build/Release-iphoneos' && unzip 'AppName.ipa'", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[3]).to eq({cmd: "/usr/bin/codesign -f -s 'iPhone Distribution' 'build/Release-iphoneos/Payload/AppName.app'", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[4]).to eq({cmd: "cd 'build/Release-iphoneos' && zip -qr 'AppName.ipa' 'Payload'", output_file: nil})
     end
 
     it 'returns the name of the ipa' do

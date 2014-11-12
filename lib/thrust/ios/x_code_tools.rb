@@ -74,18 +74,23 @@ module Thrust
 
       def create_ipa(app_name, signing_identity, provision_search_query)
         @out.puts 'Packaging...'
-        ipa_filename = "#{build_configuration_directory}/#{app_name}.ipa"
-        cmd = [
+        app_filepath = "#{build_configuration_directory}/#{app_name}.app"
+        ipa_filepath = "#{build_configuration_directory}/#{app_name}.ipa"
+        package_command = [
           "xcrun",
           "-sdk iphoneos",
           "-v PackageApplication",
-          "'#{build_configuration_directory}/#{app_name}.app'",
-          "-o '#{ipa_filename}'",
-          "--sign '#{signing_identity}'",
+          "'#{app_filepath}'",
+          "-o '#{ipa_filepath}'",
           "--embed '#{provision_path(provision_search_query)}'"
         ].join(' ')
-        @thrust_executor.system_or_exit(cmd)
-        ipa_filename
+        @thrust_executor.system_or_exit(package_command)
+
+        @thrust_executor.system_or_exit("cd '#{build_configuration_directory}' && unzip '#{app_name}.ipa'")
+        @thrust_executor.system_or_exit("/usr/bin/codesign -f -s '#{signing_identity}' '#{build_configuration_directory}/Payload/#{app_name}.app'")
+        @thrust_executor.system_or_exit("cd '#{build_configuration_directory}' && zip -qr '#{app_name}.ipa' 'Payload'")
+
+        ipa_filepath
       end
 
       def verify_provision(app_name, provision_search_query)
