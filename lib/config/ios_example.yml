@@ -26,17 +26,24 @@ deployment_targets:
 
 ios_spec_targets:
   specs: # This is the name of the rake task: `rake specs`
-    target: UISpecs # name of the build target
-#    scheme: Specs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
-    type: app # Spec target type: app or bundle. Optional, defaults to app.
-    build_configuration: Debug # name of the build configuration
+    target: UISpecs # Name of the build target.
+    scheme: Specs (My Great App) # Use if the scheme name is different from the target name.  Necessary when building in an xcode workspace.
+    type: app # Spec target type: 'app' or 'bundle'. Optional, defaults to app.
+    build_configuration: Debug # Name of the build configuration.
     build_sdk: iphonesimulator7.0 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
-    device_name: iPhone-4s # device name as suggested by ios-sim showdevicetypes
+    device_name: iPhone 4s # Device name as suggested by `ios-sim showdevicetypes`.
     os_version: 7.1 # OS version to run. Defaults to latest available version.
-    timeout: 90 # Optional. Destination timeout defaults to 30 seconds
+    timeout: 90 # Optional. Destination timeout defaults to 30 seconds.
 
-  integration:
+  spec_bundle: # Example of a spec bundle configuration.
+    scheme: My Great App # Use the name for the main app scheme.
+    type: bundle
+    build_configuration: Debug
+    device_name: iPhone 4s
+    os_version: 7.1
+
+  integration: # Example of a Mac OSX target.
     target: IntegrationSpecs
-#    scheme: IntegrationSpecs (My Great App) # use in addition to target when you want to use a scheme (necessary if you are building with an xcode workspace)
+    scheme: IntegrationSpecs (My Great App) # Use if the scheme name is different from the target name.  Necessary when building in an xcode workspace.
     build_configuration: Release
     build_sdk: macosx
