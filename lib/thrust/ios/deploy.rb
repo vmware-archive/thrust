@@ -14,6 +14,7 @@ module Thrust
 
       def run
         @git.ensure_clean
+        @git.checkout_tag(@deployment_config.tag) if @deployment_config.tag
 
         if @deployment_config.versioning_method != 'none'
           if @deployment_config.versioning_method == 'commits'
@@ -34,6 +35,8 @@ module Thrust
 
         autogenerate_notes = @deployment_config.note_generation_method == 'autotag'
         @testflight.upload(ipa_file, @deployment_config.notify, @deployment_config.distribution_list, autogenerate_notes, @deployment_target, dsym_path)
+
+        @git.create_tag(@deployment_target)
         @git.reset
       end
     end

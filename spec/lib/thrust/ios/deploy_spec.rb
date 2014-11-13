@@ -43,12 +43,13 @@ describe Thrust::IOS::Deploy do
       deploy.run
     end
 
-    it 'resets the changes after the deploy' do
-      git.should_receive(:reset)
+    it 'tags the current commit and resets the changes after the deploy' do
+      git.should_receive(:create_tag).with('production').ordered
+      git.should_receive(:reset).ordered
       deploy.run
     end
 
-    context "when versioning method is set to commits" do
+    context 'when versioning method is set to commits' do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
@@ -66,7 +67,7 @@ describe Thrust::IOS::Deploy do
       end
     end
 
-    context "when versioning method is set to none" do
+    context 'when versioning method is set to none' do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
@@ -84,7 +85,7 @@ describe Thrust::IOS::Deploy do
       end
     end
 
-    context "when versioning method is set to timestamp-sha" do
+    context 'when versioning method is set to timestamp-sha' do
       let(:distribution_config) do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
@@ -104,7 +105,7 @@ describe Thrust::IOS::Deploy do
       end
     end
 
-    context "when versioning method is set to anything else" do
+    context 'when versioning method is set to anything else' do
       it 'updates the version number to the current git SHA' do
         agv_tool.should_receive(:change_build_number).with('31758012490', nil, nil)
         deploy.run
@@ -141,6 +142,41 @@ describe Thrust::IOS::Deploy do
 
       it 'uploads to TestFlight, telling it not to auto-generate deployment notes' do
         testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', false, 'production', 'build_configuration_directory/AppName.app.dSYM')
+        deploy.run
+      end
+    end
+
+    context 'when the tag is set' do
+      let(:distribution_config) do
+        Thrust::DeploymentTarget.new(
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag',
+            'tag' => 'ci'
+        )
+      end
+
+      it 'should checkout the latest commit with that tag before deploying' do
+        git.should_receive(:checkout_tag).with('ci')
+        deploy.run
+      end
+    end
+
+    context 'when the tag is not set' do
+      let(:distribution_config) do
+        Thrust::DeploymentTarget.new(
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'ios_build_configuration' => 'configuration',
+            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'note_generation_method' => 'autotag'
+        )
+      end
+
+      it 'should deploy from HEAD' do
+        git.should_not_receive(:checkout_tag)
         deploy.run
       end
     end

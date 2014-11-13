@@ -10,15 +10,11 @@ namespace :testflight do
       desc "Deploy Android build to #{task_name} (use NOTIFY=false to prevent team notification)"
       task task_name do |_, _|
         Thrust::Android::DeployProvider.new.instance(@thrust, deployment_config, task_name).run
-
-        Rake::Task['autotag:create'].invoke(task_name)
       end
     else
       desc "Deploy iOS build to #{task_name} (use NOTIFY=false to prevent team notification)"
       task task_name do |_, _|
         Thrust::IOS::DeployProvider.new.instance(@thrust, deployment_config, task_name).run
-
-        Rake::Task['autotag:create'].invoke(task_name)
       end
     end
   end

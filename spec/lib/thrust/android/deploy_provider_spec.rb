@@ -48,9 +48,7 @@ describe Thrust::Android::DeployProvider do
         tools,
         git,
         testflight,
-        distribution_config.notify,
-        distribution_config.distribution_list,
-        true,
+        distribution_config,
         deployment_target).and_call_original
 
       expect(provider.instance(thrust_config, distribution_config, deployment_target)).to be_instance_of(Thrust::Android::Deploy)

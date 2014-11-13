@@ -28,6 +28,15 @@ describe Thrust::Git do
     end
   end
 
+  describe '#checkout_tag' do
+    it 'should checkout the latest commit that has the tag' do
+      thrust_executor.should_receive(:capture_output_from_system).with('autotag list ci').and_return("7342334 ref/blah\nlatest_ci_tag ref/blahblah")
+      thrust_executor.should_receive(:system_or_exit).with('git checkout latest_ci_tag')
+
+      subject.checkout_tag('ci')
+    end
+  end
+
   describe '#commit_summary_for_last_deploy' do
     context 'when the target has been deployed previously' do
       it 'uses the commit message from that commit' do

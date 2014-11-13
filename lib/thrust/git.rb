@@ -21,7 +21,13 @@ module Thrust
       @thrust_executor.capture_output_from_system('git log --format=format:%h -1').strip
     end
 
+    def checkout_tag(tag)
+      tag_sha = latest_commit_with_tag(tag)
+      @thrust_executor.system_or_exit("git checkout #{tag_sha}")
+    end
+
     def reset
+      @thrust_executor.system_or_exit('git checkout master')
       @thrust_executor.system_or_exit('git reset --hard')
     end
 
@@ -30,7 +36,7 @@ module Thrust
     end
 
     def commit_summary_for_last_deploy(deployment_target)
-      sha_of_latest_deployed_commit = latest_deployed_commit(deployment_target)
+      sha_of_latest_deployed_commit = latest_commit_with_tag(deployment_target)
       if sha_of_latest_deployed_commit
         "#{deployment_target}:".blue + " #{summary_for_commit(sha_of_latest_deployed_commit)}"
       else
@@ -40,7 +46,7 @@ module Thrust
 
     def generate_notes_for_deployment(deployment_target)
       sha_of_latest_commit = @thrust_executor.capture_output_from_system('git rev-parse HEAD').strip
-      sha_of_latest_deployed_commit = latest_deployed_commit(deployment_target)
+      sha_of_latest_deployed_commit = latest_commit_with_tag(deployment_target)
 
       notes = Tempfile.new('deployment_notes')
 
@@ -58,14 +64,18 @@ module Thrust
       @thrust_executor.capture_output_from_system("git rev-list HEAD | wc -l").strip
     end
 
+    def create_tag(tag_name)
+      @thrust_executor.system_or_exit("autotag create #{tag_name}")
+    end
+
     private
 
     def summary_for_commit(sha)
       @thrust_executor.capture_output_from_system("git log --oneline -n 1 #{sha}")
     end
 
-    def latest_deployed_commit(deployment_target)
-      list = @thrust_executor.capture_output_from_system("autotag list #{deployment_target}")
+    def latest_commit_with_tag(tag_name)
+      list = @thrust_executor.capture_output_from_system("autotag list #{tag_name}")
       unless list.strip.empty?
         list.split("\n").last.split(" ").first
       end
