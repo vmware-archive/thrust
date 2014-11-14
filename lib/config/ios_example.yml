@@ -19,10 +19,13 @@ deployment_targets:
     ios_build_configuration: Release
     ios_provisioning_search_query: 'query to find Provisioning Profile' # Otherwise, it will use the first provisioning profile in ~/Library/MobileDevice/Provisioning Profiles/
     versioning_method: 'none' # or 'timestamp-sha' or 'commits'. Leave blank to use Git commit SHAs for build numbers.
+    tag: ci # Deploys latest commit with the tag. Leave blank to deploy from master.
 
   demo:
     distribution_list: Beta Testers
     notify: true
+    ios_build_configuration: Demo
+    ios_provisioning_search_query: 'query to find Provisioning Profile'
 
 ios_spec_targets:
   specs: # This is the name of the rake task: `rake specs`
