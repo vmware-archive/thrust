@@ -24,6 +24,7 @@ module Thrust
     end
 
     def capture_output_from_system(cmd, env = {})
+      @out.puts "Executing #{cmd}"
       execution = @execution_helper.capture_status_and_output_from_command(cmd, env)
 
       raise(CommandFailed, '******** Build failed ********') unless execution[:success]

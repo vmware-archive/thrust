@@ -14,7 +14,15 @@ namespace :testflight do
     else
       desc "Deploy iOS build to #{task_name} (use NOTIFY=false to prevent team notification)"
       task task_name do |_, _|
-        Thrust::IOS::DeployProvider.new.instance(@thrust, deployment_config, task_name).run
+        begin
+          Thrust::IOS::DeployProvider.new.instance(@thrust, deployment_config, task_name).run
+        rescue Exception => e
+          puts "\n\n"
+          puts e.message.red
+          puts "\n\n"
+
+          Thrust::Git.new($stdout, Thrust::Executor.new).reset
+        end
       end
     end
   end

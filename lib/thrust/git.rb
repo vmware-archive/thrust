@@ -27,8 +27,8 @@ module Thrust
     end
 
     def reset
-      @thrust_executor.system_or_exit('git checkout master')
       @thrust_executor.system_or_exit('git reset --hard')
+      @thrust_executor.system_or_exit('git checkout master')
     end
 
     def checkout_file(filename)
