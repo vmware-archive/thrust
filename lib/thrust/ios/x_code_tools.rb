@@ -66,10 +66,13 @@ module Thrust
       private
 
       def provision_path(provision_search_query)
-        provision_search_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/")
-        command = %Q(grep -rl "#{provision_search_query}" "#{provision_search_path}")
-        paths = `#{command}`.split("\n")
-        paths.first or raise(ProvisioningProfileNotFound, "\nCouldn't find provisioning profiles matching #{provision_search_query}.\n\nThe command used was:\n\n#{command}")
+        provision_search_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles")
+        command = %Q(ls -t '#{provision_search_path}' | grep '#{provision_search_query}')
+        provisioning_profile = `#{command}`.split("\n").first
+        if !provisioning_profile
+          raise(ProvisioningProfileNotFound, "\nCouldn't find provisioning profiles matching #{provision_search_query}.\n\nThe command used was:\n\n#{command}")
+        end
+        "#{provision_search_path}/#{provisioning_profile}"
       end
 
       def create_ipa(app_name, signing_identity, provision_search_query)
