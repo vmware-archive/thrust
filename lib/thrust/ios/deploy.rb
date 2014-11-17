@@ -32,6 +32,7 @@ module Thrust
         ipa_file = @x_code_tools.cleanly_create_ipa(target, app_name, @thrust_config.app_config.ios_distribution_certificate, @deployment_config.ios_provisioning_search_query)
 
         dsym_path = "#{@x_code_tools.build_configuration_directory}/#{app_name}.app.dSYM"
+        dsym_path = nil unless File.exist?(dsym_path)
 
         autogenerate_notes = @deployment_config.note_generation_method == 'autotag'
         @testflight.upload(ipa_file, @deployment_config.notify, @deployment_config.distribution_list, autogenerate_notes, @deployment_target, dsym_path)

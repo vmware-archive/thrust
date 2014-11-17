@@ -25,7 +25,7 @@ describe Thrust::IOS::Deploy do
   end
   let(:deployment_target) { 'production' }
 
-  describe "#run" do
+  describe '#run' do
     let(:out) { StringIO.new }
     let(:x_code_tools) { double(Thrust::IOS::XCodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
     let(:agv_tool) { double(Thrust::IOS::AgvTool).as_null_object }
@@ -36,6 +36,7 @@ describe Thrust::IOS::Deploy do
     before do
       git.stub(:current_commit).and_return('31758012490')
       git.stub(:commit_count).and_return(149)
+      File.stub(:exist?).with('build_configuration_directory/AppName.app.dSYM').and_return(true)
     end
 
     it 'ensures the working directory is clean' do
@@ -47,6 +48,22 @@ describe Thrust::IOS::Deploy do
       git.should_receive(:create_tag).with('production').ordered
       git.should_receive(:reset).ordered
       deploy.run
+    end
+
+    context 'when the dSYM file exists' do
+      it 'should pass the path to the dSYM to #upload' do
+        testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', 'build_configuration_directory/AppName.app.dSYM')
+        deploy.run
+      end
+    end
+
+    context 'when the dSYM file does not exist' do
+      it 'should pass nil as the dSYM file path argument' do
+        File.stub(:exist?).with('build_configuration_directory/AppName.app.dSYM').and_return(false)
+
+        testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', nil)
+        deploy.run
+      end
     end
 
     context 'when versioning method is set to commits' do
