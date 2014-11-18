@@ -67,12 +67,12 @@ module Thrust
 
       def provision_path(provision_search_query)
         provision_search_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles")
-        command = %Q(ls -t '#{provision_search_path}' | grep '#{provision_search_query}')
+        command = %Q(find '#{provision_search_path}' -print0 | xargs -0 grep -lr '#{provision_search_query}' --null | xargs -0 ls -t)
         provisioning_profile = `#{command}`.split("\n").first
         if !provisioning_profile
           raise(ProvisioningProfileNotFound, "\nCouldn't find provisioning profiles matching #{provision_search_query}.\n\nThe command used was:\n\n#{command}")
         end
-        "#{provision_search_path}/#{provisioning_profile}"
+        provisioning_profile
       end
 
       def create_ipa(app_name, signing_identity, provision_search_query)
@@ -90,7 +90,7 @@ module Thrust
         @thrust_executor.system_or_exit(package_command)
 
         @thrust_executor.system_or_exit("cd '#{build_configuration_directory}' && unzip '#{app_name}.ipa'")
-        @thrust_executor.system_or_exit("/usr/bin/codesign -f -s '#{signing_identity}' '#{build_configuration_directory}/Payload/#{app_name}.app'")
+        @thrust_executor.system_or_exit("/usr/bin/codesign --verify --force --preserve-metadata=identifier,entitlements --sign '#{signing_identity}' '#{build_configuration_directory}/Payload/#{app_name}.app'")
         @thrust_executor.system_or_exit("cd '#{build_configuration_directory}' && zip -qr '#{app_name}.ipa' 'Payload'")
 
         ipa_filepath
