@@ -7,18 +7,19 @@
 [![Pivotal Tracker](http://img.shields.io/badge/Pivotal-Tracker-blue.svg)](https://www.pivotaltracker.com/projects/987818) (contact av@pivotallabs.com if you need access)
 
 __Thrust__ is a small project that contains some useful rake tasks to run Cedar specs and deploy your iOS or Android application to TestFlight.
+   
+    rake autotag:list                         # Show the commit that is currently deployed to each environment
+    rake clean                                # Clean all targets
+    rake focused_specs                        # Print out names of files containing focused specs
+    rake nof                                  # Remove any focus from specs
+    rake set_build_number[build_number]       # Set build number
+    rake spec_bundle[device_name,os_version]  # Run the FakeProject scheme
+    rake spec_suite[device_name,os_version]   # Run the SpecSuite target
+    rake mac_suite[device_name,os_version]    # Run the MacSpecSuite target
+    rake testflight:staging                   # Deploy iOS build to staging (use NOTIFY=false to prevent team notification)
+    rake testflight:demo                      # Deploy iOS build to demo (use NOTIFY=false to prevent team notification)
+    rake trim                                 # Trim whitespace
 
-    rake autotag:list                    # Show the commit that is currently deployed to each environment
-    rake clean                           # Clean all targets
-    rake clean_build                     # Clean all targets (deprecated, use "clean")
-    rake focused_specs                   # Print out names of files containing focused specs
-    rake nof                             # Remove any focus from specs
-    rake set_build_number[build_number]  # Set build number
-    rake specs                           # Run specs
-    rake testflight:demo                 # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
-    rake testflight:production           # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
-    rake testflight:staging              # Deploy build to testflight [project] team (use NOTIFY=false to prevent team notification)
-    rake trim                            # Trim whitespace
 
 # Installation
 
@@ -31,9 +32,9 @@ __Thrust__ is a small project that contains some useful rake tasks to run Cedar 
 
 After installation, change the name of `thrust.example.yml` to `thrust.yml` and update the configuration as needed.
 
-If you're using Thrust to run specs for an iOS app and do not have **ios-sim** installed, you can find it at the following link https://github.com/phonegap/ios-sim or follow the instructions below:
-* `git clone git://github.com/phonegap/ios-sim.git`
-* `rake install prefix=/usr/local/`
+If you're using **Thrust** to run specs for an iOS app and do not have *ios-sim* installed, you can find it at https://github.com/phonegap/ios-sim or install it using homebrew:
+    
+    brew install ios-sim
 
 If you had **Thrust** previously installed as a submodule, we recommend that you remove the submodule and now use **Thrust** as a gem.  This is because there are runtime dependencies that will not get installed properly if **Thrust** is installed as a submodule.
 
