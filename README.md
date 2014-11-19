@@ -200,3 +200,19 @@ We recommend generating a new file from the `thrust.example.yml` and then copyin
 
 You should remove `Dir.glob('Vendor/thrust/lib/tasks/*.rake').each { |r| import r }` from your Rakefile before running `thrust install`.
 
+## CI Setup
+
+### Setting up Jenkins to work with Thrust
+
+To use **Thrust** on CI, you should include it in a Gemfile in your project root so the same version of the gem will be installed on the CI box as on your local machine.  Your CI box should also have ruby >= 1.9.3, bundler and ios-sim.
+ 
+Here is an example .sh script for running specs with **Thrust** on Jenkins (in the Execute shell section of your job configuration).
+
+```
+#!/bin/bash --login
+
+bundle install
+git submodule update --init --recursive
+
+CC= bundle exec rake specs
+```
