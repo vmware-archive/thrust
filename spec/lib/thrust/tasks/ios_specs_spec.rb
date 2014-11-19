@@ -7,7 +7,7 @@ describe Thrust::Tasks::IOSSpecs do
 
   subject { Thrust::Tasks::IOSSpecs.new(out, xcode_tools_provider, cedar) }
 
-  before :each do
+  before do
     allow(cedar).to receive(:run)
   end
 
@@ -34,7 +34,7 @@ describe Thrust::Tasks::IOSSpecs do
       double(Thrust::Config, build_dir: 'build-dir', app_config: app_config)
     }
 
-    before :each do
+    before do
       xcode_tools_provider.stub(:instance).and_return(xcode_tools)
       xcode_tools.stub(:build_scheme_or_target)
       xcode_tools.stub(:kill_simulator)
@@ -53,7 +53,7 @@ describe Thrust::Tasks::IOSSpecs do
     end
 
     context 'when the target type is app' do
-      it 'kills the xcode tools simulator and runs the cedar suite' do
+      it 'kills the xcode tools simulator and runs the cedar suite, not replacing the dash in the device name' do
         subject.run(thrust, target_info, {})
 
         expect(xcode_tools).to have_received(:kill_simulator)
@@ -64,6 +64,13 @@ describe Thrust::Tasks::IOSSpecs do
         cedar.stub(run: :success)
 
         expect(subject.run(thrust, target_info, {})).to eq(:success)
+      end
+
+      it 'should replace the space with a dash when the device name has a space' do
+        target_info.stub(device_name: 'device name')
+        subject.run(thrust, target_info, {})
+
+        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
       end
 
       context 'when there are args' do
@@ -81,10 +88,18 @@ describe Thrust::Tasks::IOSSpecs do
         target_info.stub(type: 'bundle')
       end
 
-      it 'calls through to test the xcode tools' do
+      it 'should not replace the space with a dash when the device name has a space' do
+        target_info.stub(device_name: 'device name')
         subject.run(thrust, target_info, {})
 
-        expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device-name', '45', 'build-dir')
+        expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
+      end
+
+      it 'should replace the dash with a space when the device name has a dash' do
+        target_info.stub(device_name: 'device-name')
+        subject.run(thrust, target_info, {})
+
+        expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
       end
     end
   end

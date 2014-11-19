@@ -18,6 +18,10 @@ module Thrust
         os_version = args[:os_version] || target_info.os_version
         device_name = args[:device_name] || target_info.device_name
 
+        substitution_map = {'bundle' => '-', 'app' => ' '}
+        destination_map = {'bundle' => ' ', 'app' => '-'}
+        device_name.gsub!(substitution_map[type], destination_map[type])
+
         tools_options = {
           project_name: thrust.app_config.project_name,
           workspace_name: thrust.app_config.workspace_name
