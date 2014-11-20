@@ -46,8 +46,8 @@ module Thrust
         cmd = [
           "xcodebuild",
           "test",
-          "-scheme #{scheme}",
-          "-configuration #{build_configuration}",
+          "-scheme '#{scheme}'",
+          "-configuration '#{build_configuration}'",
           "-destination '#{destination}'",
           "-destination-timeout '#{timeout}'",
           "SYMROOT='#{build_dir}'"
