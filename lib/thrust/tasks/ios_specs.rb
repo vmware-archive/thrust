@@ -2,8 +2,8 @@ module Thrust
   module Tasks
     class IOSSpecs
       def initialize(out = $stdout,
-                     xcode_tools_provider = Thrust::IOS::XCodeToolsProvider.new,
-                     cedar = Thrust::IOS::Cedar.new)
+          xcode_tools_provider = Thrust::IOS::XCodeToolsProvider.new,
+          cedar = Thrust::IOS::Cedar.new)
         @xcode_tools_provider = xcode_tools_provider
         @cedar = cedar
         @out = out
@@ -18,13 +18,15 @@ module Thrust
         os_version = args[:os_version] || target_info.os_version
         device_name = args[:device_name] || target_info.device_name
 
-        substitution_map = {'bundle' => '-', 'app' => ' '}
-        destination_map = {'bundle' => ' ', 'app' => '-'}
-        device_name.gsub!(substitution_map[type], destination_map[type])
+        if device_name
+          substitution_map = {'bundle' => '-', 'app' => ' '}
+          destination_map = {'bundle' => ' ', 'app' => '-'}
+          device_name.gsub!(substitution_map[type], destination_map[type])
+        end
 
         tools_options = {
-          project_name: thrust.app_config.project_name,
-          workspace_name: thrust.app_config.workspace_name
+            project_name: thrust.app_config.project_name,
+            workspace_name: thrust.app_config.workspace_name
         }
         xcode_tools = @xcode_tools_provider.instance(@out, build_configuration, thrust.build_dir, tools_options)
 

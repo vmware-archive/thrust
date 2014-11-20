@@ -52,6 +52,25 @@ describe Thrust::Tasks::IOSSpecs do
       expect(xcode_tools).to have_received(:build_scheme_or_target).with('some-scheme', 'build-sdk')
     end
 
+    context 'when the device name is present' do
+      it 'pass the correct arguments to cedar#run' do
+        target_info.stub(device_name: 'device-name')
+        subject.run(thrust, target_info, {})
+
+        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
+      end
+    end
+
+    context 'when the device name is missing' do
+      it 'not throw a runtime exception' do
+        target_info.stub(device_name: nil)
+
+        expect { subject.run(thrust, target_info, {}) }.to_not raise_exception
+
+        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', nil, '45', 'build-dir', '/path/to/ios-sim')
+      end
+    end
+
     context 'when the target type is app' do
       it 'kills the xcode tools simulator and runs the cedar suite, not replacing the dash in the device name' do
         subject.run(thrust, target_info, {})
