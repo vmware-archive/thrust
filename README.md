@@ -42,7 +42,9 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 ## Version 0.5
 
-* Removes support for waxsim
+##### Version 0.5 introduced a lot of changes.  Please see the *Upgrading* section below after installing the update.
+
+* Removes support for waxsim. Specify `ios_sim_path` to use a non-system installed version of ios-sim.
 
 * Unifies configuration of Cedar Spec Suites and Cedar/iOS/OSX test bundles in thrust.yml (breaking configuration changes)
 
@@ -193,6 +195,28 @@ Once you upgrade make sure to add/update the 'thrust_version' key in the configu
 
 
 ## Upgrading Instructions
+
+### Upgrading to Version 0.5
+
+Version 0.5 required many updates to **Thrust** thanks to the releases of Xcode 6, Yosemite, and ios-sim 3.0.  In order to update successfully to version 0.5, we recommend that you:
+
+ * Use Xcode 6
+ * Install or upgrade to ios-sim 3.0 (`brew install ios-sim` or `brew upgrade ios-sim`)
+ * Use OS X Mavericks or Yosemite
+ 
+There are also significant changes to the keys in the `thrust.yml` configuration file.
+
+Older `thrust.yml` files asked for `runtime_sdk` and `device`. In **Thrust** 0.5, these keys have been removed and you should instead specify `device_name` and `os_version` in `thrust.yml`, for example:
+
+```
+  ...
+  specs:
+	device_name: iPhone-6
+	os_version: 8.1
+  ...
+```
+
+You can run `ios-sim showdevicetypes` to see the list of available devices and runtime iOS versions.
 
 ### Upgrading from Version 0.1 to Version 0.2
 
