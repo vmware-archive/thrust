@@ -16,8 +16,8 @@ project_root = Dir.pwd
 thrust_root  = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 rakefile = File.join(project_root, 'Rakefile')
-File.open(rakefile, 'a') do |f|
-  f.puts "require 'thrust/tasks'"
+File.open(rakefile, 'a+') do |f|
+  f.puts "require 'thrust/tasks'" unless f.grep(/require 'thrust\/tasks'/).any?
 end
 
 if File.exists?('AndroidManifest.xml')
@@ -29,12 +29,8 @@ end
 
 FileUtils.cp(File.join(thrust_root, 'lib', 'config', example_file_name), File.join(project_root, 'thrust.example.yml'))
 puts ''
-puts "  To finish installation of " + "Thrust".green + ", rename:\n\n"
-puts "    #{project_root}/thrust.example.yml\n".blue
-puts "  to:\n\n"
-puts "    #{project_root}/thrust.yml\n".blue
-puts "  and edit it for your project."
+puts '  To finish installation of Thrust, rename ' + 'thrust.example.yml'.blue + ' to ' + 'thrust.yml'.blue + ' and edit it for your project.'
 
 puts ''
-puts "  Thrust rake tasks were generated in your Rakefile."
-puts "  Type 'rake -T' to see the list of tasks after you have created your thrust.yml configuration.".green
+puts '  Thrust rake tasks were generated in your Rakefile.'
+puts "  Type 'rake -T' to see the list of available tasks after you have created your thrust.yml configuration."
