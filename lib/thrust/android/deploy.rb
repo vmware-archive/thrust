@@ -12,16 +12,26 @@ module Thrust
 
       def run
         @git.ensure_clean
-        @git.checkout_tag(@deployment_config.tag) if @deployment_config.tag
 
-        @tools.change_build_number(Time.now.utc.strftime('%y%m%d%H%M'), @git.current_commit)
-        apk_path = @tools.build_signed_release
+        begin
+          @git.checkout_tag(@deployment_config.tag) if @deployment_config.tag
 
-        autogenerate_notes = @deployment_config.note_generation_method == 'autotag'
-        @testflight.upload(apk_path, @deployment_config.notify, @deployment_config.distribution_list, autogenerate_notes, @deployment_target)
+          @tools.change_build_number(Time.now.utc.strftime('%y%m%d%H%M'), @git.current_commit)
+          apk_path = @tools.build_signed_release
 
-        @git.create_tag(@deployment_target)
-        @git.reset
+          autogenerate_notes = @deployment_config.note_generation_method == 'autotag'
+          @testflight.upload(apk_path, @deployment_config.notify, @deployment_config.distribution_list, autogenerate_notes, @deployment_target)
+
+          @git.create_tag(@deployment_target)
+          @git.reset
+        rescue Exception => e
+          @out.puts "\n\n"
+          @out.puts e.message.red
+          @out.puts "\n\n"
+
+          @git.reset
+          exit 1
+        end
       end
     end
   end

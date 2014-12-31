@@ -44,6 +44,40 @@ describe Thrust::IOS::Deploy do
       deploy.run
     end
 
+    describe 'when the working directory is not clean' do
+      it 'raises an error' do
+        git.stub(:ensure_clean).and_raise(Thrust::Executor::CommandFailed)
+        git.should_not_receive(:reset)
+        expect { deploy.run }.to raise_error(Thrust::Executor::CommandFailed)
+      end
+    end
+
+    describe 'when something fails' do
+      before do
+        x_code_tools.stub(:cleanly_create_ipa).and_raise(StandardError.new("Build Error"))
+      end
+
+      it 'should display an error message' do
+        begin
+          deploy.run
+        rescue SystemExit
+        end
+        expect(out.string).to include 'Build Error'
+      end
+
+      it 'should reset the working directory' do
+        git.should_receive(:reset)
+        begin
+          deploy.run
+        rescue SystemExit
+        end
+      end
+
+      it 'should exit with code 1' do
+        expect { deploy.run }.to raise_error SystemExit
+      end
+    end
+
     it 'tags the current commit and resets the changes after the deploy' do
       git.should_receive(:create_tag).with('production').ordered
       git.should_receive(:reset).ordered
