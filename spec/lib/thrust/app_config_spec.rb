@@ -64,11 +64,11 @@ describe Thrust::AppConfig do
   end
 
   it 'exposes the fully expanded spec directories' do
-    config = Thrust::AppConfig.new({'spec_directories' => ['SpecDirA', 'SpecDirB/SubDirectory', 'SpecDirB/../SpecDirC']})
+    config = Thrust::AppConfig.new({'spec_directories' => ['SpecDirA', 'SpecDirB/SubDirectory', 'SpecDirB/../SpecDirC'], 'project_root' => '/project_root'})
     expect(config.spec_directories).to eq([
-                                              "#{File.join(Dir.pwd, 'SpecDirA')}",
-                                              "#{File.join(Dir.pwd, 'SpecDirB/SubDirectory')}",
-                                              "#{File.join(Dir.pwd, 'SpecDirC')}"
+                                              '/project_root/SpecDirA',
+                                              '/project_root/SpecDirB/SubDirectory',
+                                              '/project_root/SpecDirC',
                                           ])
 
   end
