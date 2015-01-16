@@ -13,5 +13,6 @@ RSpec.configure do |c|
 
   c.before(:all) { ENV['ANDROID_HOME'] = '/fake/android_home' }
   c.before(:each) { FakeFS.activate! }
+  c.before(:each) { FakeFS::FileSystem.clear }
   c.after(:each) { FakeFS.deactivate! }
 end

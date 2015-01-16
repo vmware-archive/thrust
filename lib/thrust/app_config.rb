@@ -14,7 +14,9 @@ module Thrust
                 :thrust_version,
                 :workspace_name,
                 :path_to_xcodeproj,
-                :spec_directories
+                :spec_directories,
+                :build_directory,
+                :project_root
 
     def initialize(attributes)
       @app_name = attributes['app_name']
@@ -28,6 +30,8 @@ module Thrust
       @thrust_version = attributes['thrust_version'].to_s
       @workspace_name = attributes['workspace_name']
       @path_to_xcodeproj = attributes['path_to_xcodeproj']
+      @build_directory = attributes['build_directory']
+      @project_root = attributes['project_root']
     end
 
     private

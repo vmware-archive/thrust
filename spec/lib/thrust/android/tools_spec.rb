@@ -42,7 +42,6 @@ describe Thrust::Android::Tools do
       context 'when /usr/local/opt/android-sdk exists and maven fails' do
         before do
           FileUtils.mkdir_p('/usr/local/opt/android-sdk')
-          FileUtils.rmdir('target/example-signed-aligned.apk')
         end
 
         it 'raises an error' do

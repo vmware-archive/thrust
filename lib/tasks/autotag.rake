@@ -1,6 +1,6 @@
 require_relative '../thrust'
 
-@thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@app_config = Thrust::Config.load_configuration(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 namespace :autotag do
   task :create, :stage do |_, args|
@@ -9,6 +9,6 @@ namespace :autotag do
 
   desc 'Show the commit that is currently deployed to each environment'
   task :list do
-    Thrust::Tasks::Autotag::List.new.run(@thrust)
+    Thrust::Tasks::Autotag::List.new.run(@app_config)
   end
 end

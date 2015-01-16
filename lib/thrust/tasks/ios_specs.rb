@@ -9,7 +9,7 @@ module Thrust
         @out = out
       end
 
-      def run(thrust, target_info, args)
+      def run(app_config, target_info, args)
         build_configuration = target_info.build_configuration
         type = target_info.type
         target = target_info.target
@@ -25,17 +25,17 @@ module Thrust
         end
 
         tools_options = {
-            project_name: thrust.app_config.project_name,
-            workspace_name: thrust.app_config.workspace_name
+            project_name: app_config.project_name,
+            workspace_name: app_config.workspace_name
         }
-        xcode_tools = @xcode_tools_provider.instance(@out, build_configuration, thrust.build_dir, tools_options)
+        xcode_tools = @xcode_tools_provider.instance(@out, build_configuration, app_config.build_directory, tools_options)
 
         if type == 'app'
           xcode_tools.build_scheme_or_target(scheme || target, build_sdk)
           xcode_tools.kill_simulator
-          @cedar.run(build_configuration, target, build_sdk, os_version, device_name, target_info.timeout, thrust.build_dir, thrust.app_config.ios_sim_path)
+          @cedar.run(build_configuration, target, build_sdk, os_version, device_name, target_info.timeout, app_config.build_directory, app_config.ios_sim_path)
         else
-          xcode_tools.test(target || scheme, build_configuration, os_version, device_name, target_info.timeout, thrust.build_dir)
+          xcode_tools.test(target || scheme, build_configuration, os_version, device_name, target_info.timeout, app_config.build_directory)
         end
       end
     end

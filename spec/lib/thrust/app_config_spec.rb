@@ -72,4 +72,14 @@ describe Thrust::AppConfig do
                                           ])
 
   end
+
+  it 'exposes the build directory' do
+    config = Thrust::AppConfig.new({'build_directory' => '/build/dir'})
+    expect(config.build_directory).to eq('/build/dir')
+  end
+
+  it 'exposes the project root' do
+    config = Thrust::AppConfig.new({'project_root' => '/project/root'})
+    expect(config.project_root).to eq('/project/root')
+  end
 end

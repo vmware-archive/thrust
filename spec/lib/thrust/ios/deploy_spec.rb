@@ -10,10 +10,11 @@ describe Thrust::IOS::Deploy do
         'testflight' => {
             'team_token' => 'team_token',
             'api_token' => 'api_token'
-        }
+        },
+        'build_directory' => 'build_dir'
     )
   end
-  let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
+
   let(:distribution_config) do
     Thrust::DeploymentTarget.new(
         'notify' => 'true',
@@ -23,6 +24,7 @@ describe Thrust::IOS::Deploy do
         'note_generation_method' => 'autotag'
     )
   end
+
   let(:deployment_target) { 'production' }
 
   describe '#run' do
@@ -31,7 +33,7 @@ describe Thrust::IOS::Deploy do
     let(:agv_tool) { double(Thrust::IOS::AgvTool).as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
     let(:testflight) { double(Thrust::Testflight).as_null_object }
-    subject(:deploy) { Thrust::IOS::Deploy.new(out, x_code_tools, agv_tool, git, testflight, thrust_config, distribution_config, deployment_target) }
+    subject(:deploy) { Thrust::IOS::Deploy.new(out, x_code_tools, agv_tool, git, testflight, app_config, distribution_config, deployment_target) }
 
     before do
       git.stub(:current_commit).and_return('31758012490')

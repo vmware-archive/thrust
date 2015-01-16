@@ -11,11 +11,10 @@ describe Thrust::IOS::DeployProvider do
         'testflight' => {
           'team_token' => 'team_token',
           'api_token' => 'api_token'
-        }
+        },
+        'build_directory' => 'build_dir'
       )
     end
-
-    let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
 
     let(:distribution_config) do
       Thrust::DeploymentTarget.new(
@@ -54,9 +53,9 @@ describe Thrust::IOS::DeployProvider do
       Thrust::Testflight.should_receive(:new).with(executor, $stdout, $stdin, 'api_token', 'team_token').and_return(testflight)
 
       Thrust::IOS::Deploy.should_receive(:new).with($stdout, xcode_tools, agv_tool, git, testflight,
-        thrust_config, distribution_config, deployment_target).and_call_original
+        app_config, distribution_config, deployment_target).and_call_original
 
-      expect(provider.instance(thrust_config, distribution_config, deployment_target)).to be_instance_of(Thrust::IOS::Deploy)
+      expect(provider.instance(app_config, distribution_config, deployment_target)).to be_instance_of(Thrust::IOS::Deploy)
     end
   end
 end

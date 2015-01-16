@@ -10,12 +10,9 @@ describe Thrust::Tasks::Clean do
     it 'cleans the build' do
       app_config = Thrust::AppConfig.new(
         'project_name' => 'project-name',
-        'workspace_name' => 'workspace-name'
+        'workspace_name' => 'workspace-name',
+        'build_directory' => 'build-dir'
       )
-
-      thrust = double(Thrust::Config)
-      thrust.stub(:build_dir).and_return('build-dir')
-      thrust.stub(:app_config).and_return(app_config)
 
       tools_options = {
         project_name: 'project-name',
@@ -28,7 +25,7 @@ describe Thrust::Tasks::Clean do
 
       expect(xcode_tools).to receive(:clean_build)
 
-      subject.run(thrust)
+      subject.run(app_config)
     end
   end
 end

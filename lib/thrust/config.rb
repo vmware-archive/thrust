@@ -4,39 +4,44 @@ require 'yaml'
 
 module Thrust
   class Config
-    attr_reader :project_root, :app_config, :build_dir
+    class ConfigError < StandardError ; end
+    class MissingConfigError < ConfigError ; end
+    class MalformedConfigError < ConfigError ; end
+    class InvalidVersionConfigError < ConfigError ; end
 
     THRUST_VERSION = '0.5'
-    THRUST_ROOT = File.expand_path('../..', __FILE__)
 
-    def self.make(relative_project_root, config_file)
+    def self.load_configuration(relative_project_root, config_file, out = STDERR)
       begin
-        config_file_contents = YAML.load_file(config_file)
+        config = YAML.load_file(config_file)
       rescue Errno::ENOENT
-        puts ""
-        puts "  Missing thrust.yml. Create by running:\n".red
-        puts "      cp thrust.example.yml thrust.yml".blue
-        exit 1
+        out.puts ""
+        out.puts "  Missing thrust.yml. Create by running:\n".red
+        out.puts "      cp thrust.example.yml thrust.yml".blue
+        raise MissingConfigError
       rescue Psych::SyntaxError
-        puts ""
-        puts "  Malformed thrust.yml.".red
-        exit 1
+        out.puts ""
+        out.puts "  Malformed thrust.yml.".red
+        raise MalformedConfigError
       end
-      new(relative_project_root, config_file_contents)
-    end
 
-    def initialize(relative_project_root, config)
-      @project_root = File.expand_path(relative_project_root)
-      @build_dir = File.join(project_root, 'build')
-      @app_config = Thrust::AppConfig.new(config)
-      verify_configuration
+      project_root = File.expand_path(relative_project_root)
+      config['project_root'] = project_root
+      config['build_directory'] = File.join(project_root, 'build')
+
+      app_config = Thrust::AppConfig.new(config)
+      verify_configuration(app_config, out)
+
+      app_config
     end
 
     private
 
-    def verify_configuration
-      if @app_config.thrust_version != THRUST_VERSION
-        fail "Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies an out-of-date version, and thrust is at version: #{THRUST_VERSION}. See README for details.".red
+    def self.verify_configuration(app_config, out)
+      if app_config.thrust_version != THRUST_VERSION
+        out.puts ''
+        out.puts "  Invalid configuration. Have you updated thrust recently? Your thrust.yml specifies an out-of-date version, and thrust is at version: #{THRUST_VERSION}. See README for details.".red
+        raise InvalidVersionConfigError
       end
     end
   end

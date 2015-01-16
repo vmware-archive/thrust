@@ -1,6 +1,6 @@
 require_relative '../thrust'
 
-@thrust = Thrust::Config.make(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@app_config = Thrust::Config.load_configuration(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 desc 'Trim whitespace'
 task :trim do
@@ -14,20 +14,20 @@ end
 
 desc 'Print out names of files containing focused specs'
 task :focused_specs do
-  Thrust::Tasks::FocusedSpecs.new.run(@thrust.app_config)
+  Thrust::Tasks::FocusedSpecs.new.run(@app_config)
 end
 
 desc 'Clean all targets'
 task :clean do
-  Thrust::Tasks::Clean.new.run(@thrust)
+  Thrust::Tasks::Clean.new.run(@app_config)
 end
 
 desc 'Clean all targets (deprecated, use "clean")'
 task :clean_build => :clean
 
-@thrust.app_config.ios_spec_targets.each do |target_name, target_info|
+@app_config.ios_spec_targets.each do |target_name, target_info|
   desc target_info.scheme ? "Run the #{target_info.scheme} scheme" : "Run the #{target_info.target} target"
   task target_name, :device_name, :os_version do |_, args|
-    exit(1) unless Thrust::Tasks::IOSSpecs.new.run(@thrust, target_info, args)
+    exit(1) unless Thrust::Tasks::IOSSpecs.new.run(@app_config, target_info, args)
   end
 end

@@ -25,13 +25,12 @@ describe Thrust::Tasks::IOSSpecs do
       'build_configuration' => 'build-configuration'
     ) }
 
-    let(:thrust) {
-      app_config = Thrust::AppConfig.new(
+    let(:app_config) {
+      Thrust::AppConfig.new(
         'project_name' => 'project-name',
         'workspace_name' => 'workspace-name',
-        'ios_sim_path' => '/path/to/ios-sim')
-
-      double(Thrust::Config, build_dir: 'build-dir', app_config: app_config)
+        'ios_sim_path' => '/path/to/ios-sim',
+        'build_directory' => 'build-dir')
     }
 
     before do
@@ -41,7 +40,7 @@ describe Thrust::Tasks::IOSSpecs do
     end
 
     it 'instantiates, and builds the xcode tools correctly' do
-      subject.run(thrust, target_info, {})
+      subject.run(app_config, target_info, {})
 
       expect(xcode_tools_provider).to have_received(:instance).with(
         out,
@@ -55,7 +54,7 @@ describe Thrust::Tasks::IOSSpecs do
     context 'when the device name is present' do
       it 'pass the correct arguments to cedar#run' do
         target_info.stub(device_name: 'device-name')
-        subject.run(thrust, target_info, {})
+        subject.run(app_config, target_info, {})
 
         expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
       end
@@ -65,7 +64,7 @@ describe Thrust::Tasks::IOSSpecs do
       it 'not throw a runtime exception' do
         target_info.stub(device_name: nil)
 
-        expect { subject.run(thrust, target_info, {}) }.to_not raise_exception
+        expect { subject.run(app_config, target_info, {}) }.to_not raise_exception
 
         expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', nil, '45', 'build-dir', '/path/to/ios-sim')
       end
@@ -73,7 +72,7 @@ describe Thrust::Tasks::IOSSpecs do
 
     context 'when the target type is app' do
       it 'kills the xcode tools simulator and runs the cedar suite, not replacing the dash in the device name' do
-        subject.run(thrust, target_info, {})
+        subject.run(app_config, target_info, {})
 
         expect(xcode_tools).to have_received(:kill_simulator)
         expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
@@ -82,19 +81,19 @@ describe Thrust::Tasks::IOSSpecs do
       it 'returns the cedar return value' do
         cedar.stub(run: :success)
 
-        expect(subject.run(thrust, target_info, {})).to eq(:success)
+        expect(subject.run(app_config, target_info, {})).to eq(:success)
       end
 
       it 'should replace the space with a dash when the device name has a space' do
         target_info.stub(device_name: 'device name')
-        subject.run(thrust, target_info, {})
+        subject.run(app_config, target_info, {})
 
         expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
       end
 
       context 'when there are args' do
         it 'passes the os version and device name from the arguments to the cedar runner' do
-          subject.run(thrust, target_info, {os_version: 'args-os-version', device_name: 'args-device-name'})
+          subject.run(app_config, target_info, {os_version: 'args-os-version', device_name: 'args-device-name'})
 
           expect(cedar).to have_received(:run).with(anything, anything, anything, 'args-os-version', 'args-device-name', anything, anything, anything)
         end
@@ -109,14 +108,14 @@ describe Thrust::Tasks::IOSSpecs do
 
       it 'should not replace the space with a dash when the device name has a space' do
         target_info.stub(device_name: 'device name')
-        subject.run(thrust, target_info, {})
+        subject.run(app_config, target_info, {})
 
         expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
       end
 
       it 'should replace the dash with a space when the device name has a dash' do
         target_info.stub(device_name: 'device-name')
-        subject.run(thrust, target_info, {})
+        subject.run(app_config, target_info, {})
 
         expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
       end

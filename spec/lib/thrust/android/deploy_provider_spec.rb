@@ -9,11 +9,10 @@ describe Thrust::Android::DeployProvider do
         'testflight' => {
           'team_token' => 'team_token',
           'api_token' => 'api_token'
-        }
+        },
+        'build_directory' => 'build_dir'
       )
     end
-
-    let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
 
     let(:distribution_config) do
       Thrust::DeploymentTarget.new(
@@ -51,7 +50,7 @@ describe Thrust::Android::DeployProvider do
         distribution_config,
         deployment_target).and_call_original
 
-      expect(provider.instance(thrust_config, distribution_config, deployment_target)).to be_instance_of(Thrust::Android::Deploy)
+      expect(provider.instance(app_config, distribution_config, deployment_target)).to be_instance_of(Thrust::Android::Deploy)
 
     end
   end
