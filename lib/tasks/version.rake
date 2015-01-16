@@ -1,6 +1,6 @@
 require_relative '../thrust'
 
-@app_config = Thrust::Config.load_configuration(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
+@app_config = Thrust::ConfigLoader.load_configuration(Dir.getwd, File.join(Dir.getwd, 'thrust.yml'))
 
 desc 'Set build number'
 task :set_build_number, :build_number do |_, args|

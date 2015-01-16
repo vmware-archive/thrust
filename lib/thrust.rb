@@ -1,4 +1,4 @@
-require 'thrust/config'
+require 'thrust/config_loader'
 require 'thrust/executor'
 require 'thrust/execution_helper'
 require 'thrust/git'

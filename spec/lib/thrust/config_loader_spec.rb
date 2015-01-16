@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Thrust::Config do
+describe Thrust::ConfigLoader do
   describe '.load_configuration' do
     let(:out) { StringIO.new }
-    subject { Thrust::Config.load_configuration('/useless_dir/../relative_project_root', 'config.yml', out) }
+    subject { Thrust::ConfigLoader.load_configuration('/useless_dir/../relative_project_root', 'config.yml', out) }
 
     context 'when the thrust configuration is valid' do
       before do
@@ -30,7 +30,7 @@ describe Thrust::Config do
       end
 
       it 'raises an exception' do
-        expect { subject }.to raise_exception(Thrust::Config::InvalidVersionConfigError)
+        expect { subject }.to raise_exception(Thrust::ConfigLoader::InvalidVersionConfigError)
         expect(out.string).to match /Invalid configuration/
       end
     end
@@ -43,7 +43,7 @@ describe Thrust::Config do
       end
 
       it 'exits with an error code' do
-        expect { subject }.to raise_exception(Thrust::Config::MalformedConfigError)
+        expect { subject }.to raise_exception(Thrust::ConfigLoader::MalformedConfigError)
         expect(out.string).to match /Malformed thrust.yml/
       end
     end
@@ -54,7 +54,7 @@ describe Thrust::Config do
       end
 
       it 'exits with an error code' do
-        expect { subject }.to raise_exception(Thrust::Config::MissingConfigError)
+        expect { subject }.to raise_exception(Thrust::ConfigLoader::MissingConfigError)
         expect(out.string).to match /Missing thrust.yml/
       end
     end

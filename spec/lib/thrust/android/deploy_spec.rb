@@ -11,7 +11,7 @@ describe Thrust::Android::Deploy do
         }
     }
   end
-  let(:thrust_config) { double(Thrust::Config, app_config: app_config, build_dir: 'build_dir') }
+  let(:thrust_config) { double(Thrust::ConfigLoader, app_config: app_config, build_dir: 'build_dir') }
   let(:deployment_config) { Thrust::DeploymentTarget.new({'notify' => 'true', 'distribution_list' => 'devs', 'note_generation_method' => 'autotag' }) }
   let(:deployment_target) { 'production' }
 

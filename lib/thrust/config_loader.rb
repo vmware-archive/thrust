@@ -3,7 +3,7 @@ require_relative 'app_config'
 require 'yaml'
 
 module Thrust
-  class Config
+  class ConfigLoader
     class ConfigError < StandardError ; end
     class MissingConfigError < ConfigError ; end
     class MalformedConfigError < ConfigError ; end
