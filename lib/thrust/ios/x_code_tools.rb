@@ -34,9 +34,9 @@ module Thrust
         FileUtils.rm_rf(@build_directory)
       end
 
-      def build_scheme_or_target(scheme_or_target, build_sdk, architecture=nil)
+      def build_scheme_or_target(scheme_or_target, build_sdk)
         @out.puts "Building..."
-        run_xcode(build_sdk, scheme_or_target, architecture)
+        run_xcode(build_sdk, scheme_or_target)
       end
 
       def test(scheme, build_configuration, os_version, device_name, timeout, build_dir)
@@ -106,8 +106,7 @@ module Thrust
         end
       end
 
-      def run_xcode(sdk = nil, scheme_or_target = nil, architecture = nil)
-        architecture_flag = architecture ? "-arch #{architecture}" : nil
+      def run_xcode(sdk = nil, scheme_or_target = nil)
         target_flag = @workspace_name ? "-scheme \"#{scheme_or_target}\"" : "-target \"#{scheme_or_target}\""
         sdk_flag = sdk ? "-sdk #{sdk}" : nil
         configuration_build_dir = File.join(@build_directory, "#{@build_configuration}-#{sdk}").inspect
@@ -117,7 +116,6 @@ module Thrust
           'set -o pipefail &&',
           'xcodebuild',
           project_or_workspace_flag,
-          architecture_flag,
           target_flag,
           "-configuration #{@build_configuration}",
           sdk_flag,
