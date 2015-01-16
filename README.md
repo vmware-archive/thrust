@@ -40,13 +40,17 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 # Changelog
 
+## Version 0.6
+
+* Adds `spec_directories` configuration key to `thrust.yml`.  This allows you to specify from where `rake nof` removes focused specs.
+
 ## Version 0.5
 
 ##### Version 0.5 introduced a lot of changes.  Please see the *Upgrading* section below after installing the update.
 
 * Removes support for waxsim. Specify `ios_sim_path` to use a non-system installed version of ios-sim.
 
-* Unifies configuration of Cedar Spec Suites and Cedar/iOS/OSX test bundles in thrust.yml (breaking configuration changes)
+* Unifies configuration of Cedar Spec Suites and Cedar/iOS/OSX test bundles in `thrust.yml` (breaking configuration changes)
 
 * Fixes hardcoded bundle test destination which was broken in Xcode 6+
 
@@ -171,6 +175,12 @@ ios_spec_targets:
     scheme: IntegrationSpecs (My Great App) # Use if the scheme name is different from the target name.  Necessary when building in an xcode workspace.
     build_configuration: Release
     build_sdk: macosx
+
+spec_directories:
+  - SpecSuite
+  - SpecBundle
+  - WatchKit/SpecBundle
+  - MacSpecSuite
 ```
 
 ## Overriding config options

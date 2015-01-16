@@ -50,3 +50,9 @@ ios_spec_targets:
     scheme: IntegrationSpecs (My Great App) # Use if the scheme name is different from the target name.  Necessary when building in an xcode workspace.
     build_configuration: Release
     build_sdk: macosx
+
+spec_directories:
+  - SpecSuite
+  - SpecBundle
+  - WatchKit/SpecBundle
+  - MacSpecSuite
