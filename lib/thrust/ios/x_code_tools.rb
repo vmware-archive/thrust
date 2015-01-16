@@ -67,7 +67,7 @@ module Thrust
       def provision_path(provision_search_query)
         provision_search_path = File.expand_path("~/Library/MobileDevice/Provisioning Profiles")
         command = %Q(find '#{provision_search_path}' -print0 | xargs -0 grep -lr '#{provision_search_query}' --null | xargs -0 ls -t)
-        provisioning_profile = `#{command}`.split("\n").first
+        provisioning_profile = @thrust_executor.capture_output_from_system(command).split("\n").first
         if !provisioning_profile
           raise(ProvisioningProfileNotFound, "\nCouldn't find provisioning profiles matching #{provision_search_query}.\n\nThe command used was:\n\n#{command}")
         end

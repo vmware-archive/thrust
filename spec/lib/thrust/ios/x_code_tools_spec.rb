@@ -140,7 +140,9 @@ describe Thrust::IOS::XCodeTools do
     subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     before do
-      subject.stub(:`).and_return(provisioning_path)
+      provision_search_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles')
+      command = "find '#{provision_search_path}' -print0 | xargs -0 grep -lr 'query' --null | xargs -0 ls -t"
+      thrust_executor.register_output_for_cmd(provisioning_path, command)
     end
 
     def create_ipa
@@ -178,17 +180,20 @@ describe Thrust::IOS::XCodeTools do
     end
 
     context 'when it can not find the provisioning profile' do
-      let(:provisioning_path) { 'nonexistent-file' }
+      let(:provisioning_path) { '' }
 
       it 'raises an error' do
-        subject.cleanly_create_ipa(target, app_name, signing_identity, provisioning_path)
+        expect {
+          create_ipa
+        }.to raise_error(Thrust::IOS::XCodeTools::ProvisioningProfileNotFound)
       end
     end
 
     context 'when xcrun embeds the wrong provisioning profile' do
       it 'raises an error' do
+        FileUtils.stub(:cmp).and_return(false)
+
         expect do
-          FileUtils.stub(:cmp).and_return(false)
           create_ipa
         end.to raise_error(Thrust::IOS::XCodeTools::ProvisioningProfileNotEmbedded)
       end
