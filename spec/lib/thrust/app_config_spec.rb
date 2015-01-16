@@ -62,4 +62,14 @@ describe Thrust::AppConfig do
     config = Thrust::AppConfig.new({'path_to_xcodeproj' => '../foo/bar.xcodeproj'})
     expect(config.path_to_xcodeproj).to eq('../foo/bar.xcodeproj')
   end
+
+  it 'exposes the fully expanded spec directories' do
+    config = Thrust::AppConfig.new({'spec_directories' => ['SpecDirA', 'SpecDirB/SubDirectory', 'SpecDirB/../SpecDirC']})
+    expect(config.spec_directories).to eq([
+                                              "#{File.join(Dir.pwd, 'SpecDirA')}",
+                                              "#{File.join(Dir.pwd, 'SpecDirB/SubDirectory')}",
+                                              "#{File.join(Dir.pwd, 'SpecDirC')}"
+                                          ])
+
+  end
 end

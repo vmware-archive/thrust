@@ -13,7 +13,8 @@ module Thrust
                 :testflight,
                 :thrust_version,
                 :workspace_name,
-                :path_to_xcodeproj
+                :path_to_xcodeproj,
+                :spec_directories
 
     def initialize(attributes)
       @app_name = attributes['app_name']
@@ -21,6 +22,7 @@ module Thrust
       @ios_distribution_certificate = attributes['ios_distribution_certificate']
       @ios_sim_path = attributes['ios_sim_path']
       @ios_spec_targets = generate_ios_spec_targets(attributes['ios_spec_targets'])
+      @spec_directories = generate_spec_directories(attributes['spec_directories'])
       @project_name = attributes['project_name']
       @testflight = generate_testflight_credentials(attributes['testflight'])
       @thrust_version = attributes['thrust_version'].to_s
@@ -36,6 +38,14 @@ module Thrust
       ios_spec_targets_hash.inject({}) do |existing, (key, value)|
         existing[key] = IOSSpecTarget.new(value)
         existing
+      end
+    end
+
+    def generate_spec_directories(spec_directories)
+      return [] if spec_directories.nil?
+
+      spec_directories.map do |sd|
+        File.expand_path(File.join(Dir.pwd, sd))
       end
     end
 
