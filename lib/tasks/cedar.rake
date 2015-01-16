@@ -14,7 +14,7 @@ end
 
 desc 'Print out names of files containing focused specs'
 task :focused_specs do
-  Thrust::Tasks::FocusedSpecs.new.run(@thrust)
+  Thrust::Tasks::FocusedSpecs.new.run(@thrust.app_config)
 end
 
 desc 'Clean all targets'

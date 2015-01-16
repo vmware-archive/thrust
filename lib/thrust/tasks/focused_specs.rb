@@ -7,10 +7,10 @@ module Thrust
         @executor = executor
       end
 
-      def run(thrust)
+      def run(app_config)
         pattern = FOCUSED_METHODS.join("\\|")
-        directories = thrust.app_config.ios_spec_targets.values.map(&:target).join(' ')
-        @executor.system_or_exit %Q[grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks'; exit 0]
+        directories = app_config.spec_directories.map{ |sd| "\"#{sd}\"" }.join(' ')
+        @executor.system %Q[grep -l -r -e "\\(#{pattern}\\)" #{directories} | grep -v 'Frameworks']
       end
     end
   end
