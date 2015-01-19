@@ -85,6 +85,18 @@ describe Thrust::IOS::XcodeTools do
         end
       end
 
+      context 'when the build_sdk is macosx-ish' do
+        it 'does not include CONFIGURATION_BUILD_DIR' do
+          subject.build_scheme(scheme, 'macosx10.10')
+
+          expected_command = {
+              cmd: 'set -o pipefail && xcodebuild -project AwesomeProject.xcodeproj -scheme "AppScheme" -configuration Release -sdk macosx10.10 SYMROOT="build" 2>&1 | grep -v \'backing file\'',
+              output_file: 'build/Release-build.output'
+          }
+          expect(thrust_executor.system_or_exit_history.last).to eq(expected_command)
+        end
+      end
+
       context 'when the build is configured to clean' do
         it 'cleans in the build command' do
           subject.build_scheme(scheme, 'iphoneos', true)

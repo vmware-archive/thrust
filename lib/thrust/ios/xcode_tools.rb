@@ -88,7 +88,7 @@ module Thrust
       def build(scheme_or_target_flag, build_sdk, clean)
         sdk_flag = build_sdk ? "-sdk #{build_sdk}" : nil
         configuration_build_dir = File.join(@build_directory, "#{@build_configuration}-#{build_sdk}")
-        configuration_build_dir_option = (build_sdk == 'macosx') ? nil : "CONFIGURATION_BUILD_DIR=\"#{configuration_build_dir}\""
+        configuration_build_dir_option = build_sdk.include?('macosx') ? nil : "CONFIGURATION_BUILD_DIR=\"#{configuration_build_dir}\""
 
         command = [
             'set -o pipefail &&',

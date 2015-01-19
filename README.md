@@ -46,6 +46,8 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * Updates `ios_spec_targets` to require the `scheme` name instead of the `target` name.  The `target` key is no longer used.
 
+* Adds support for specifying the MacOSX sdk version in a spec target configuration.  E.g. `build_sdk` can now be set to `macosx10.9` or `macosx10.10`.  Run `xcodebuild -showsdks` to see the full list of available sdks.
+
 ## Version 0.5
 
 ##### Version 0.5 introduced a lot of changes.  Please see the *Upgrading* section below after installing the update.

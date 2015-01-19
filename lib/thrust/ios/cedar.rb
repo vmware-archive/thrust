@@ -9,7 +9,7 @@ module Thrust
       end
 
       def run(executable_name, build_configuration, build_sdk, os_version, device_name, timeout, build_dir, simulator_binary)
-        if build_sdk == 'macosx'
+        if build_sdk.include?('macosx')
           build_path = File.join(build_dir, build_configuration)
           app_executable = File.join(build_path, executable_name)
           @thrust_executor.check_command_for_failure("\"#{app_executable}\"", {'DYLD_FRAMEWORK_PATH' => "\"#{build_path}\""})

@@ -53,6 +53,16 @@ describe Thrust::IOS::Cedar do
       end
     end
 
+    context 'with macosx-ish as the build_sdk' do
+      let(:build_sdk) { 'macosx10.9' }
+
+      it 'should (safely) pass thrust the build path as an env variable' do
+        run_cedar
+
+        expect(thrust_executor).to have_received(:check_command_for_failure).with('"build_dir/build_configuration/AwesomeExecutable"', {'DYLD_FRAMEWORK_PATH' => '"build_dir/build_configuration"'})
+      end
+    end
+
     describe 'when no ios_sim_path is provided' do
       let(:ios_sim_path) { nil }
 
