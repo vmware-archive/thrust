@@ -5,10 +5,6 @@ require 'thrust/git'
 require 'thrust/testflight'
 require 'thrust/user_prompt'
 
-require 'thrust/android/deploy'
-require 'thrust/android/deploy_provider'
-require 'thrust/android/tools'
-
 require 'thrust/ios/agv_tool'
 require 'thrust/ios/cedar'
 require 'thrust/ios/deploy'

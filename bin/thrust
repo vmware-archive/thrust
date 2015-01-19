@@ -13,21 +13,14 @@ end
 
 require 'fileutils'
 project_root = Dir.pwd
-thrust_root  = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+thrust_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 rakefile = File.join(project_root, 'Rakefile')
 File.open(rakefile, 'a+') do |f|
   f.puts "require 'thrust/tasks'" unless f.grep(/require 'thrust\/tasks'/).any?
 end
 
-if File.exists?('AndroidManifest.xml')
-  example_file_name = 'android_example.yml'
-else
-  example_file_name = 'ios_example.yml'
-end
-
-
-FileUtils.cp(File.join(thrust_root, 'lib', 'config', example_file_name), File.join(project_root, 'thrust.example.yml'))
+FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'ios_example.yml'), File.join(project_root, 'thrust.example.yml'))
 puts ''
 puts '  To finish installation of Thrust, rename ' + 'thrust.example.yml'.blue + ' to ' + 'thrust.yml'.blue + ' and edit it for your project.'
 
