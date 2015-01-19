@@ -17,7 +17,7 @@ module Thrust
 
       def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
         kill_simulator
-        build_scheme(target, 'iphoneos', true)
+        build_target(target, 'iphoneos', true)
         ipa_name = create_ipa(app_name, signing_identity, provision_search_query)
         verify_provision(app_name, provision_search_query)
 
@@ -34,32 +34,13 @@ module Thrust
       end
 
       def build_scheme(scheme, build_sdk, clean = false)
-        @out.puts "Building..."
+        @out.puts 'Building...'
+        build("-scheme \"#{scheme}\"", build_sdk, clean)
+      end
 
-        sdk_flag = build_sdk ? "-sdk #{build_sdk}" : nil
-        configuration_build_dir = File.join(@build_directory, "#{@build_configuration}-#{build_sdk}")
-        configuration_build_dir_option = (build_sdk == 'macosx') ? nil : "CONFIGURATION_BUILD_DIR=\"#{configuration_build_dir}\""
-
-        command = [
-            'set -o pipefail &&',
-            'xcodebuild',
-            project_or_workspace_flag,
-            "-scheme \"#{scheme}\"",
-            "-configuration #{@build_configuration}",
-            sdk_flag,
-            clean ? 'clean build' : nil,
-            "SYMROOT=\"#{@build_directory}\"",
-            configuration_build_dir_option,
-            '2>&1',
-            "| grep -v 'backing file'"
-        ].compact.join(' ')
-        output_file = output_file("#{@build_configuration}-build")
-        begin
-          @thrust_executor.system_or_exit(command, output_file)
-        rescue Thrust::Executor::CommandFailed => e
-          @out.write File.read(output_file)
-          raise e
-        end
+      def build_target(target, build_sdk, clean = false)
+        @out.puts 'Building...'
+        build("-target \"#{target}\"", build_sdk, clean)
       end
 
       def test(scheme, build_configuration, os_version, device_name, timeout, build_dir)
@@ -102,6 +83,33 @@ module Thrust
           raise(ProvisioningProfileNotFound, "\nCouldn't find provisioning profiles matching #{provision_search_query}.\n\nThe command used was:\n\n#{command}")
         end
         provisioning_profile
+      end
+
+      def build(scheme_or_target_flag, build_sdk, clean)
+        sdk_flag = build_sdk ? "-sdk #{build_sdk}" : nil
+        configuration_build_dir = File.join(@build_directory, "#{@build_configuration}-#{build_sdk}")
+        configuration_build_dir_option = (build_sdk == 'macosx') ? nil : "CONFIGURATION_BUILD_DIR=\"#{configuration_build_dir}\""
+
+        command = [
+            'set -o pipefail &&',
+            'xcodebuild',
+            project_or_workspace_flag,
+            scheme_or_target_flag,
+            "-configuration #{@build_configuration}",
+            sdk_flag,
+            clean ? 'clean build' : nil,
+            "SYMROOT=\"#{@build_directory}\"",
+            configuration_build_dir_option,
+            '2>&1',
+            "| grep -v 'backing file'"
+        ].compact.join(' ')
+        output_file = output_file("#{@build_configuration}-build")
+        begin
+          @thrust_executor.system_or_exit(command, output_file)
+        rescue Thrust::Executor::CommandFailed => e
+          @out.write File.read(output_file)
+          raise e
+        end
       end
 
       def create_ipa(app_name, signing_identity, provision_search_query)
