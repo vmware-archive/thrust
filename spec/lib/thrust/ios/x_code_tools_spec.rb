@@ -199,4 +199,16 @@ describe Thrust::IOS::XCodeTools do
       end
     end
   end
+
+  describe '#find_executable_name' do
+    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+
+    before do
+      thrust_executor.register_output_for_cmd("EXECUTABLE_NAME = AwesomeExecutable\nOTHER_BUILD_SETTING = Hello", 'xcodebuild -scheme "AwesomeScheme" -showBuildSettings')
+    end
+
+    it 'returns the executable name for the provided scheme' do
+      expect(subject.find_executable_name('AwesomeScheme')).to eq('AwesomeExecutable')
+    end
+  end
 end

@@ -37,6 +37,7 @@ describe Thrust::Tasks::IOSSpecs do
       xcode_tools_provider.stub(:instance).and_return(xcode_tools)
       xcode_tools.stub(:build_scheme_or_target)
       xcode_tools.stub(:kill_simulator)
+      allow(xcode_tools).to receive(:find_executable_name).with('some-scheme').and_return('ExecutableName')
     end
 
     it 'instantiates, and builds the xcode tools correctly' do
@@ -56,7 +57,7 @@ describe Thrust::Tasks::IOSSpecs do
         target_info.stub(device_name: 'device-name')
         subject.run(app_config, target_info, {})
 
-        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
+        expect(cedar).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
       end
     end
 
@@ -66,7 +67,7 @@ describe Thrust::Tasks::IOSSpecs do
 
         expect { subject.run(app_config, target_info, {}) }.to_not raise_exception
 
-        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', nil, '45', 'build-dir', '/path/to/ios-sim')
+        expect(cedar).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', nil, '45', 'build-dir', '/path/to/ios-sim')
       end
     end
 
@@ -75,7 +76,7 @@ describe Thrust::Tasks::IOSSpecs do
         subject.run(app_config, target_info, {})
 
         expect(xcode_tools).to have_received(:kill_simulator)
-        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
+        expect(cedar).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
       end
 
       it 'returns the cedar return value' do
@@ -88,7 +89,7 @@ describe Thrust::Tasks::IOSSpecs do
         target_info.stub(device_name: 'device name')
         subject.run(app_config, target_info, {})
 
-        expect(cedar).to have_received(:run).with('build-configuration', 'some-target', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
+        expect(cedar).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
       end
 
       context 'when there are args' do

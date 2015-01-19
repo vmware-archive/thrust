@@ -62,6 +62,12 @@ module Thrust
         @thrust_executor.system %q[killall -m -KILL "iPhone Simulator"]
       end
 
+      def find_executable_name(scheme)
+        build_settings = @thrust_executor.capture_output_from_system("xcodebuild -scheme \"#{scheme}\" -showBuildSettings")
+        matches = build_settings.match(/EXECUTABLE_NAME = (.*)$/)
+        matches.captures.first
+      end
+
       private
 
       def provision_path(provision_search_query)
