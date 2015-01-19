@@ -44,6 +44,8 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * Adds `spec_directories` configuration key to `thrust.yml`.  This allows you to specify from where `rake nof` removes focused specs.
 
+* Updates `ios_spec_targets` to require the `scheme` name instead of the `target` name.  The `target` key is no longer used.
+
 ## Version 0.5
 
 ##### Version 0.5 introduced a lot of changes.  Please see the *Upgrading* section below after installing the update.
@@ -153,26 +155,27 @@ deployment_targets:
     ios_provisioning_search_query: 'query to find Provisioning Profile'
 
 ios_spec_targets:
-  specs: # This is the name of the rake task: `rake specs`
-    target: UISpecs # Name of the build target.
-    scheme: Specs (My Great App) # Use if the scheme name is different from the target name.  Necessary when building in an xcode workspace.
+  # Example of an iOS spec suite configuration.
+  specs: # This is the name of the rake task
+    scheme: Specs (My Great App) # Name of the scheme.
     type: app # Spec target type: 'app' or 'bundle'. Optional, defaults to app.
     build_configuration: Debug # Name of the build configuration.
-    build_sdk: iphonesimulator7.0 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
-    device_name: iPhone 4s # Device name as suggested by `ios-sim showdevicetypes`.
-    os_version: 7.1 # OS version to run. Defaults to latest available version.
-    timeout: 90 # Optional. Destination timeout defaults to 30 seconds.
-  
-  spec_bundle: # Example of a spec bundle configuration.
+    build_sdk: iphonesimulator8.1 # SDK used to build the target. Optional, defaults to latest iphonesimulator.
+    device_name: iPhone 6 # Device name. Run `ios-sim showdevicetypes` to see a full list of available devices.
+    os_version: 8.1 # OS version to run. Optional, defaults to latest available version.
+    timeout: 90 # Optional, defaults to 30 seconds.
+
+  # Example of an iOS spec bundle configuration.
+  spec_bundle:
     scheme: My Great App # Use the name for the main app scheme.
     type: bundle
     build_configuration: Debug
     device_name: iPhone 4s
     os_version: 7.1
 
-  integration: # Example of a Mac OSX target
-    target: IntegrationSpecs
-    scheme: IntegrationSpecs (My Great App) # Use if the scheme name is different from the target name.  Necessary when building in an xcode workspace.
+  # Example of a Mac OSX target configuration.
+  integration:
+    scheme: IntegrationSpecs (My Great App)
     build_configuration: Release
     build_sdk: macosx
 
@@ -205,6 +208,10 @@ Once you upgrade make sure to add/update the 'thrust_version' key in the configu
 
 
 ## Upgrading Instructions
+
+### Upgrading to Version 0.6
+
+In your `thrust.yml`, update all spec configurations under `ios_spec_targets` to specify the spec `scheme` instead of the `target`. 
 
 ### Upgrading to Version 0.5
 
