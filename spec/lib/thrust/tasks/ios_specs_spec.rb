@@ -18,7 +18,6 @@ describe Thrust::Tasks::IOSSpecs do
       'device' => 'device',
       'device_name' => 'device-name',
       'os_version' => 'os-version',
-      'target' => 'some-target',
       'scheme' => 'some-scheme',
       'timeout' => '45',
       'build_sdk' => 'build-sdk',
@@ -35,7 +34,7 @@ describe Thrust::Tasks::IOSSpecs do
 
     before do
       xcode_tools_provider.stub(:instance).and_return(xcode_tools)
-      xcode_tools.stub(:build_scheme_or_target)
+      xcode_tools.stub(:build_scheme)
       xcode_tools.stub(:kill_simulator)
       allow(xcode_tools).to receive(:find_executable_name).with('some-scheme').and_return('ExecutableName')
     end
@@ -49,7 +48,7 @@ describe Thrust::Tasks::IOSSpecs do
         'build-dir',
         {project_name: 'project-name', workspace_name: 'workspace-name'}
       )
-      expect(xcode_tools).to have_received(:build_scheme_or_target).with('some-scheme', 'build-sdk')
+      expect(xcode_tools).to have_received(:build_scheme).with('some-scheme', 'build-sdk')
     end
 
     context 'when the device name is present' do
@@ -111,14 +110,14 @@ describe Thrust::Tasks::IOSSpecs do
         target_info.stub(device_name: 'device name')
         subject.run(app_config, target_info, {})
 
-        expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
+        expect(xcode_tools).to have_received(:test).with('some-scheme', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
       end
 
       it 'should replace the dash with a space when the device name has a dash' do
         target_info.stub(device_name: 'device-name')
         subject.run(app_config, target_info, {})
 
-        expect(xcode_tools).to have_received(:test).with('some-target', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
+        expect(xcode_tools).to have_received(:test).with('some-scheme', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
       end
     end
   end

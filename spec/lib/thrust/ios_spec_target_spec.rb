@@ -16,11 +16,6 @@ describe Thrust::IOSSpecTarget do
     expect(target.build_sdk).to eq('iphonesimulator')
   end
 
-  it 'exposes the target name' do
-    target = Thrust::IOSSpecTarget.new('target' => 'some-target')
-    expect(target.target).to eq('some-target')
-  end
-
   it 'exposes the device type' do
     target = Thrust::IOSSpecTarget.new('device' => 'some-device')
     expect(target.device).to eq('some-device')

@@ -6,7 +6,6 @@ module Thrust
                 :device_name,
                 :os_version,
                 :scheme,
-                :target,
                 :type,
                 :timeout
 
@@ -17,7 +16,6 @@ module Thrust
       @device_name = attributes['device_name']
       @os_version = attributes['os_version']
       @scheme = attributes['scheme']
-      @target = attributes['target']
       @type = attributes['type'] || 'app'
       @timeout = attributes['timeout']
     end

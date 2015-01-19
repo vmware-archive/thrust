@@ -17,7 +17,7 @@ module Thrust
 
       def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
         kill_simulator
-        build_scheme_or_target(target, 'iphoneos', true)
+        build_scheme(target, 'iphoneos', true)
         ipa_name = create_ipa(app_name, signing_identity, provision_search_query)
         verify_provision(app_name, provision_search_query)
 
@@ -33,9 +33,33 @@ module Thrust
         FileUtils.rm_rf(@build_directory)
       end
 
-      def build_scheme_or_target(scheme_or_target, build_sdk, clean = false)
+      def build_scheme(scheme, build_sdk, clean = false)
         @out.puts "Building..."
-        run_xcode(build_sdk, scheme_or_target, clean)
+
+        sdk_flag = build_sdk ? "-sdk #{build_sdk}" : nil
+        configuration_build_dir = File.join(@build_directory, "#{@build_configuration}-#{build_sdk}")
+        configuration_build_dir_option = (build_sdk == 'macosx') ? nil : "CONFIGURATION_BUILD_DIR=\"#{configuration_build_dir}\""
+
+        command = [
+            'set -o pipefail &&',
+            'xcodebuild',
+            project_or_workspace_flag,
+            "-scheme \"#{scheme}\"",
+            "-configuration #{@build_configuration}",
+            sdk_flag,
+            clean ? 'clean build' : nil,
+            "SYMROOT=\"#{@build_directory}\"",
+            configuration_build_dir_option,
+            '2>&1',
+            "| grep -v 'backing file'"
+        ].compact.join(' ')
+        output_file = output_file("#{@build_configuration}-build")
+        begin
+          @thrust_executor.system_or_exit(command, output_file)
+        rescue Thrust::Executor::CommandFailed => e
+          @out.write File.read(output_file)
+          raise e
+        end
       end
 
       def test(scheme, build_configuration, os_version, device_name, timeout, build_dir)
@@ -108,34 +132,6 @@ module Thrust
 
         if !FileUtils.cmp(embedded_filename, correct_provision_filename)
           raise(ProvisioningProfileNotEmbedded, "Wrong mobile provision embedded by xcrun. Check your xcode provisioning profile settings.")
-        end
-      end
-
-      def run_xcode(sdk, scheme_or_target, clean)
-        target_flag = @workspace_name ? "-scheme \"#{scheme_or_target}\"" : "-target \"#{scheme_or_target}\""
-        sdk_flag = sdk ? "-sdk #{sdk}" : nil
-        configuration_build_dir = File.join(@build_directory, "#{@build_configuration}-#{sdk}").inspect
-        configuration_build_dir_option = sdk != 'macosx' ? "CONFIGURATION_BUILD_DIR=#{configuration_build_dir}" : nil
-
-        command = [
-          'set -o pipefail &&',
-          'xcodebuild',
-          project_or_workspace_flag,
-          target_flag,
-          "-configuration #{@build_configuration}",
-          sdk_flag,
-          clean ? "clean build" : nil,
-          "SYMROOT=#{@build_directory.inspect}",
-          configuration_build_dir_option,
-          '2>&1',
-          "| grep -v 'backing file'"
-        ].compact.join(' ')
-        output_file = output_file("#{@build_configuration}-build")
-        begin
-          @thrust_executor.system_or_exit(command, output_file)
-        rescue Thrust::Executor::CommandFailed => e
-          @out.write File.read(output_file)
-          raise e
         end
       end
 
