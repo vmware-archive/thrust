@@ -198,7 +198,9 @@ TestFlight deployment requires you to be in a clean git repo and to be at the he
 
 ### Notifying distribution lists
 
-Deploying to TestFlight will automatically notify all of the people on your TestFlight distribution list.  If you would prefer not to notify them, then you can change the 'notify' value in `thrust.yml` for that distribution list. You can also set the environment variable `NOTIFY` to false.
+Deploying to TestFlight will automatically notify all of the people on your TestFlight distribution list.  If you would prefer not to notify them, then you can change the `notify` value in `thrust.yml` for that distribution list. You can also set the environment variable `NOTIFY` to false, e.g:
+
+    NOTIFY=false rake testflight:staging
 
 # Upgrading
 
