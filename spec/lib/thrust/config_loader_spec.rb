@@ -50,7 +50,7 @@ describe Thrust::ConfigLoader do
 
     context 'when the configuration YAML is missing' do
       before do
-        expect(File.exist?('config.yml')).to be_false
+        expect(File.exist?('config.yml')).to be_falsey
       end
 
       it 'exits with an error code' do

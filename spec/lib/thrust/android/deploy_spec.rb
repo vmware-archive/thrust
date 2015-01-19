@@ -23,25 +23,25 @@ describe Thrust::Android::Deploy do
     subject(:deploy) { Thrust::Android::Deploy.new(out, android_tools, git, testflight, deployment_config, deployment_target) }
 
     before do
-      git.stub(:current_commit).and_return('31758012490')
+      allow(git).to receive(:current_commit).and_return('31758012490')
     end
 
     it 'ensures the working directory is clean' do
-      git.should_receive(:ensure_clean)
+      expect(git).to receive(:ensure_clean)
       deploy.run
     end
 
     describe 'when the working directory is not clean' do
       it 'raises an error' do
-        git.stub(:ensure_clean).and_raise(Thrust::Executor::CommandFailed)
-        git.should_not_receive(:reset)
+        allow(git).to receive(:ensure_clean).and_raise(Thrust::Executor::CommandFailed)
+        expect(git).to_not receive(:reset)
         expect { deploy.run }.to raise_error(Thrust::Executor::CommandFailed)
       end
     end
 
     describe 'when something fails' do
       before do
-        android_tools.stub(:build_signed_release).and_raise(StandardError.new("Build Error"))
+        allow(android_tools).to receive(:build_signed_release).and_raise(StandardError.new("Build Error"))
       end
 
       it 'should display an error message' do
@@ -53,7 +53,7 @@ describe Thrust::Android::Deploy do
       end
 
       it 'should reset the working directory' do
-        git.should_receive(:reset)
+        expect(git).to receive(:reset)
         begin
           deploy.run
         rescue SystemExit
@@ -67,24 +67,24 @@ describe Thrust::Android::Deploy do
 
     it 'updates the version number to the current git SHA' do
       Timecop.freeze(Time.at(1389303568)) do
-        android_tools.should_receive(:change_build_number).with('1401092139', '31758012490')
+        expect(android_tools).to receive(:change_build_number).with('1401092139', '31758012490')
         deploy.run
       end
     end
 
     it 'creates the apk' do
-      android_tools.should_receive(:build_signed_release)
+      expect(android_tools).to receive(:build_signed_release)
       deploy.run
     end
 
     it 'uploads to TestFlight' do
-      testflight.should_receive(:upload).with('apk_path', 'true', 'devs', true, deployment_target)
+      expect(testflight).to receive(:upload).with('apk_path', 'true', 'devs', true, deployment_target)
       deploy.run
     end
 
     it 'resets the changes and tags the current commit after the deploy' do
-      git.should_receive(:create_tag).with('production').ordered
-      git.should_receive(:reset).ordered
+      expect(git).to receive(:create_tag).with('production').ordered
+      expect(git).to receive(:reset).ordered
       deploy.run
     end
   end

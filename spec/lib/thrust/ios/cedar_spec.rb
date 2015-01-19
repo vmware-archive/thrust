@@ -35,7 +35,7 @@ describe Thrust::IOS::Cedar do
     it 'returns false when the command fails' do
       allow(thrust_executor).to receive(:check_command_for_failure).and_return(false)
 
-      run_cedar.should be_false
+      expect(run_cedar).to be_falsey
     end
 
     it 'passes timeout through to executor' do
@@ -49,7 +49,7 @@ describe Thrust::IOS::Cedar do
       it 'should (safely) pass thrust the build path as an env variable' do
         run_cedar
 
-        thrust_executor.should have_received(:check_command_for_failure).with('"build_dir/build_configuration/AwesomeExecutable"', {'DYLD_FRAMEWORK_PATH' => '"build_dir/build_configuration"'})
+        expect(thrust_executor).to have_received(:check_command_for_failure).with('"build_dir/build_configuration/AwesomeExecutable"', {'DYLD_FRAMEWORK_PATH' => '"build_dir/build_configuration"'})
       end
     end
 

@@ -38,21 +38,21 @@ describe Thrust::IOS::DeployProvider do
     subject(:provider) { Thrust::IOS::DeployProvider.new }
 
     before do
-      Thrust::IOS::XcodeTools.stub(:new).and_return(xcode_tools)
-      Thrust::IOS::AgvTool.stub(:new).and_return(agv_tool)
-      Thrust::Git.stub(:new).and_return(git)
-      Thrust::Executor.stub(:new).and_return(executor)
-      Thrust::Testflight.stub(:new).and_return(testflight)
+      allow(Thrust::IOS::XcodeTools).to receive(:new).and_return(xcode_tools)
+      allow(Thrust::IOS::AgvTool).to receive(:new).and_return(agv_tool)
+      allow(Thrust::Git).to receive(:new).and_return(git)
+      allow(Thrust::Executor).to receive(:new).and_return(executor)
+      allow(Thrust::Testflight).to receive(:new).and_return(testflight)
     end
 
     it 'builds the dependencies and passes provisioning search query, thrust config, and distribution_config to the Thrust::IOS::Deploy' do
-      Thrust::IOS::XcodeToolsProvider.should_receive(:new).and_return(xcode_tools_provider)
-      xcode_tools_provider.should_receive(:instance).with($stdout, 'configuration', 'build_dir', {project_name: 'project_name', workspace_name: 'workspace_name'}).and_return(xcode_tools)
-      Thrust::Git.should_receive(:new).with($stdout, executor).and_return(git)
-      Thrust::IOS::AgvTool.should_receive(:new).with(executor, git).and_return(agv_tool)
-      Thrust::Testflight.should_receive(:new).with(executor, $stdout, $stdin, 'api_token', 'team_token').and_return(testflight)
+      expect(Thrust::IOS::XcodeToolsProvider).to receive(:new).and_return(xcode_tools_provider)
+      expect(xcode_tools_provider).to receive(:instance).with($stdout, 'configuration', 'build_dir', {project_name: 'project_name', workspace_name: 'workspace_name'}).and_return(xcode_tools)
+      expect(Thrust::Git).to receive(:new).with($stdout, executor).and_return(git)
+      expect(Thrust::IOS::AgvTool).to receive(:new).with(executor, git).and_return(agv_tool)
+      expect(Thrust::Testflight).to receive(:new).with(executor, $stdout, $stdin, 'api_token', 'team_token').and_return(testflight)
 
-      Thrust::IOS::Deploy.should_receive(:new).with($stdout, xcode_tools, agv_tool, git, testflight,
+      expect(Thrust::IOS::Deploy).to receive(:new).with($stdout, xcode_tools, agv_tool, git, testflight,
         app_config, distribution_config, deployment_target).and_call_original
 
       expect(provider.instance(app_config, distribution_config, deployment_target)).to be_instance_of(Thrust::IOS::Deploy)

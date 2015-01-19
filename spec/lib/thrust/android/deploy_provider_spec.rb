@@ -32,18 +32,18 @@ describe Thrust::Android::DeployProvider do
     subject(:provider) { Thrust::Android::DeployProvider.new }
 
     before do
-      Thrust::Git.stub(:new).and_return(git)
-      Thrust::Executor.stub(:new).and_return(executor)
-      Thrust::Testflight.stub(:new).and_return(testflight)
-      Thrust::Android::Tools.stub(:new).and_return(tools)
+      allow(Thrust::Git).to receive(:new).and_return(git)
+      allow(Thrust::Executor).to receive(:new).and_return(executor)
+      allow(Thrust::Testflight).to receive(:new).and_return(testflight)
+      allow(Thrust::Android::Tools).to receive(:new).and_return(tools)
     end
 
     it 'builds the dependencies and passes thrust config, distribution_config and deployment_target to the Thrust::Android::Deploy' do
-      Thrust::Testflight.should_receive(:new).with(executor, $stdout, $stdin, 'api_token', 'team_token').and_return(testflight)
-      Thrust::Git.should_receive(:new).with($stdout, executor).and_return(git)
-      Thrust::Android::Tools.should_receive(:new).with($stdout, executor).and_return(tools)
+      expect(Thrust::Testflight).to receive(:new).with(executor, $stdout, $stdin, 'api_token', 'team_token').and_return(testflight)
+      expect(Thrust::Git).to receive(:new).with($stdout, executor).and_return(git)
+      expect(Thrust::Android::Tools).to receive(:new).with($stdout, executor).and_return(tools)
 
-      Thrust::Android::Deploy.should_receive(:new).with($stdout,
+      expect(Thrust::Android::Deploy).to receive(:new).with($stdout,
         tools,
         git,
         testflight,

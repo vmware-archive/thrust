@@ -33,9 +33,9 @@ describe Thrust::Tasks::IOSSpecs do
     }
 
     before do
-      xcode_tools_provider.stub(:instance).and_return(xcode_tools)
-      xcode_tools.stub(:build_scheme)
-      xcode_tools.stub(:kill_simulator)
+      allow(xcode_tools_provider).to receive(:instance).and_return(xcode_tools)
+      allow(xcode_tools).to receive(:build_scheme)
+      allow(xcode_tools).to receive(:kill_simulator)
       allow(xcode_tools).to receive(:find_executable_name).with('some-scheme').and_return('ExecutableName')
     end
 
@@ -53,7 +53,7 @@ describe Thrust::Tasks::IOSSpecs do
 
     context 'when the device name is present' do
       it 'pass the correct arguments to cedar#run' do
-        target_info.stub(device_name: 'device-name')
+        allow(target_info).to receive(:device_name).and_return('device-name')
         subject.run(app_config, target_info, {})
 
         expect(cedar).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
@@ -62,7 +62,7 @@ describe Thrust::Tasks::IOSSpecs do
 
     context 'when the device name is missing' do
       it 'not throw a runtime exception' do
-        target_info.stub(device_name: nil)
+        allow(target_info).to receive(:device_name).and_return(nil)
 
         expect { subject.run(app_config, target_info, {}) }.to_not raise_exception
 
@@ -79,13 +79,13 @@ describe Thrust::Tasks::IOSSpecs do
       end
 
       it 'returns the cedar return value' do
-        cedar.stub(run: :success)
+        allow(cedar).to receive(:run).and_return(:success)
 
         expect(subject.run(app_config, target_info, {})).to eq(:success)
       end
 
       it 'should replace the space with a dash when the device name has a space' do
-        target_info.stub(device_name: 'device name')
+        allow(target_info).to receive(:device_name).and_return('device name')
         subject.run(app_config, target_info, {})
 
         expect(cedar).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim')
@@ -102,19 +102,19 @@ describe Thrust::Tasks::IOSSpecs do
 
     context 'when the target type is bundle' do
       before :each do
-        xcode_tools.stub(:test)
-        target_info.stub(type: 'bundle')
+        allow(xcode_tools).to receive(:test)
+        allow(target_info).to receive(:type).and_return('bundle')
       end
 
       it 'should not replace the space with a dash when the device name has a space' do
-        target_info.stub(device_name: 'device name')
+        allow(target_info).to receive(:device_name).and_return('device name')
         subject.run(app_config, target_info, {})
 
         expect(xcode_tools).to have_received(:test).with('some-scheme', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')
       end
 
       it 'should replace the dash with a space when the device name has a dash' do
-        target_info.stub(device_name: 'device-name')
+        allow(target_info).to receive(:device_name).and_return('device-name')
         subject.run(app_config, target_info, {})
 
         expect(xcode_tools).to have_received(:test).with('some-scheme', 'build-configuration', 'os-version', 'device name', '45', 'build-dir')

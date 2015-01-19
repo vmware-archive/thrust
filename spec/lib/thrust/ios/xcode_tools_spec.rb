@@ -14,8 +14,8 @@ describe Thrust::IOS::XcodeTools do
   end
 
   before do
-    Thrust::Git.stub(:new).and_return(git)
-    FileUtils.stub(:cmp).and_return(true)
+    allow(Thrust::Git).to receive(:new).and_return(git)
+    allow(FileUtils).to receive(:cmp).and_return(true)
   end
 
   describe '.initialize' do
@@ -33,7 +33,7 @@ describe Thrust::IOS::XcodeTools do
 
     it 'deletes the build folder' do
       subject.clean_build
-      expect(File.directory?('build')).to be_false
+      expect(File.directory?('build')).to be_falsey
     end
   end
 
@@ -43,14 +43,14 @@ describe Thrust::IOS::XcodeTools do
     it 'delegates to thrust executor' do
       command_result = double()
 
-      thrust_executor.stub(:check_command_for_failure).and_return(command_result)
+      allow(thrust_executor).to receive(:check_command_for_failure).and_return(command_result)
 
-      subject.test('scheme', 'build_configuration', 'os_version', 'device_name', '33', 'build_dir').should == command_result
+      expect(subject.test('scheme', 'build_configuration', 'os_version', 'device_name', '33', 'build_dir')).to eq(command_result)
       expect(thrust_executor).to have_received(:check_command_for_failure).with("xcodebuild test -scheme 'scheme' -configuration 'build_configuration' -destination 'OS=os_version,name=device_name' -destination-timeout '33' SYMROOT='build_dir'")
     end
 
     it 'defaults destination-timeout to 30' do
-      thrust_executor.stub(:check_command_for_failure)
+      allow(thrust_executor).to receive(:check_command_for_failure)
 
       subject.test('scheme', 'build_configuration', 'os_version', 'device_name', nil, 'build_dir')
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/-destination-timeout '30'/)
@@ -158,7 +158,7 @@ describe Thrust::IOS::XcodeTools do
     end
 
     it 'cleans and builds the app target' do
-      subject.should_receive(:build_target).with(target, 'iphoneos', true)
+      expect(subject).to receive(:build_target).with(target, 'iphoneos', true)
       create_ipa
     end
 
@@ -189,7 +189,7 @@ describe Thrust::IOS::XcodeTools do
 
     context 'when xcrun embeds the wrong provisioning profile' do
       it 'raises an error' do
-        FileUtils.stub(:cmp).and_return(false)
+        allow(FileUtils).to receive(:cmp).and_return(false)
 
         expect do
           create_ipa

@@ -21,7 +21,7 @@ describe Thrust::Tasks::Clean do
 
       xcode_tools = double(Thrust::IOS::XcodeTools)
 
-      xcode_tools_provider.stub(:instance).with(out, nil, 'build-dir', tools_options).and_return(xcode_tools)
+      allow(xcode_tools_provider).to receive(:instance).with(out, nil, 'build-dir', tools_options).and_return(xcode_tools)
 
       expect(xcode_tools).to receive(:clean_build)
 

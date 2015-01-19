@@ -7,7 +7,7 @@ describe Thrust::UserPrompt do
     let(:temp) { File.new('temp', 'w') }
 
     before do
-      Tempfile.stub(:new).and_return(temp)
+      allow(Tempfile).to receive(:new).and_return(temp)
     end
 
     it 'prints the prompt' do

@@ -36,27 +36,27 @@ describe Thrust::IOS::Deploy do
     subject(:deploy) { Thrust::IOS::Deploy.new(out, xcode_tools, agv_tool, git, testflight, app_config, distribution_config, deployment_target) }
 
     before do
-      git.stub(:current_commit).and_return('31758012490')
-      git.stub(:commit_count).and_return(149)
-      File.stub(:exist?).with('build_configuration_directory/AppName.app.dSYM').and_return(true)
+      allow(git).to receive(:current_commit).and_return('31758012490')
+      allow(git).to receive(:commit_count).and_return(149)
+      allow(File).to receive(:exist?).with('build_configuration_directory/AppName.app.dSYM').and_return(true)
     end
 
     it 'ensures the working directory is clean' do
-      git.should_receive(:ensure_clean)
+      expect(git).to receive(:ensure_clean)
       deploy.run
     end
 
     describe 'when the working directory is not clean' do
       it 'raises an error' do
-        git.stub(:ensure_clean).and_raise(Thrust::Executor::CommandFailed)
-        git.should_not_receive(:reset)
+        allow(git).to receive(:ensure_clean).and_raise(Thrust::Executor::CommandFailed)
+        expect(git).to_not receive(:reset)
         expect { deploy.run }.to raise_error(Thrust::Executor::CommandFailed)
       end
     end
 
     describe 'when something fails' do
       before do
-        xcode_tools.stub(:cleanly_create_ipa).and_raise(StandardError.new("Build Error"))
+        allow(xcode_tools).to receive(:cleanly_create_ipa).and_raise(StandardError.new("Build Error"))
       end
 
       it 'should display an error message' do
@@ -68,7 +68,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'should reset the working directory' do
-        git.should_receive(:reset)
+        expect(git).to receive(:reset)
         begin
           deploy.run
         rescue SystemExit
@@ -81,23 +81,23 @@ describe Thrust::IOS::Deploy do
     end
 
     it 'tags the current commit and resets the changes after the deploy' do
-      git.should_receive(:create_tag).with('production').ordered
-      git.should_receive(:reset).ordered
+      expect(git).to receive(:create_tag).with('production').ordered
+      expect(git).to receive(:reset).ordered
       deploy.run
     end
 
     context 'when the dSYM file exists' do
       it 'should pass the path to the dSYM to #upload' do
-        testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', 'build_configuration_directory/AppName.app.dSYM')
+        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', 'build_configuration_directory/AppName.app.dSYM')
         deploy.run
       end
     end
 
     context 'when the dSYM file does not exist' do
       it 'should pass nil as the dSYM file path argument' do
-        File.stub(:exist?).with('build_configuration_directory/AppName.app.dSYM').and_return(false)
+        allow(File).to receive(:exist?).with('build_configuration_directory/AppName.app.dSYM').and_return(false)
 
-        testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', nil)
+        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', nil)
         deploy.run
       end
     end
@@ -115,7 +115,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it "updates the version number to the number of commits on the current branch" do
-        agv_tool.should_receive(:change_build_number).with(149, nil, nil)
+        expect(agv_tool).to receive(:change_build_number).with(149, nil, nil)
         deploy.run
       end
     end
@@ -152,15 +152,15 @@ describe Thrust::IOS::Deploy do
 
       it "updates the version number to the current git SHA and a timestamp in UTC" do
         mocked_time = Time.parse("Thu Mar 29 22:33:20 PST 2014")
-        Time.stub(:now).and_return(mocked_time)
-        agv_tool.should_receive(:change_build_number).with('31758012490', '1403300633', nil)
+        allow(Time).to receive(:now).and_return(mocked_time)
+        expect(agv_tool).to receive(:change_build_number).with('31758012490', '1403300633', nil)
         deploy.run
       end
     end
 
     context 'when versioning method is set to anything else' do
       it 'updates the version number to the current git SHA' do
-        agv_tool.should_receive(:change_build_number).with('31758012490', nil, nil)
+        expect(agv_tool).to receive(:change_build_number).with('31758012490', nil, nil)
         deploy.run
       end
     end
@@ -177,7 +177,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'uploads to TestFlight, telling it to auto-generate the deployment notes' do
-        testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', 'build_configuration_directory/AppName.app.dSYM')
+        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', 'build_configuration_directory/AppName.app.dSYM')
         deploy.run
       end
     end
@@ -194,7 +194,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'uploads to TestFlight, telling it not to auto-generate deployment notes' do
-        testflight.should_receive(:upload).with('ipa_path', 'true', 'devs', false, 'production', 'build_configuration_directory/AppName.app.dSYM')
+        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', false, 'production', 'build_configuration_directory/AppName.app.dSYM')
         deploy.run
       end
     end
@@ -212,7 +212,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'should checkout the latest commit with that tag before deploying' do
-        git.should_receive(:checkout_tag).with('ci')
+        expect(git).to receive(:checkout_tag).with('ci')
         deploy.run
       end
     end
@@ -229,7 +229,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'should deploy from HEAD' do
-        git.should_not_receive(:checkout_tag)
+        expect(git).to_not receive(:checkout_tag)
         deploy.run
       end
     end
@@ -246,7 +246,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'creates the ipa, using the target' do
-        xcode_tools.should_receive(:cleanly_create_ipa).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
+        expect(xcode_tools).to receive(:cleanly_create_ipa).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
         deploy.run
       end
     end
@@ -262,7 +262,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'defaults to the app name as the target when building the ipa' do
-        xcode_tools.should_receive(:cleanly_create_ipa).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
+        expect(xcode_tools).to receive(:cleanly_create_ipa).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
         deploy.run
       end
     end

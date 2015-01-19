@@ -7,7 +7,7 @@ describe Thrust::IOS::AgvTool do
   subject { Thrust::IOS::AgvTool.new(thrust_executor, git) }
 
   before do
-    git.stub(:checkout_file)
+    allow(git).to receive(:checkout_file)
   end
 
   describe '#change_build_number' do
