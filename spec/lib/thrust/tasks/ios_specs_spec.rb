@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Thrust::Tasks::IOSSpecs do
   let(:out) { double(:out) }
-  let(:xcode_tools_provider) { double(Thrust::IOS::XcodeToolsProvider) }
-  let(:cedar) { double(Thrust::IOS::Cedar) }
+  let(:xcode_tools_provider) { double(Thrust::XcodeToolsProvider) }
+  let(:cedar) { double(Thrust::Cedar) }
 
   subject { Thrust::Tasks::IOSSpecs.new(out, xcode_tools_provider, cedar) }
 
@@ -12,7 +12,7 @@ describe Thrust::Tasks::IOSSpecs do
   end
 
   describe '#run' do
-    let(:xcode_tools) { double(Thrust::IOS::XcodeTools) }
+    let(:xcode_tools) { double(Thrust::XcodeTools) }
     let(:target_info) { Thrust::IOSSpecTarget.new(
       'type' => 'app',
       'device' => 'device',

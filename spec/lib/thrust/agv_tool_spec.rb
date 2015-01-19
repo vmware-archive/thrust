@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Thrust::IOS::AgvTool do
+describe Thrust::AgvTool do
   let(:thrust_executor) { Thrust::FakeExecutor.new }
   let(:git) { double(Thrust::Git) }
 
-  subject { Thrust::IOS::AgvTool.new(thrust_executor, git) }
+  subject { Thrust::AgvTool.new(thrust_executor, git) }
 
   before do
     allow(git).to receive(:checkout_file)

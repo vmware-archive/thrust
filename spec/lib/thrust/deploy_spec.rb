@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Thrust::IOS::Deploy do
+describe Thrust::Deploy do
   let(:app_config) do
     Thrust::AppConfig.new(
         'app_name' => 'AppName',
@@ -29,11 +29,11 @@ describe Thrust::IOS::Deploy do
 
   describe '#run' do
     let(:out) { StringIO.new }
-    let(:xcode_tools) { double(Thrust::IOS::XcodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
-    let(:agv_tool) { double(Thrust::IOS::AgvTool).as_null_object }
+    let(:xcode_tools) { double(Thrust::XcodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
+    let(:agv_tool) { double(Thrust::AgvTool).as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
     let(:testflight) { double(Thrust::Testflight).as_null_object }
-    subject(:deploy) { Thrust::IOS::Deploy.new(out, xcode_tools, agv_tool, git, testflight, app_config, distribution_config, deployment_target) }
+    subject(:deploy) { Thrust::Deploy.new(out, xcode_tools, agv_tool, git, testflight, app_config, distribution_config, deployment_target) }
 
     before do
       allow(git).to receive(:current_commit).and_return('31758012490')

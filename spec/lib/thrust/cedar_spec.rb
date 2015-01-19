@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Thrust::IOS::Cedar do
+describe Thrust::Cedar do
   let(:build_configuration) { 'build_configuration' }
   let(:build_sdk) { 'os' }
   let(:executable_name) { 'AwesomeExecutable' }
@@ -12,7 +12,7 @@ describe Thrust::IOS::Cedar do
   let(:timeout) { '45' }
   let(:thrust_executor) { double(Thrust::Executor) }
 
-  subject { Thrust::IOS::Cedar.new(out, thrust_executor) }
+  subject { Thrust::Cedar.new(out, thrust_executor) }
 
   describe '#run' do
     before do
