@@ -28,9 +28,9 @@ module Thrust
         end
 
         app_name = @app_config.app_name
-        target = @deployment_config.ios_target || app_name
+        target = @deployment_config.target || app_name
 
-        ipa_file = @xcode_tools.cleanly_create_ipa(target, app_name, @app_config.ios_distribution_certificate, @deployment_config.ios_provisioning_search_query)
+        ipa_file = @xcode_tools.cleanly_create_ipa(target, app_name, @app_config.distribution_certificate, @deployment_config.provisioning_search_query)
 
         dsym_path = "#{@xcode_tools.build_configuration_directory}/#{app_name}.app.dSYM"
         dsym_path = nil unless File.exist?(dsym_path)

@@ -6,15 +6,15 @@ describe Thrust::AppConfig do
     expect(config.ios_sim_path).to eq('ios-sim-binary')
   end
 
-  it 'exposes the ios_spec_targets when passed in' do
-    ios_spec_targets = {'foo' => {'type' => 'bundle'}}
-    config = Thrust::AppConfig.new('ios_spec_targets' => ios_spec_targets)
-    expect(config.ios_spec_targets['foo'].type).to eq('bundle')
+  it 'exposes the spec_targets when passed in' do
+    spec_targets = {'foo' => {'type' => 'bundle'}}
+    config = Thrust::AppConfig.new('spec_targets' => spec_targets)
+    expect(config.spec_targets['foo'].type).to eq('bundle')
   end
 
-  it 'returns an empty set when ios_spec_targets are not passed in' do
+  it 'returns an empty set when spec_targets are not passed in' do
     config = Thrust::AppConfig.new({})
-    expect(config.ios_spec_targets).to eq({})
+    expect(config.spec_targets).to eq({})
   end
 
   it 'exposes the project name' do
@@ -53,9 +53,9 @@ describe Thrust::AppConfig do
     expect(config.app_name).to eq('my-cool-app')
   end
 
-  it 'exposes the ios_distribution_certificate' do
-    config = Thrust::AppConfig.new({'ios_distribution_certificate' => 'some-cert'})
-    expect(config.ios_distribution_certificate).to eq('some-cert')
+  it 'exposes the distribution_certificate' do
+    config = Thrust::AppConfig.new({'distribution_certificate' => 'some-cert'})
+    expect(config.distribution_certificate).to eq('some-cert')
   end
 
   it 'exposes the path to the .xcodeproj file' do

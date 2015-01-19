@@ -6,12 +6,12 @@ describe Thrust::DeploymentTarget do
     expect(target.distribution_list).to eq('Presidents')
   end
 
-  it 'exposes ios_build_configuration' do
-    target = Thrust::DeploymentTarget.new('ios_build_configuration' => 'Debug')
-    expect(target.ios_build_configuration).to eq('Debug')
+  it 'exposes build_configuration' do
+    target = Thrust::DeploymentTarget.new('build_configuration' => 'Debug')
+    expect(target.build_configuration).to eq('Debug')
   end
 
-  it 'exposes the versioing_method' do
+  it 'exposes the versioning_method' do
     target = Thrust::DeploymentTarget.new('versioning_method' => 'some-method')
     expect(target.versioning_method).to eq('some-method')
   end
@@ -26,13 +26,13 @@ describe Thrust::DeploymentTarget do
     expect(target.note_generation_method).to eq('generate-it')
   end
 
-  it 'exposes the ios_provisioning_search_query' do
-    target = Thrust::DeploymentTarget.new('ios_provisioning_search_query' => 'some-query')
-    expect(target.ios_provisioning_search_query).to eq('some-query')
+  it 'exposes the provisioning_search_query' do
+    target = Thrust::DeploymentTarget.new('provisioning_search_query' => 'some-query')
+    expect(target.provisioning_search_query).to eq('some-query')
   end
 
-  it 'exposes the ios_target value' do
-    target = Thrust::DeploymentTarget.new('ios_target' => 'some-target')
-    expect(target.ios_target).to eq('some-target')
+  it 'exposes the target value' do
+    target = Thrust::DeploymentTarget.new('target' => 'some-target')
+    expect(target.target).to eq('some-target')
   end
 end

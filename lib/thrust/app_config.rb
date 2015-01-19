@@ -6,9 +6,9 @@ module Thrust
   class AppConfig
     attr_reader :app_name,
                 :deployment_targets,
-                :ios_distribution_certificate,
+                :distribution_certificate,
                 :ios_sim_path,
-                :ios_spec_targets,
+                :spec_targets,
                 :project_name,
                 :testflight,
                 :thrust_version,
@@ -23,9 +23,9 @@ module Thrust
       @project_root = attributes['project_root']
       @app_name = attributes['app_name']
       @deployment_targets = generate_deployment_targets(attributes['deployment_targets'])
-      @ios_distribution_certificate = attributes['ios_distribution_certificate']
+      @distribution_certificate = attributes['distribution_certificate']
       @ios_sim_path = attributes['ios_sim_path']
-      @ios_spec_targets = generate_ios_spec_targets(attributes['ios_spec_targets'])
+      @spec_targets = generate_spec_targets(attributes['spec_targets'])
       @spec_directories = generate_spec_directories(attributes['spec_directories'])
       @project_name = attributes['project_name']
       @testflight = generate_testflight_credentials(attributes['testflight'])
@@ -36,10 +36,10 @@ module Thrust
 
     private
 
-    def generate_ios_spec_targets(ios_spec_targets_hash)
-      return {} if ios_spec_targets_hash.nil?
+    def generate_spec_targets(spec_targets_hash)
+      return {} if spec_targets_hash.nil?
 
-      ios_spec_targets_hash.inject({}) do |existing, (key, value)|
+      spec_targets_hash.inject({}) do |existing, (key, value)|
         existing[key] = IOSSpecTarget.new(value)
         existing
       end

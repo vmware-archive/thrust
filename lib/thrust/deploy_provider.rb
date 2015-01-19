@@ -3,7 +3,7 @@ module Thrust
     def instance(app_config, deployment_config, deployment_target)
       stdout = $stdout
       thrust_executor = Thrust::Executor.new
-      build_configuration = deployment_config.ios_build_configuration
+      build_configuration = deployment_config.build_configuration
       tools_options = {project_name: app_config.project_name, workspace_name: app_config.workspace_name}
       xcode_tools = Thrust::XcodeToolsProvider.new.instance(stdout, build_configuration, app_config.build_directory, tools_options)
       git = Thrust::Git.new(stdout, thrust_executor)

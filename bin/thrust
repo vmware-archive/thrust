@@ -20,7 +20,7 @@ File.open(rakefile, 'a+') do |f|
   f.puts "require 'thrust/tasks'" unless f.grep(/require 'thrust\/tasks'/).any?
 end
 
-FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'ios_example.yml'), File.join(project_root, 'thrust.example.yml'))
+FileUtils.cp(File.join(thrust_root, 'lib', 'config', 'thrust_example.yml'), File.join(project_root, 'thrust.example.yml'))
 puts ''
 puts '  To finish installation of Thrust, rename ' + 'thrust.example.yml'.blue + ' to ' + 'thrust.yml'.blue + ' and edit it for your project.'
 

@@ -4,7 +4,7 @@ describe Thrust::Deploy do
   let(:app_config) do
     Thrust::AppConfig.new(
         'app_name' => 'AppName',
-        'ios_distribution_certificate' => 'signing_identity',
+        'distribution_certificate' => 'signing_identity',
         'project_name' => 'project_name',
         'workspace_name' => 'workspace_name',
         'testflight' => {
@@ -19,8 +19,8 @@ describe Thrust::Deploy do
     Thrust::DeploymentTarget.new(
         'notify' => 'true',
         'distribution_list' => 'devs',
-        'ios_build_configuration' => 'configuration',
-        'ios_provisioning_search_query' => 'Provisioning Profile query',
+        'build_configuration' => 'configuration',
+        'provisioning_search_query' => 'Provisioning Profile query',
         'note_generation_method' => 'autotag'
     )
   end
@@ -107,8 +107,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
             'note_generation_method' => 'autotag',
             'versioning_method' => 'commits'
         )
@@ -125,8 +125,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
             'note_generation_method' => 'autotag',
             'versioning_method' => 'none'
         )
@@ -143,8 +143,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
             'note_generation_method' => 'autotag',
             'versioning_method' => 'timestamp-sha'
         )
@@ -170,8 +170,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
             'note_generation_method' => 'autotag'
         )
       end
@@ -187,8 +187,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
             'note_generation_method' => 'ask'
         )
       end
@@ -204,8 +204,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
             'note_generation_method' => 'autotag',
             'tag' => 'ci'
         )
@@ -222,8 +222,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
             'note_generation_method' => 'autotag'
         )
       end
@@ -239,9 +239,9 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
-            'ios_target' => 'TargetName'
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
+            'target' => 'TargetName'
         )
       end
 
@@ -256,8 +256,8 @@ describe Thrust::Deploy do
         Thrust::DeploymentTarget.new(
             'notify' => 'true',
             'distribution_list' => 'devs',
-            'ios_build_configuration' => 'configuration',
-            'ios_provisioning_search_query' => 'Provisioning Profile query',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
         )
       end
 
