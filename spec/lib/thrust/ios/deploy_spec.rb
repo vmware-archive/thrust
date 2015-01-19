@@ -29,11 +29,11 @@ describe Thrust::IOS::Deploy do
 
   describe '#run' do
     let(:out) { StringIO.new }
-    let(:x_code_tools) { double(Thrust::IOS::XCodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
+    let(:xcode_tools) { double(Thrust::IOS::XcodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
     let(:agv_tool) { double(Thrust::IOS::AgvTool).as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
     let(:testflight) { double(Thrust::Testflight).as_null_object }
-    subject(:deploy) { Thrust::IOS::Deploy.new(out, x_code_tools, agv_tool, git, testflight, app_config, distribution_config, deployment_target) }
+    subject(:deploy) { Thrust::IOS::Deploy.new(out, xcode_tools, agv_tool, git, testflight, app_config, distribution_config, deployment_target) }
 
     before do
       git.stub(:current_commit).and_return('31758012490')
@@ -56,7 +56,7 @@ describe Thrust::IOS::Deploy do
 
     describe 'when something fails' do
       before do
-        x_code_tools.stub(:cleanly_create_ipa).and_raise(StandardError.new("Build Error"))
+        xcode_tools.stub(:cleanly_create_ipa).and_raise(StandardError.new("Build Error"))
       end
 
       it 'should display an error message' do
@@ -246,7 +246,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'creates the ipa, using the target' do
-        x_code_tools.should_receive(:cleanly_create_ipa).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
+        xcode_tools.should_receive(:cleanly_create_ipa).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
         deploy.run
       end
     end
@@ -262,7 +262,7 @@ describe Thrust::IOS::Deploy do
       end
 
       it 'defaults to the app name as the target when building the ipa' do
-        x_code_tools.should_receive(:cleanly_create_ipa).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
+        xcode_tools.should_receive(:cleanly_create_ipa).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
         deploy.run
       end
     end

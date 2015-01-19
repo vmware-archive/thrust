@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Thrust::IOS::XCodeTools do
+describe Thrust::IOS::XcodeTools do
   let(:thrust_executor) { Thrust::FakeExecutor.new }
   let(:out) { StringIO.new }
   let(:build_configuration) { 'Release' }
@@ -20,16 +20,16 @@ describe Thrust::IOS::XCodeTools do
 
   describe '.initialize' do
     it 'requires either a project_name or workspace_name' do
-      expect { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory) }.to raise_error
+      expect { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory) }.to raise_error
     end
 
     it 'does not allow both a project_name and workspace_name' do
-      expect { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: 'workspace', project_name: 'project') }.to raise_error
+      expect { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, workspace_name: 'workspace', project_name: 'project') }.to raise_error
     end
   end
 
   describe '#clean_build' do
-    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     it 'deletes the build folder' do
       subject.clean_build
@@ -38,7 +38,7 @@ describe Thrust::IOS::XCodeTools do
   end
 
   describe '#test' do
-    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     it 'delegates to thrust executor' do
       command_result = double()
@@ -58,7 +58,7 @@ describe Thrust::IOS::XCodeTools do
   end
 
   describe '#build_scheme' do
-    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     context 'when the build succeeds' do
       context 'when the build_sdk is iphoneos' do
@@ -116,7 +116,7 @@ describe Thrust::IOS::XCodeTools do
   end
 
   describe '#build_target' do
-    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     it 'calls xcodebuild with the build command with the target' do
       subject.build_target('TargetName', 'iphoneos')
@@ -135,7 +135,7 @@ describe Thrust::IOS::XCodeTools do
     let(:signing_identity) { 'iPhone Distribution' }
     let(:provision_search_query) { 'query' }
     let(:provisioning_path) { 'provisioning-path' }
-    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     before do
       provision_search_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles')
@@ -183,7 +183,7 @@ describe Thrust::IOS::XCodeTools do
       it 'raises an error' do
         expect {
           create_ipa
-        }.to raise_error(Thrust::IOS::XCodeTools::ProvisioningProfileNotFound)
+        }.to raise_error(Thrust::IOS::XcodeTools::ProvisioningProfileNotFound)
       end
     end
 
@@ -193,13 +193,13 @@ describe Thrust::IOS::XCodeTools do
 
         expect do
           create_ipa
-        end.to raise_error(Thrust::IOS::XCodeTools::ProvisioningProfileNotEmbedded)
+        end.to raise_error(Thrust::IOS::XcodeTools::ProvisioningProfileNotEmbedded)
       end
     end
   end
 
   describe '#find_executable_name' do
-    subject { Thrust::IOS::XCodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+    subject { Thrust::IOS::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
 
     before do
       thrust_executor.register_output_for_cmd("EXECUTABLE_NAME = AwesomeExecutable\nOTHER_BUILD_SETTING = Hello", 'xcodebuild -scheme "AwesomeScheme" -showBuildSettings')

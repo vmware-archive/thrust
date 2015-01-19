@@ -1,6 +1,6 @@
 module Thrust
   module IOS
-    class XCodeTools
+    class XcodeTools
       ProvisioningProfileNotFound = Class.new(StandardError)
       ProvisioningProfileNotEmbedded = Class.new(StandardError)
 

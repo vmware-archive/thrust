@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Thrust::Tasks::Clean do
   let(:out) { double(:out) }
-  let(:xcode_tools_provider) { double(Thrust::IOS::XCodeToolsProvider) }
+  let(:xcode_tools_provider) { double(Thrust::IOS::XcodeToolsProvider) }
 
   subject { Thrust::Tasks::Clean.new(out, xcode_tools_provider) }
 
@@ -19,7 +19,7 @@ describe Thrust::Tasks::Clean do
         workspace_name: 'workspace-name'
       }
 
-      xcode_tools = double(Thrust::IOS::XCodeTools)
+      xcode_tools = double(Thrust::IOS::XcodeTools)
 
       xcode_tools_provider.stub(:instance).with(out, nil, 'build-dir', tools_options).and_return(xcode_tools)
 

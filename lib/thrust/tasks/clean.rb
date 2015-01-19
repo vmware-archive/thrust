@@ -1,7 +1,7 @@
 module Thrust
   module Tasks
     class Clean
-      def initialize(out = $stdout, xcode_tools_provider = Thrust::IOS::XCodeToolsProvider.new)
+      def initialize(out = $stdout, xcode_tools_provider = Thrust::IOS::XcodeToolsProvider.new)
         @xcode_tools_provider = xcode_tools_provider
         @out = out
       end

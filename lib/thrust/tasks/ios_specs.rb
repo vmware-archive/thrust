@@ -2,7 +2,7 @@ module Thrust
   module Tasks
     class IOSSpecs
       def initialize(out = $stdout,
-          xcode_tools_provider = Thrust::IOS::XCodeToolsProvider.new,
+          xcode_tools_provider = Thrust::IOS::XcodeToolsProvider.new,
           cedar = Thrust::IOS::Cedar.new)
         @xcode_tools_provider = xcode_tools_provider
         @cedar = cedar

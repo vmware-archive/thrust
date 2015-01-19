@@ -1,9 +1,9 @@
 module Thrust
   module IOS
     class Deploy
-      def initialize(out, x_code_tools, agv_tool, git, testflight, app_config, deployment_config, deployment_target)
+      def initialize(out, xcode_tools, agv_tool, git, testflight, app_config, deployment_config, deployment_target)
         @out = out
-        @x_code_tools = x_code_tools
+        @xcode_tools = xcode_tools
         @agv_tool = agv_tool
         @git = git
         @testflight = testflight
@@ -31,9 +31,9 @@ module Thrust
           app_name = @app_config.app_name
           target = @deployment_config.ios_target || app_name
 
-          ipa_file = @x_code_tools.cleanly_create_ipa(target, app_name, @app_config.ios_distribution_certificate, @deployment_config.ios_provisioning_search_query)
+          ipa_file = @xcode_tools.cleanly_create_ipa(target, app_name, @app_config.ios_distribution_certificate, @deployment_config.ios_provisioning_search_query)
 
-          dsym_path = "#{@x_code_tools.build_configuration_directory}/#{app_name}.app.dSYM"
+          dsym_path = "#{@xcode_tools.build_configuration_directory}/#{app_name}.app.dSYM"
           dsym_path = nil unless File.exist?(dsym_path)
 
           autogenerate_notes = @deployment_config.note_generation_method == 'autotag'

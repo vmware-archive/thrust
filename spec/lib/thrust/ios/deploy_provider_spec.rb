@@ -28,8 +28,8 @@ describe Thrust::IOS::DeployProvider do
 
     let(:deployment_target) { 'production' }
 
-    let(:xcode_tools_provider) { double(Thrust::IOS::XCodeToolsProvider) }
-    let(:xcode_tools) { double(Thrust::IOS::XCodeTools) }
+    let(:xcode_tools_provider) { double(Thrust::IOS::XcodeToolsProvider) }
+    let(:xcode_tools) { double(Thrust::IOS::XcodeTools) }
     let(:agv_tool) { double(Thrust::IOS::AgvTool) }
     let(:git) { double(Thrust::Git) }
     let(:executor) { double(Thrust::Executor) }
@@ -38,7 +38,7 @@ describe Thrust::IOS::DeployProvider do
     subject(:provider) { Thrust::IOS::DeployProvider.new }
 
     before do
-      Thrust::IOS::XCodeTools.stub(:new).and_return(xcode_tools)
+      Thrust::IOS::XcodeTools.stub(:new).and_return(xcode_tools)
       Thrust::IOS::AgvTool.stub(:new).and_return(agv_tool)
       Thrust::Git.stub(:new).and_return(git)
       Thrust::Executor.stub(:new).and_return(executor)
@@ -46,7 +46,7 @@ describe Thrust::IOS::DeployProvider do
     end
 
     it 'builds the dependencies and passes provisioning search query, thrust config, and distribution_config to the Thrust::IOS::Deploy' do
-      Thrust::IOS::XCodeToolsProvider.should_receive(:new).and_return(xcode_tools_provider)
+      Thrust::IOS::XcodeToolsProvider.should_receive(:new).and_return(xcode_tools_provider)
       xcode_tools_provider.should_receive(:instance).with($stdout, 'configuration', 'build_dir', {project_name: 'project_name', workspace_name: 'workspace_name'}).and_return(xcode_tools)
       Thrust::Git.should_receive(:new).with($stdout, executor).and_return(git)
       Thrust::IOS::AgvTool.should_receive(:new).with(executor, git).and_return(agv_tool)
