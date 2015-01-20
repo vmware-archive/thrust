@@ -1,5 +1,5 @@
 require_relative 'deployment_target'
-require_relative 'ios_spec_target'
+require_relative 'spec_target'
 require_relative 'testflight_credentials'
 
 module Thrust
@@ -40,7 +40,7 @@ module Thrust
       return {} if spec_targets_hash.nil?
 
       spec_targets_hash.inject({}) do |existing, (key, value)|
-        existing[key] = IOSSpecTarget.new(value)
+        existing[key] = SpecTarget.new(value)
         existing
       end
     end

@@ -1,5 +1,5 @@
 module Thrust
-  class IOSSpecTarget
+  class SpecTarget
     attr_reader :build_configuration,
                 :build_sdk,
                 :device,

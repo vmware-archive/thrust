@@ -1,6 +1,6 @@
 module Thrust
   module Tasks
-    class IOSSpecs
+    class SpecRunner
       def initialize(out = $stdout,
           xcode_tools_provider = Thrust::XcodeToolsProvider.new,
           cedar = Thrust::Cedar.new)

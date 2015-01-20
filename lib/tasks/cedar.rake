@@ -25,6 +25,6 @@ end
 @app_config.spec_targets.each do |target_name, target_info|
   desc "Run the #{target_info.scheme} scheme"
   task target_name, :device_name, :os_version do |_, args|
-    exit(1) unless Thrust::Tasks::IOSSpecs.new.run(@app_config, target_info, args)
+    exit(1) unless Thrust::Tasks::SpecRunner.new.run(@app_config, target_info, args)
   end
 end
