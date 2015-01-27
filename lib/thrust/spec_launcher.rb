@@ -19,8 +19,7 @@ module Thrust
 
         arguments = ["--devicetypeid \"#{device_type_id}\"",
                      "--timeout #{timeout || '30'}",
-                     "--setenv CFFIXED_USER_HOME=\"#{Dir.tmpdir}\"",
-                     "--setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter"]
+                     "--setenv CFFIXED_USER_HOME=\"#{Dir.tmpdir}\""]
         environment_variables.each do |key, value|
           arguments << "--setenv #{key}=\"#{value}\""
         end

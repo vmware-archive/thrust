@@ -39,11 +39,10 @@ describe Thrust::SpecLauncher do
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/--timeout 45/)
     end
 
-    it 'passes the default environment variables to ios-sim' do
+    it 'sets the CFFIXED_USER_HOME to a tmp directory' do
       launch_specs
 
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CFFIXED_USER_HOME="\/tmp"/)
-      expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter/)
     end
 
     it 'passes the custom environment variables to ios-sim' do
