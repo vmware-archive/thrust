@@ -6,7 +6,7 @@ module Thrust
 
     def capture_status_and_output_from_command(command, env = {})
       env_string = ''
-      for key in env.keys
+      env.keys.each do |key|
         env_string += "#{key}=#{env[key]} "
       end
 
