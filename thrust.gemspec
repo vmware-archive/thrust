@@ -39,7 +39,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'auto_tagger', '~> 0.2'
   s.add_runtime_dependency 'rake', '~> 10.1'
   s.add_runtime_dependency 'nori', '~> 2.4.0'
-  s.add_runtime_dependency 'pry-debugger'
   s.add_development_dependency 'fakefs', '~> 0.5'
   s.add_development_dependency 'rspec', '3.1.0'
   s.add_development_dependency 'timecop', '~> 0.7'
