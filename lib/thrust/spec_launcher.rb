@@ -1,7 +1,7 @@
 require 'tmpdir'
 
 module Thrust
-  class Cedar
+  class SpecLauncher
     def initialize(out = $stdout, thrust_executor = Thrust::Executor.new)
       @thrust_executor = thrust_executor
       @out = out

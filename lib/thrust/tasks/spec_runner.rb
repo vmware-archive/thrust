@@ -6,10 +6,10 @@ module Thrust
     class SpecRunner
       def initialize(out = $stdout,
                      xcode_tools_provider = Thrust::XcodeToolsProvider.new,
-                     cedar = Thrust::Cedar.new,
+                     spec_launcher = Thrust::SpecLauncher.new,
                      scheme_parser = Thrust::SchemeParser.new)
         @xcode_tools_provider = xcode_tools_provider
-        @cedar = cedar
+        @spec_launcher = spec_launcher
         @scheme_parser = scheme_parser
         @out = out
       end
@@ -41,15 +41,15 @@ module Thrust
           executable = xcode_tools.find_executable_name(scheme)
           environment_variables = @scheme_parser.parse_environment_variables(scheme, app_config.path_to_xcodeproj)
 
-          @cedar.run(executable,
-                     build_configuration,
-                     build_sdk,
-                     os_version,
-                     device_name,
-                     target_info.timeout,
-                     app_config.build_directory,
-                     app_config.ios_sim_path,
-                     environment_variables)
+          @spec_launcher.run(executable,
+                             build_configuration,
+                             build_sdk,
+                             os_version,
+                             device_name,
+                             target_info.timeout,
+                             app_config.build_directory,
+                             app_config.ios_sim_path,
+                             environment_variables)
         else
           xcode_tools.test(scheme,
                            build_configuration,

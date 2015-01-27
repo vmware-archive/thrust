@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Thrust::Cedar do
+describe Thrust::SpecLauncher do
   let(:build_configuration) { 'build_configuration' }
   let(:build_sdk) { 'os' }
   let(:executable_name) { 'AwesomeExecutable' }
@@ -13,19 +13,19 @@ describe Thrust::Cedar do
   let(:environment_variables) { {'CEDAR_RANDOM_SEED' => '100', 'CEDAR_REPORTER_OPTS' => 'nested'} }
   let(:thrust_executor) { double(Thrust::Executor) }
 
-  subject { Thrust::Cedar.new(out, thrust_executor) }
+  subject { Thrust::SpecLauncher.new(out, thrust_executor) }
 
   describe '#run' do
     before do
       allow(thrust_executor).to receive(:check_command_for_failure).and_return(true)
     end
 
-    def run_cedar
+    def launch_specs
       subject.run(executable_name, build_configuration, build_sdk, os_version, device_name, timeout, build_dir, ios_sim_path, environment_variables)
     end
 
     it 'launches the spec executable with ios-sim and returns true' do
-      success = run_cedar
+      success = launch_specs
 
       expect(success).to eq(true)
 
@@ -34,20 +34,20 @@ describe Thrust::Cedar do
     end
 
     it 'passes timeout to ios-sim' do
-      run_cedar
+      launch_specs
 
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/--timeout 45/)
     end
 
     it 'passes the default environment variables to ios-sim' do
-      run_cedar
+      launch_specs
 
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CFFIXED_USER_HOME="\/tmp"/)
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter/)
     end
 
     it 'passes the custom environment variables to ios-sim' do
-      run_cedar
+      launch_specs
 
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CEDAR_RANDOM_SEED="100"/)
       expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CEDAR_REPORTER_OPTS="nested"/)
@@ -56,14 +56,14 @@ describe Thrust::Cedar do
     it 'returns false when the command fails' do
       allow(thrust_executor).to receive(:check_command_for_failure).and_return(false)
 
-      expect(run_cedar).to be_falsey
+      expect(launch_specs).to be_falsey
     end
 
     context 'with macosx as the build_sdk' do
       let(:build_sdk) { 'macosx' }
 
       it 'should (safely) pass thrust the build path as an env variable' do
-        run_cedar
+        launch_specs
 
         expect(thrust_executor).to have_received(:check_command_for_failure).with('"build_dir/build_configuration/AwesomeExecutable"', {'DYLD_FRAMEWORK_PATH' => '"build_dir/build_configuration"'})
       end
@@ -73,7 +73,7 @@ describe Thrust::Cedar do
       let(:build_sdk) { 'macosx10.9' }
 
       it 'should (safely) pass thrust the build path as an env variable' do
-        run_cedar
+        launch_specs
 
         expect(thrust_executor).to have_received(:check_command_for_failure).with('"build_dir/build_configuration/AwesomeExecutable"', {'DYLD_FRAMEWORK_PATH' => '"build_dir/build_configuration"'})
       end
@@ -83,7 +83,7 @@ describe Thrust::Cedar do
       let(:ios_sim_path) { nil }
 
       it 'defaults to system-installed ios-sim' do
-        run_cedar
+        launch_specs
 
         expect(thrust_executor).to have_received(:check_command_for_failure).with(/ios-sim/)
       end
@@ -93,7 +93,7 @@ describe Thrust::Cedar do
       let(:timeout) { nil }
 
       it 'defaults to 30' do
-        run_cedar
+        launch_specs
 
         expect(thrust_executor).to have_received(:check_command_for_failure).with(/--timeout 30/)
       end
