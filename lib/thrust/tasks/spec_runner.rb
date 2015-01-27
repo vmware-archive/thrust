@@ -38,7 +38,6 @@ module Thrust
 
         if type == 'app'
           xcode_tools.build_scheme(scheme, build_sdk)
-          xcode_tools.kill_simulator
 
           executable_name = xcode_tools.find_executable_name(scheme)
           environment_variables = @scheme_parser.parse_environment_variables(scheme, app_config.path_to_xcodeproj)
@@ -49,6 +48,8 @@ module Thrust
                                    app_config.build_directory,
                                    environment_variables)
           else
+            xcode_tools.kill_simulator
+
             @ios_spec_launcher.run(executable_name,
                                    build_configuration,
                                    build_sdk,
