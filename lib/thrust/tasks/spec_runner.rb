@@ -1,11 +1,16 @@
+require 'nori'
+require 'json'
+
 module Thrust
   module Tasks
     class SpecRunner
       def initialize(out = $stdout,
-          xcode_tools_provider = Thrust::XcodeToolsProvider.new,
-          cedar = Thrust::Cedar.new)
+                     xcode_tools_provider = Thrust::XcodeToolsProvider.new,
+                     cedar = Thrust::Cedar.new,
+                     scheme_parser = Thrust::SchemeParser.new)
         @xcode_tools_provider = xcode_tools_provider
         @cedar = cedar
+        @scheme_parser = scheme_parser
         @out = out
       end
 
@@ -32,10 +37,26 @@ module Thrust
         if type == 'app'
           xcode_tools.build_scheme(scheme, build_sdk)
           xcode_tools.kill_simulator
+
           executable = xcode_tools.find_executable_name(scheme)
-          @cedar.run(executable, build_configuration, build_sdk, os_version, device_name, target_info.timeout, app_config.build_directory, app_config.ios_sim_path)
+          environment_variables = @scheme_parser.parse_environment_variables(scheme, app_config.path_to_xcodeproj)
+
+          @cedar.run(executable,
+                     build_configuration,
+                     build_sdk,
+                     os_version,
+                     device_name,
+                     target_info.timeout,
+                     app_config.build_directory,
+                     app_config.ios_sim_path,
+                     environment_variables)
         else
-          xcode_tools.test(scheme, build_configuration, os_version, device_name, target_info.timeout, app_config.build_directory)
+          xcode_tools.test(scheme,
+                           build_configuration,
+                           os_version,
+                           device_name,
+                           target_info.timeout,
+                           app_config.build_directory)
         end
       end
     end

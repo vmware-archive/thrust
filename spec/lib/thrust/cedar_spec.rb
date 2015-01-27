@@ -10,6 +10,7 @@ describe Thrust::Cedar do
   let(:out) { StringIO.new }
   let(:ios_sim_path) { '/path/to/my/ios-sim' }
   let(:timeout) { '45' }
+  let(:environment_variables) { {'CEDAR_RANDOM_SEED' => '100', 'CEDAR_REPORTER_OPTS' => 'nested'} }
   let(:thrust_executor) { double(Thrust::Executor) }
 
   subject { Thrust::Cedar.new(out, thrust_executor) }
@@ -20,27 +21,42 @@ describe Thrust::Cedar do
     end
 
     def run_cedar
-      subject.run(executable_name, build_configuration, build_sdk, os_version, device_name, timeout, build_dir, ios_sim_path)
+      subject.run(executable_name, build_configuration, build_sdk, os_version, device_name, timeout, build_dir, ios_sim_path, environment_variables)
     end
 
-    it 'launches the spec executable with ios-sim' do
+    it 'launches the spec executable with ios-sim and returns true' do
       success = run_cedar
 
-      expect(success).to eq true
+      expect(success).to eq(true)
 
-      expected_command = %Q[/path/to/my/ios-sim launch build_dir/build_configuration-os/AwesomeExecutable.app --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.device-name, os-version' --timeout 45 --setenv CFFIXED_USER_HOME=/tmp --setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter]
-      expect(thrust_executor).to have_received(:check_command_for_failure).with(expected_command)
+      expected_command = '/path/to/my/ios-sim launch build_dir/build_configuration-os/AwesomeExecutable.app --devicetypeid "com.apple.CoreSimulator.SimDeviceType.device-name, os-version"'
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/#{expected_command}/)
+    end
+
+    it 'passes timeout to ios-sim' do
+      run_cedar
+
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/--timeout 45/)
+    end
+
+    it 'passes the default environment variables to ios-sim' do
+      run_cedar
+
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CFFIXED_USER_HOME="\/tmp"/)
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CEDAR_REPORTER_CLASS=CDRDefaultReporter/)
+    end
+
+    it 'passes the custom environment variables to ios-sim' do
+      run_cedar
+
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CEDAR_RANDOM_SEED="100"/)
+      expect(thrust_executor).to have_received(:check_command_for_failure).with(/--setenv CEDAR_REPORTER_OPTS="nested"/)
     end
 
     it 'returns false when the command fails' do
       allow(thrust_executor).to receive(:check_command_for_failure).and_return(false)
 
       expect(run_cedar).to be_falsey
-    end
-
-    it 'passes timeout through to executor' do
-      run_cedar
-      expect(thrust_executor).to have_received(:check_command_for_failure).with(/--timeout 45/)
     end
 
     context 'with macosx as the build_sdk' do

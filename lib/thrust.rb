@@ -10,6 +10,7 @@ require 'thrust/deploy'
 require 'thrust/deploy_provider'
 require 'thrust/xcode_tools'
 require 'thrust/xcode_tools_provider'
+require 'thrust/scheme_parser'
 
 require 'thrust/tasks/autotag/create'
 require 'thrust/tasks/autotag/list'

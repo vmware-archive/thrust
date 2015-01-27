@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
     'Tyler Schultz',
     'Wiley Kestner'
   ]
-  s.email       = 'mc+jbritz@pivotallabs.com'
+  s.email       = 'edellapenna@pivotal.io'
   s.files       = FileList['lib/**/**.rb', 'lib/**/*.rake', 'lib/**/*.yml'].to_a
   s.homepage    = 'http://github.com/pivotal/thrust'
   s.default_executable = 'thrust'
@@ -38,6 +38,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'colorize', '~> 0.6'
   s.add_runtime_dependency 'auto_tagger', '~> 0.2'
   s.add_runtime_dependency 'rake', '~> 10.1'
+  s.add_runtime_dependency 'nori', '~> 2.4.0'
+  s.add_runtime_dependency 'pry-debugger'
   s.add_development_dependency 'fakefs', '~> 0.5'
   s.add_development_dependency 'rspec', '3.1.0'
   s.add_development_dependency 'timecop', '~> 0.7'

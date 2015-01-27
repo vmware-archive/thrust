@@ -42,7 +42,7 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 ## Version 0.6
 
-* Drops Android support.
+* Drops Android support.  If you want to use **Thrust** to deploy Android apps to TestFlight, use version 0.5.2.
 
 * Drops `ios` prefix from keys in `thrust.yml`:
 
