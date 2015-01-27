@@ -165,7 +165,7 @@ describe Thrust::XcodeTools do
       expect(thrust_executor.system_history).to eq([
                                                        {cmd: 'killall -m -KILL "gdb"', output_file: nil},
                                                        {cmd: 'killall -m -KILL "otest"', output_file: nil},
-                                                       {cmd: 'killall -m -KILL "iPhone Simulator"', output_file: nil}
+                                                       {cmd: 'killall -m -KILL "iOS Simulator"', output_file: nil}
                                                    ])
     end
 

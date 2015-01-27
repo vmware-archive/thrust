@@ -63,7 +63,7 @@ module Thrust
       @out.puts('Killing simulator...')
       @thrust_executor.system %q[killall -m -KILL "gdb"]
       @thrust_executor.system %q[killall -m -KILL "otest"]
-      @thrust_executor.system %q[killall -m -KILL "iPhone Simulator"]
+      @thrust_executor.system %q[killall -m -KILL "iOS Simulator"]
     end
 
     def find_executable_name(scheme)
