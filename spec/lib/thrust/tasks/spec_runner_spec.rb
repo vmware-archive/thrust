@@ -3,14 +3,16 @@ require 'spec_helper'
 describe Thrust::Tasks::SpecRunner do
   let(:out) { double(:out) }
   let(:xcode_tools_provider) { double(Thrust::XcodeToolsProvider) }
-  let(:spec_launcher) { double(Thrust::SpecLauncher) }
+  let(:ios_spec_launcher) { double(Thrust::IOSSpecLauncher) }
+  let(:osx_spec_launcher) { double(Thrust::OSXSpecLauncher) }
   let(:scheme_parser) { double(Thrust::SchemeParser) }
   let(:environment_variables) { {'environment_variable' => '5'} }
 
-  subject { Thrust::Tasks::SpecRunner.new(out, xcode_tools_provider, spec_launcher, scheme_parser) }
+  subject { Thrust::Tasks::SpecRunner.new(out, xcode_tools_provider, ios_spec_launcher, osx_spec_launcher, scheme_parser) }
 
   before do
-    allow(spec_launcher).to receive(:run)
+    allow(ios_spec_launcher).to receive(:run)
+    allow(osx_spec_launcher).to receive(:run)
     allow(scheme_parser).to receive(:parse_environment_variables).and_return(environment_variables)
   end
 
@@ -42,7 +44,7 @@ describe Thrust::Tasks::SpecRunner do
       allow(xcode_tools).to receive(:find_executable_name).with('some-scheme').and_return('ExecutableName')
     end
 
-    it 'instantiates, and builds the xcode tools correctly' do
+    it 'instantiates the xcode tools correctly' do
       subject.run(app_config, target_info, {})
 
       expect(xcode_tools_provider).to have_received(:instance).with(
@@ -51,25 +53,27 @@ describe Thrust::Tasks::SpecRunner do
         'build-dir',
         {project_name: 'project-name', workspace_name: 'workspace-name'}
       )
+    end
+
+    it 'builds the provided scheme' do
+      subject.run(app_config, target_info, {})
+
       expect(xcode_tools).to have_received(:build_scheme).with('some-scheme', 'build-sdk')
     end
 
-    context 'when the device name is present' do
-      it 'pass the correct arguments to spec_launcher#run' do
-        allow(target_info).to receive(:device_name).and_return('device-name')
-        subject.run(app_config, target_info, {})
+    it 'launches the specs using the ios spec launcher' do
+      subject.run(app_config, target_info, {})
 
-        expect(spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim', environment_variables)
-      end
+      expect(ios_spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim', environment_variables)
     end
 
-    context 'when the device name is missing' do
-      it 'not throw a runtime exception' do
-        allow(target_info).to receive(:device_name).and_return(nil)
+    context 'when the specs are for a mac spec target' do
+      it 'launches the specs using the osx spec launcher' do
+        allow(target_info).to receive(:build_sdk).and_return('macosx10.9')
 
-        expect { subject.run(app_config, target_info, {}) }.to_not raise_exception
+        subject.run(app_config, target_info, {})
 
-        expect(spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', nil, '45', 'build-dir', '/path/to/ios-sim', environment_variables)
+        expect(osx_spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-dir')
       end
     end
 
@@ -78,11 +82,11 @@ describe Thrust::Tasks::SpecRunner do
         subject.run(app_config, target_info, {})
 
         expect(xcode_tools).to have_received(:kill_simulator)
-        expect(spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim', environment_variables)
+        expect(ios_spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim', environment_variables)
       end
 
       it 'returns the spec_launcher return value' do
-        allow(spec_launcher).to receive(:run).and_return(:success)
+        allow(ios_spec_launcher).to receive(:run).and_return(:success)
 
         expect(subject.run(app_config, target_info, {})).to eq(:success)
       end
@@ -91,14 +95,14 @@ describe Thrust::Tasks::SpecRunner do
         allow(target_info).to receive(:device_name).and_return('device name')
         subject.run(app_config, target_info, {})
 
-        expect(spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim', environment_variables)
+        expect(ios_spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim', environment_variables)
       end
 
       context 'when there are args' do
         it 'passes the os version and device name from the arguments to the spec launcher' do
           subject.run(app_config, target_info, {os_version: 'args-os-version', device_name: 'args-device-name'})
 
-          expect(spec_launcher).to have_received(:run).with(anything, anything, anything, 'args-os-version', 'args-device-name', anything, anything, anything, anything)
+          expect(ios_spec_launcher).to have_received(:run).with(anything, anything, anything, 'args-os-version', 'args-device-name', anything, anything, anything, anything)
         end
       end
     end

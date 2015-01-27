@@ -6,10 +6,12 @@ module Thrust
     class SpecRunner
       def initialize(out = $stdout,
                      xcode_tools_provider = Thrust::XcodeToolsProvider.new,
-                     spec_launcher = Thrust::SpecLauncher.new,
+                     ios_spec_launcher = Thrust::IOSSpecLauncher.new,
+                     osx_spec_launcher = Thrust::OSXSpecLauncher.new,
                      scheme_parser = Thrust::SchemeParser.new)
         @xcode_tools_provider = xcode_tools_provider
-        @spec_launcher = spec_launcher
+        @ios_spec_launcher = ios_spec_launcher
+        @osx_spec_launcher = osx_spec_launcher
         @scheme_parser = scheme_parser
         @out = out
       end
@@ -28,28 +30,32 @@ module Thrust
           device_name.gsub!(substitution_map[type], destination_map[type])
         end
 
-        tools_options = {
-            project_name: app_config.project_name,
-            workspace_name: app_config.workspace_name
-        }
-        xcode_tools = @xcode_tools_provider.instance(@out, build_configuration, app_config.build_directory, tools_options)
+        xcode_tools = @xcode_tools_provider.instance(@out,
+                                                     build_configuration,
+                                                     app_config.build_directory,
+                                                     project_name: app_config.project_name,
+                                                     workspace_name: app_config.workspace_name)
 
         if type == 'app'
           xcode_tools.build_scheme(scheme, build_sdk)
           xcode_tools.kill_simulator
 
-          executable = xcode_tools.find_executable_name(scheme)
-          environment_variables = @scheme_parser.parse_environment_variables(scheme, app_config.path_to_xcodeproj)
+          executable_name = xcode_tools.find_executable_name(scheme)
 
-          @spec_launcher.run(executable,
-                             build_configuration,
-                             build_sdk,
-                             os_version,
-                             device_name,
-                             target_info.timeout,
-                             app_config.build_directory,
-                             app_config.ios_sim_path,
-                             environment_variables)
+          if build_sdk.include?('macosx')
+            @osx_spec_launcher.run(executable_name, build_configuration, app_config.build_directory)
+          else
+            environment_variables = @scheme_parser.parse_environment_variables(scheme, app_config.path_to_xcodeproj)
+            @ios_spec_launcher.run(executable_name,
+                                   build_configuration,
+                                   build_sdk,
+                                   os_version,
+                                   device_name,
+                                   target_info.timeout,
+                                   app_config.build_directory,
+                                   app_config.ios_sim_path,
+                                   environment_variables)
+          end
         else
           xcode_tools.test(scheme,
                            build_configuration,
