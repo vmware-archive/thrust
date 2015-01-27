@@ -73,7 +73,7 @@ describe Thrust::Tasks::SpecRunner do
 
         subject.run(app_config, target_info, {})
 
-        expect(osx_spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-dir')
+        expect(osx_spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-dir', environment_variables)
       end
     end
 
