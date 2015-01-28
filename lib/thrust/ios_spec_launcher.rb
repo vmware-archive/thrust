@@ -30,7 +30,7 @@ module Thrust
       @out.puts 'Results:'
       @out.puts results
 
-      results.include?("Finished") && !results.include?("FAILURE") && !results.include?("EXCEPTION")
+      Thrust::CedarResultsParser.parse_results_for_success(results)
     end
   end
 end

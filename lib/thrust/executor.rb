@@ -36,10 +36,11 @@ module Thrust
       @out.puts "Executing #{cmd} and checking for FAILURE"
       execution = @execution_helper.capture_status_and_output_from_command("#{cmd} 2>&1", env)
       result = execution[:output]
+
       @out.puts "Results:"
       @out.puts result
 
-      result.include?("Finished") && !result.include?("FAILURE") && !result.include?("EXCEPTION")
+      Thrust::CedarResultsParser.parse_results_for_success(result)
     end
   end
 end
