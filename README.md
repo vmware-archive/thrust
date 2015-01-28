@@ -58,6 +58,14 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 * Adds support for specifying the MacOSX sdk version in a spec target configuration.  E.g. `build_sdk` can now be set to `macosx10.9` or `macosx10.10`.  Run `xcodebuild -showsdks` to see the full list of available sdks.
 
+* Adds support for specifying the Cedar random seed for spec targets (note that this is not currently supported for spec bundles):
+
+```
+CEDAR_RANDOM_SEED=5 bundle exec rake spec_suite
+```
+
+
+
 ## Version 0.5
 
 ##### Version 0.5 introduced a lot of changes.  Please see the *Upgrading* section below after installing the update.

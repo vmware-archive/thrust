@@ -41,6 +41,7 @@ module Thrust
 
           executable_name = xcode_tools.find_executable_name(scheme)
           environment_variables = @scheme_parser.parse_environment_variables(scheme, app_config.path_to_xcodeproj)
+          environment_variables['CEDAR_RANDOM_SEED'] = ENV['CEDAR_RANDOM_SEED'] if ENV['CEDAR_RANDOM_SEED']
 
           if build_sdk.include?('macosx')
             @osx_spec_launcher.run(executable_name,

@@ -29,7 +29,7 @@ describe Thrust::Tasks::SpecRunner do
         'ios_sim_path' => '/path/to/ios-sim',
         'build_directory' => 'build-dir')
     }
-    let(:environment_variables) { {'environment_variable' => '5'} }
+    let(:environment_variables) { {'environment_variable' => '5', 'CEDAR_RANDOM_SEED' => '4' } }
 
     before do
       allow(scheme_parser).to receive(:parse_environment_variables).and_return(environment_variables)
@@ -71,6 +71,18 @@ describe Thrust::Tasks::SpecRunner do
         subject.run(app_config, target_info, {})
 
         expect(ios_spec_launcher).to have_received(:run).with('ExecutableName', 'build-configuration', 'build-sdk', 'os-version', 'device-name', '45', 'build-dir', '/path/to/ios-sim', environment_variables)
+      end
+
+      context 'when the cedar random seed is specified in the environment' do
+        before { ENV['CEDAR_RANDOM_SEED'] = '5' }
+        after { ENV['CEDAR_RANDOM_SEED'] = nil }
+
+        it 'uses that value in precedence to the value in the scheme' do
+          subject.run(app_config, target_info, {})
+
+          expected_environment_variables = environment_variables.merge({'CEDAR_RANDOM_SEED' => '5'})
+          expect(ios_spec_launcher).to have_received(:run).with(anything, anything, anything, anything, anything, anything, anything, anything, expected_environment_variables)
+        end
       end
 
       it 'kills the simulator and runs the cedar suite, not replacing the dash in the device name' do
