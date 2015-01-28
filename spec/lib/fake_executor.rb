@@ -1,9 +1,10 @@
 class Thrust::FakeExecutor
-  attr_reader :system_or_exit_history, :system_history
+  attr_reader :system_or_exit_history, :system_history, :capture_output_history
 
   def initialize
     @system_or_exit_history = []
     @system_history = []
+    @capture_output_history = []
     @outputs_for_commands = {}
   end
 
@@ -28,6 +29,7 @@ class Thrust::FakeExecutor
   end
 
   def capture_output_from_system(cmd)
+    @capture_output_history << cmd
     @outputs_for_commands[cmd]
   end
 

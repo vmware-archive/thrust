@@ -9,7 +9,7 @@ end
 
 desc 'Remove any focus from specs'
 task :nof do
-  Thrust::Tasks::Nof.new.run
+  Thrust::Tasks::Nof.new.run(@app_config)
 end
 
 desc 'Print out names of files containing focused specs'
