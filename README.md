@@ -79,7 +79,7 @@ If you are using a spec bundle, you will need to set the environment variable in
 ## Example thrust.yml for iOS
 
 ```yaml
-thrust_version: 0.5
+thrust_version: 0.6
 project_name: My Great Project # do not use if building with an xcode workspace
 # workspace_name: My Workspace # use if building with an xcode workspace
 # path_to_xcodeproj: 'App/MyApp.xcodeproj' # use if xcodeproj is not in the same directory as this yaml file. Optional.

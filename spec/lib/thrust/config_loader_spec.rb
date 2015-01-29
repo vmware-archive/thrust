@@ -8,7 +8,7 @@ describe Thrust::ConfigLoader do
     context 'when the thrust configuration is valid' do
       before do
         File.open 'config.yml', 'w+' do |f|
-          f.write(YAML.dump({'thrust_version' => 0.5}))
+          f.write(YAML.dump({'thrust_version' => 0.6}))
         end
       end
 
@@ -16,7 +16,7 @@ describe Thrust::ConfigLoader do
         app_config = subject
         expect(app_config).to be_instance_of(Thrust::AppConfig)
 
-        expect(app_config.thrust_version).to eq('0.5')
+        expect(app_config.thrust_version).to eq('0.6')
         expect(app_config.project_root).to eq('/relative_project_root')
         expect(app_config.build_directory).to eq('/relative_project_root/build')
       end

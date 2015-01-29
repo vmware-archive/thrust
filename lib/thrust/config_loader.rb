@@ -9,7 +9,7 @@ module Thrust
     class MalformedConfigError < ConfigError ; end
     class InvalidVersionConfigError < ConfigError ; end
 
-    THRUST_VERSION = '0.5'
+    THRUST_VERSION = '0.6'
 
     def self.load_configuration(relative_project_root, config_file, out = STDERR)
       begin
