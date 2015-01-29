@@ -64,6 +64,15 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 CEDAR_RANDOM_SEED=5 bundle exec rake spec_suite
 ```
 
+* Adds support for reading environment variables set in the scheme.
+
+e.g. If you set a `CEDAR_RANDOM_SEED` in the spec target's scheme in Xcode, the spec task will run with that random seed:
+
+![Image of Scheme Configuration](docs/scheme_env_variables.png)
+
+See the [Cedar wiki](https://github.com/pivotal/cedar/wiki/Configuration) for a list of all available Cedar environment variables.
+
+If you are using a spec bundle, you will need to set the environment variable in the scheme for the main app target.
 
 
 ## Version 0.5
