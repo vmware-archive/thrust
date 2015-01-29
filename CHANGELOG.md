@@ -37,7 +37,7 @@ If you are using a spec bundle, you will need to set the environment variable in
 
 ## Version 0.5
 
-##### Version 0.5 introduced a lot of changes.  Please see the *Upgrading* section below after installing the update.
+##### Version 0.5 introduced a lot of changes.  Please see the *Upgrading* section in the README after installing the update.
 
 * Removes support for waxsim. Specify `ios_sim_path` to use a non-system installed version of ios-sim.
 
