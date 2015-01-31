@@ -153,7 +153,7 @@ module Thrust
     end
 
     def project_or_workspace_flag
-      @workspace_name ? "-workspace #{@workspace_name}.xcworkspace" : "-project #{@project_name}.xcodeproj"
+      @workspace_name ? "-workspace \"#{@workspace_name}.xcworkspace\"" : "-project \"#{@project_name}.xcodeproj\""
     end
   end
 end
