@@ -8,10 +8,8 @@ module Thrust
       xcode_tools = Thrust::XcodeToolsProvider.new.instance(stdout, build_configuration, app_config.build_directory, tools_options)
       git = Thrust::Git.new(stdout, thrust_executor)
       agv_tool = Thrust::AgvTool.new(thrust_executor, git)
-      testflight_config = app_config.testflight
-      testflight = Thrust::Testflight.new(thrust_executor, stdout, $stdin, testflight_config.api_token, testflight_config.team_token)
 
-      Thrust::Deploy.new(stdout, xcode_tools, agv_tool, git, testflight, app_config, deployment_config, deployment_target)
+      Thrust::Deploy.new(stdout, xcode_tools, agv_tool, git, app_config, deployment_config, deployment_target)
     end
   end
 end

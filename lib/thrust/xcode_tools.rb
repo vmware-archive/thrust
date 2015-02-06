@@ -125,6 +125,7 @@ module Thrust
       ].join(' ')
       @thrust_executor.system_or_exit(package_command)
 
+      @thrust_executor.system_or_exit("rm -rf #{build_configuration_directory}/Payload")
       @thrust_executor.system_or_exit("cd '#{build_configuration_directory}' && unzip '#{app_name}.ipa'")
       @thrust_executor.system_or_exit("/usr/bin/codesign --verify --force --preserve-metadata=identifier,entitlements --sign '#{signing_identity}' '#{build_configuration_directory}/Payload/#{app_name}.app'")
       @thrust_executor.system_or_exit("cd '#{build_configuration_directory}' && zip -qr '#{app_name}.ipa' 'Payload'")

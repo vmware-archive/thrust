@@ -32,8 +32,7 @@ describe Thrust::Deploy do
     let(:xcode_tools) { double(Thrust::XcodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
     let(:agv_tool) { double(Thrust::AgvTool).as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
-    let(:testflight) { double(Thrust::Testflight).as_null_object }
-    subject(:deploy) { Thrust::Deploy.new(out, xcode_tools, agv_tool, git, testflight, app_config, distribution_config, deployment_target) }
+    subject(:deploy) { Thrust::Deploy.new(out, xcode_tools, agv_tool, git, app_config, distribution_config, deployment_target) }
 
     before do
       allow(git).to receive(:current_commit).and_return('31758012490')
@@ -80,26 +79,9 @@ describe Thrust::Deploy do
       end
     end
 
-    it 'tags the current commit and resets the changes after the deploy' do
-      expect(git).to receive(:create_tag).with('production').ordered
-      expect(git).to receive(:reset).ordered
+    it 'resets the changes after the deploy' do
+      expect(git).to receive(:reset)
       deploy.run
-    end
-
-    context 'when the dSYM file exists' do
-      it 'should pass the path to the dSYM to #upload' do
-        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', 'build_configuration_directory/AppName.app.dSYM')
-        deploy.run
-      end
-    end
-
-    context 'when the dSYM file does not exist' do
-      it 'should pass nil as the dSYM file path argument' do
-        allow(File).to receive(:exist?).with('build_configuration_directory/AppName.app.dSYM').and_return(false)
-
-        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', nil)
-        deploy.run
-      end
     end
 
     context 'when versioning method is set to commits' do
@@ -161,40 +143,6 @@ describe Thrust::Deploy do
     context 'when versioning method is set to anything else' do
       it 'updates the version number to the current git SHA' do
         expect(agv_tool).to receive(:change_build_number).with('31758012490', nil, nil)
-        deploy.run
-      end
-    end
-
-    context 'when note generation method is set to autotag' do
-      let(:distribution_config) do
-        Thrust::DeploymentTarget.new(
-            'notify' => 'true',
-            'distribution_list' => 'devs',
-            'build_configuration' => 'configuration',
-            'provisioning_search_query' => 'Provisioning Profile query',
-            'note_generation_method' => 'autotag'
-        )
-      end
-
-      it 'uploads to TestFlight, telling it to auto-generate the deployment notes' do
-        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', true, 'production', 'build_configuration_directory/AppName.app.dSYM')
-        deploy.run
-      end
-    end
-
-    context 'when note generation is set to anything else' do
-      let(:distribution_config) do
-        Thrust::DeploymentTarget.new(
-            'notify' => 'true',
-            'distribution_list' => 'devs',
-            'build_configuration' => 'configuration',
-            'provisioning_search_query' => 'Provisioning Profile query',
-            'note_generation_method' => 'ask'
-        )
-      end
-
-      it 'uploads to TestFlight, telling it not to auto-generate deployment notes' do
-        expect(testflight).to receive(:upload).with('ipa_path', 'true', 'devs', false, 'production', 'build_configuration_directory/AppName.app.dSYM')
         deploy.run
       end
     end

@@ -1,11 +1,10 @@
 module Thrust
   class Deploy
-    def initialize(out, xcode_tools, agv_tool, git, testflight, app_config, deployment_config, deployment_target)
+    def initialize(out, xcode_tools, agv_tool, git, app_config, deployment_config, deployment_target)
       @out = out
       @xcode_tools = xcode_tools
       @agv_tool = agv_tool
       @git = git
-      @testflight = testflight
       @app_config = app_config
       @deployment_config = deployment_config
       @deployment_target = deployment_target
@@ -32,13 +31,10 @@ module Thrust
 
         ipa_file = @xcode_tools.cleanly_create_ipa(target, app_name, @app_config.distribution_certificate, @deployment_config.provisioning_search_query)
 
-        dsym_path = "#{@xcode_tools.build_configuration_directory}/#{app_name}.app.dSYM"
-        dsym_path = nil unless File.exist?(dsym_path)
+        @out.puts "\n\n"
+        @out.puts "  .ipa located at:  " + ipa_file.green
+        @out.puts "\n\n"
 
-        autogenerate_notes = @deployment_config.note_generation_method == 'autotag'
-        @testflight.upload(ipa_file, @deployment_config.notify, @deployment_config.distribution_list, autogenerate_notes, @deployment_target, dsym_path)
-
-        @git.create_tag(@deployment_target)
         @git.reset
       rescue Exception => e
         @out.puts "\n\n"

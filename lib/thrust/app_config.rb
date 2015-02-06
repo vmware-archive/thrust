@@ -1,6 +1,5 @@
 require_relative 'deployment_target'
 require_relative 'spec_target'
-require_relative 'testflight_credentials'
 
 module Thrust
   class AppConfig
@@ -10,7 +9,6 @@ module Thrust
                 :ios_sim_path,
                 :spec_targets,
                 :project_name,
-                :testflight,
                 :thrust_version,
                 :workspace_name,
                 :path_to_xcodeproj,
@@ -28,7 +26,6 @@ module Thrust
       @spec_targets = generate_spec_targets(attributes['spec_targets'])
       @spec_directories = generate_spec_directories(attributes['spec_directories'])
       @project_name = attributes['project_name']
-      @testflight = generate_testflight_credentials(attributes['testflight'])
       @thrust_version = attributes['thrust_version'].to_s
       @workspace_name = attributes['workspace_name']
       @path_to_xcodeproj = attributes['path_to_xcodeproj']
@@ -60,12 +57,6 @@ module Thrust
         existing[key] = DeploymentTarget.new(value)
         existing
       end
-    end
-
-    def generate_testflight_credentials(testflight_credentials_hash)
-      return if testflight_credentials_hash.nil?
-
-      TestflightCredentials.new(testflight_credentials_hash)
     end
   end
 end

@@ -43,11 +43,6 @@ describe Thrust::AppConfig do
     expect(config.deployment_targets).to eq({})
   end
 
-  it 'exposes test flight credentials' do
-    config = Thrust::AppConfig.new({'testflight' => {'api_token' => 'f3eaae399310defaa'}})
-    expect(config.testflight.api_token).to eq('f3eaae399310defaa')
-  end
-
   it 'exposes the app name' do
     config = Thrust::AppConfig.new({'app_name' => 'my-cool-app'})
     expect(config.app_name).to eq('my-cool-app')
