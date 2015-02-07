@@ -8,6 +8,7 @@
 
 __Thrust__ is a small project that contains some useful rake tasks to run Cedar specs and build iOS app archives for deployment.
    
+    rake autotag:create[environment]          # Create a tag for the given deployment environment
     rake autotag:list                         # Show the commit that is currently deployed to each environment
     rake build_ipa:demo                       # Build an .ipa file for deployment to demo
     rake build_ipa:production                 # Build an .ipa file for deployment to production
