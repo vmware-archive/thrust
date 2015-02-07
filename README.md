@@ -49,9 +49,9 @@ See [CHANGELOG.md](https://github.com/pivotal/thrust/blob/master/CHANGELOG.md) f
 
 * Adds rake tasks for building an .ipa file for deployment.  The rake tasks use the existing TestFlight deployment configurations to build the .ipa's.  The keys that are still used are:
 	
-	* `target`
-	* `build_configuration`
-	* `provisioning_search_query`
+    * `target`
+    * `build_configuration`
+    * `provisioning_search_query`
     * `versioning_method`
     * `tag`
     
@@ -101,6 +101,7 @@ Here is an example of how you might use **Thrust** with the deliver gem:
 export DELIVER_USER=<iTunes Connect Username>
 export DELIVER_PASSWORD=<iTunes Connect Password>
 bundle exec rake build_ipa:staging | tail -n 1 | xargs deliver testflight  -a <Apple ID>
+bundle exec rake autotag:create[staging]
 ```
 
 The Apple ID is a unique identifier assigned to your app in iTunes Connect.  Find it in iTunes Connect under:
