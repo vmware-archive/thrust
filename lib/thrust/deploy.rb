@@ -31,11 +31,11 @@ module Thrust
 
         ipa_file = @xcode_tools.cleanly_create_ipa(target, app_name, @app_config.distribution_certificate, @deployment_config.provisioning_search_query)
 
-        @out.puts "\n\n"
-        @out.puts "  .ipa located at:  " + ipa_file.green
-        @out.puts "\n\n"
-
         @git.reset
+
+        @out.puts "\n\n"
+        @out.puts "Successfully built .ipa:".green
+        @out.puts ipa_file
       rescue Exception => e
         @out.puts "\n\n"
         @out.puts e.message.red

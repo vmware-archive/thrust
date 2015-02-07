@@ -8,10 +8,6 @@ describe Thrust::DeployProvider do
         'distribution_certificate' => 'signing_identity',
         'project_name' => 'project_name',
         'workspace_name' => 'workspace_name',
-        'testflight' => {
-          'team_token' => 'team_token',
-          'api_token' => 'api_token'
-        },
         'build_directory' => 'build_dir'
       )
     end

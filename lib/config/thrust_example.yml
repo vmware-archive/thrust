@@ -6,15 +6,8 @@ app_name: My Great App
 distribution_certificate: 'Name of Distribution Signing Certificate'
 #ios_sim_path: '/path/to/ios-sim' # Optional. Use to prefer a specific ios-sim binary (e.g. within project directory) over a system-installed version (homebrew)
 
-testflight:
-  api_token: 'testflight api token' # To find your App Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829956-what-does-the-api-token-do-
-  team_token: 'testflight team token' # To find your Team Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829942-how-do-i-find-my-team-token-
-
 deployment_targets:
   staging:
-    distribution_list: Developers # This is the name of a TestFlight distribution list
-    notify: true # Whether to notify people on the distribution list about this deployment
-    note_generation_method: autotag  # If you set this value, it will auto-generate the deploy notes from the commit history. Optional.
     target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name.
     build_configuration: Release
     provisioning_search_query: 'query to find Provisioning Profile' # Otherwise, it will use the first provisioning profile in ~/Library/MobileDevice/Provisioning Profiles/
@@ -22,8 +15,6 @@ deployment_targets:
     tag: ci # Deploys latest commit with the tag. Leave blank to deploy from master.
 
   demo:
-    distribution_list: Beta Testers
-    notify: true
     build_configuration: Demo
     provisioning_search_query: 'query to find Provisioning Profile'
 

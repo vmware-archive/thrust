@@ -6,9 +6,12 @@
 [![Stability: 2 - unstable](http://img.shields.io/badge/stability-unstable-yellow.svg)](http://nodejs.org/api/documentation.html#documentation_stability_index)
 [![Pivotal Tracker](http://img.shields.io/badge/Pivotal-Tracker-blue.svg)](https://www.pivotaltracker.com/projects/987818) (contact av@pivotallabs.com if you need access)
 
-__Thrust__ is a small project that contains some useful rake tasks to run Cedar specs and deploy iOS applications to TestFlight.
+__Thrust__ is a small project that contains some useful rake tasks to run Cedar specs and build iOS app archives for deployment.
    
     rake autotag:list                         # Show the commit that is currently deployed to each environment
+    rake build_ipa:demo                       # Build an .ipa file for deployment to demo
+    rake build_ipa:production                 # Build an .ipa file for deployment to production
+    rake build_ipa:staging                    # Build an .ipa file for deployment to staging
     rake clean                                # Clean all targets
     rake focused_specs                        # Print out names of files containing focused specs
     rake nof                                  # Remove any focus from specs
@@ -16,8 +19,6 @@ __Thrust__ is a small project that contains some useful rake tasks to run Cedar 
     rake spec_bundle[device_name,os_version]  # Run the FakeProject scheme
     rake spec_suite[device_name,os_version]   # Run the SpecSuite target
     rake mac_suite[device_name,os_version]    # Run the MacSpecSuite target
-    rake testflight:staging                   # Deploy iOS build to staging (use NOTIFY=false to prevent team notification)
-    rake testflight:demo                      # Deploy iOS build to demo (use NOTIFY=false to prevent team notification)
     rake trim                                 # Trim whitespace
 
 
@@ -38,8 +39,23 @@ If you're using **Thrust** to run specs for an iOS app and do not have *ios-sim*
 
 If you had **Thrust** previously installed as a submodule, we recommend that you remove the submodule and now use **Thrust** as a gem.  This is because there are runtime dependencies that will not get installed properly if **Thrust** is installed as a submodule.
 
+# Recent Changelog
 
-# Version 0.6 Changes
+See [CHANGELOG.md](https://github.com/pivotal/thrust/blob/master/CHANGELOG.md) for the full list of changes.
+
+## Version 0.7 Changes
+
+* Drops support for automated deploys to TestFlight, since testflightapp.com no longer exists.  We recommend that you use **Thrust** in conjunction with another gem that supports automated deploys, e.g. [shenzhen](https://github.com/nomad/shenzhen) or [deliver](https://github.com/KrauseFx/deliver).
+
+* Adds rake tasks for building an .ipa file for deployment.  The rake tasks use the existing TestFlight deployment configurations to build the .ipa's.  The keys that are still used are:
+	
+	* `target`
+	* `build_configuration`
+	* `provisioning_search_query`
+    * `versioning_method`
+    * `tag`
+    
+## Version 0.6 Changes
 
 * Drops Android support.  If you want to use **Thrust** to deploy Android apps to TestFlight, use version 0.5.2.
 
@@ -73,6 +89,23 @@ See the [Cedar wiki](https://github.com/pivotal/cedar/wiki/Configuration) for a 
 
 If you are using a spec bundle, you will need to set the environment variable in the scheme for the main app target.
 
+# Automated Deployments
+
+As of version 0.7, **Thrust** no longer supports automated deploys to TestFlight.  This is because testflightapp.com no longer exists as of February 26, 2015.  We recommend that you use **Thrust** in conjunction with another deployment gem, such as [shenzhen](https://github.com/nomad/shenzhen) or [deliver](https://github.com/KrauseFx/deliver).
+
+### Using Thrust with deliver
+
+Here is an example of how you might use **Thrust** with the deliver gem:
+
+```bash
+export DELIVER_USER=<iTunes Connect Username>
+export DELIVER_PASSWORD=<iTunes Connect Password>
+bundle exec rake build_ipa:staging | tail -n 1 | xargs deliver testflight  -a <Apple ID>
+```
+
+The Apple ID is a unique identifier assigned to your app in iTunes Connect.  Find it in iTunes Connect under:
+
+    My Apps -> [App Name] -> More -> About This App -> Apple ID
 
 # Configuration
 
@@ -87,15 +120,8 @@ app_name: My Great App
 distribution_certificate: 'Name of Distribution Signing Certificate'
 #ios_sim_path: '/path/to/ios-sim' # Optional. Use to prefer a specific ios-sim binary (e.g. within project directory) over a system-installed version (homebrew)
 
-testflight:
-  api_token: 'testflight api token' # To find your App Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829956-what-does-the-api-token-do-
-  team_token: 'testflight team token' # To find your Team Token, follow the instructions at: http://help.testflightapp.com/customer/portal/articles/829942-how-do-i-find-my-team-token-
-
 deployment_targets:
   staging:
-    distribution_list: Developers # This is the name of a TestFlight distribution list
-    notify: true # Whether to notify people on the distribution list about this deployment
-    note_generation_method: autotag  # If you set this value, it will auto-generate the deploy notes from the commit history. Optional.
     target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name.
     build_configuration: Release
     provisioning_search_query: 'query to find Provisioning Profile' # Otherwise, it will use the first provisioning profile in ~/Library/MobileDevice/Provisioning Profiles/
@@ -103,8 +129,6 @@ deployment_targets:
     tag: ci # Deploys latest commit with the tag. Leave blank to deploy from master.
 
   demo:
-    distribution_list: Beta Testers
-    notify: true
     build_configuration: Demo
     provisioning_search_query: 'query to find Provisioning Profile'
 
@@ -165,9 +189,19 @@ Once you upgrade make sure to add/update the 'thrust_version' key in the configu
 
 ## Upgrading Instructions
 
+### Upgrading to Version 0.7
+
+1. Remove the `testflight` section from your `thrust.yml`.
+
+1. Clean up the `deployment_targets` configurations to no longer include deprecated keys: `distribution_list`, `notify`, `note_generation_method`.
+
+1. See the *Automated Deployments* section above for instructions on how to set up automated deployment using **Thrust** with the [deliver](https://github.com/KrauseFx/deliver) gem.
+
 ### Upgrading to Version 0.6
 
-In your `thrust.yml`, update all spec configurations under `spec_targets` to specify the spec `scheme` instead of the `target`. Rename `ios_` prefixed keys (`ios_spec_targets`, `ios_distribution_certificate`, `ios_target`, `ios_provisioning_search_query`, `ios_build_configuration`).
+1. In your `thrust.yml`, update all spec configurations under `spec_targets` to specify the spec `scheme` instead of the `target`.
+
+1. Rename `ios_` prefixed keys (`ios_spec_targets`, `ios_distribution_certificate`, `ios_target`, `ios_provisioning_search_query`, `ios_build_configuration`) to no longer include the `ios_` prefix.
 
 ### Upgrading to Version 0.5
 
@@ -197,7 +231,8 @@ We recommend generating a new file from the `thrust.example.yml` and then copyin
 
 You should remove `Dir.glob('Vendor/thrust/lib/tasks/*.rake').each { |r| import r }` from your Rakefile before running `thrust install`.
 
-## CI Setup
+
+# CI Setup
 
 ### Setting up Jenkins to work with Thrust
 
@@ -205,7 +240,7 @@ To use **Thrust** on CI, you should include it in a Gemfile in your project root
  
 Here is an example .sh script for running specs with **Thrust** on Jenkins (in the Execute shell section of your job configuration).
 
-```
+```bash
 #!/bin/bash --login
 
 bundle install

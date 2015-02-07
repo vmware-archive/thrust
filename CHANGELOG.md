@@ -1,5 +1,17 @@
 # Thrust Changelog
 
+## Version 0.7 Changes
+
+* Drops support for automated deploys to TestFlight, since testflightapp.com no longer exists.  We recommend that you use **Thrust** in conjunction with another gem that supports automated deploys, e.g. [shenzhen](https://github.com/nomad/shenzhen) or [deliver](https://github.com/KrauseFx/deliver).
+
+* Adds rake tasks for building an .ipa file for deployment.  The rake tasks use the existing TestFlight deployment configurations to build the .ipa's.  The keys that are still used are:
+
+	* `target`
+	* `build_configuration`
+	* `provisioning_search_query`
+    * `versioning_method`
+    * `tag`
+
 ## Version 0.6
 
 * Drops Android support.  If you want to use **Thrust** to deploy Android apps to TestFlight, use version 0.5.2.
