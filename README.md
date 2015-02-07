@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/pivotal/thrust.svg?branch=master)](https://travis-ci.org/pivotal/thrust)
 [![Stability: 2 - unstable](http://img.shields.io/badge/stability-unstable-yellow.svg)](http://nodejs.org/api/documentation.html#documentation_stability_index)
-[![Pivotal Tracker](http://img.shields.io/badge/Pivotal-Tracker-blue.svg)](https://www.pivotaltracker.com/projects/987818) (contact av@pivotallabs.com if you need access)
+[![Pivotal Tracker](http://img.shields.io/badge/Pivotal-Tracker-blue.svg)](https://www.pivotaltracker.com/projects/987818) (contact avonderhaar@pivotal.io if you need access)
 
 __Thrust__ is a small project that contains some useful rake tasks to run Cedar specs and build iOS app archives for deployment.
    

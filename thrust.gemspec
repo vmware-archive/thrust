@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
     'Tyler Schultz',
     'Wiley Kestner'
   ]
-  s.email       = 'edellapenna@pivotal.io'
+  s.email       = 'avonderhaar@pivotal.io'
   s.files       = FileList['lib/**/**.rb', 'lib/**/*.rake', 'lib/**/*.yml'].to_a
   s.homepage    = 'http://github.com/pivotal/thrust'
   s.default_executable = 'thrust'
