@@ -1,5 +1,5 @@
 module Thrust
-  class Deploy
+  class IPABuilder
     def initialize(out, xcode_tools, agv_tool, git, app_config, deployment_config, deployment_target)
       @out = out
       @xcode_tools = xcode_tools

@@ -1,5 +1,5 @@
 module Thrust
-  class DeployProvider
+  class IPABuilderProvider
     def instance(app_config, deployment_config, deployment_target)
       stdout = $stdout
       thrust_executor = Thrust::Executor.new
@@ -9,7 +9,7 @@ module Thrust
       git = Thrust::Git.new(stdout, thrust_executor)
       agv_tool = Thrust::AgvTool.new(thrust_executor, git)
 
-      Thrust::Deploy.new(stdout, xcode_tools, agv_tool, git, app_config, deployment_config, deployment_target)
+      Thrust::IPABuilder.new(stdout, xcode_tools, agv_tool, git, app_config, deployment_config, deployment_target)
     end
   end
 end

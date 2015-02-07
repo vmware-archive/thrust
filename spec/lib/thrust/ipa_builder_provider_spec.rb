@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Thrust::DeployProvider do
+describe Thrust::IPABuilderProvider do
   describe "#instance" do
     let(:app_config) do
       Thrust::AppConfig.new(
@@ -30,7 +30,7 @@ describe Thrust::DeployProvider do
     let(:git) { double(Thrust::Git) }
     let(:executor) { double(Thrust::Executor) }
 
-    subject(:provider) { Thrust::DeployProvider.new }
+    subject(:provider) { Thrust::IPABuilderProvider.new }
 
     before do
       allow(Thrust::XcodeTools).to receive(:new).and_return(xcode_tools)
@@ -45,9 +45,9 @@ describe Thrust::DeployProvider do
       expect(Thrust::Git).to receive(:new).with($stdout, executor).and_return(git)
       expect(Thrust::AgvTool).to receive(:new).with(executor, git).and_return(agv_tool)
 
-      expect(Thrust::Deploy).to receive(:new).with($stdout, xcode_tools, agv_tool, git, app_config, distribution_config, deployment_target).and_call_original
+      expect(Thrust::IPABuilder).to receive(:new).with($stdout, xcode_tools, agv_tool, git, app_config, distribution_config, deployment_target).and_call_original
 
-      expect(provider.instance(app_config, distribution_config, deployment_target)).to be_instance_of(Thrust::Deploy)
+      expect(provider.instance(app_config, distribution_config, deployment_target)).to be_instance_of(Thrust::IPABuilder)
     end
   end
 end
