@@ -3,6 +3,7 @@ module Thrust
     attr_reader :distribution_list,
                 :build_configuration,
                 :provisioning_search_query,
+                :scheme,
                 :target,
                 :note_generation_method,
                 :notify,
@@ -13,6 +14,7 @@ module Thrust
       @distribution_list = attributes['distribution_list']
       @build_configuration = attributes['build_configuration']
       @provisioning_search_query = attributes['provisioning_search_query']
+      @scheme = attributes['scheme']
       @target = attributes['target']
       @note_generation_method = attributes['note_generation_method']
       @notify = attributes['notify']

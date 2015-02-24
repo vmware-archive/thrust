@@ -28,8 +28,13 @@ module Thrust
 
         app_name = @app_config.app_name
         target = @deployment_config.target || app_name
+        scheme = @deployment_config.scheme
 
-        ipa_file = @xcode_tools.cleanly_create_ipa(target, app_name, @app_config.distribution_certificate, @deployment_config.provisioning_search_query)
+        if scheme != nil
+          ipa_file = @xcode_tools.cleanly_create_ipa_with_scheme(scheme, app_name, @app_config.distribution_certificate, @deployment_config.provisioning_search_query)
+        else
+          ipa_file = @xcode_tools.cleanly_create_ipa_with_target(target, app_name, @app_config.distribution_certificate, @deployment_config.provisioning_search_query)
+        end
 
         @git.reset
 

@@ -155,7 +155,77 @@ describe Thrust::XcodeTools do
     end
   end
 
-  describe '#cleanly_create_ipa' do
+  describe '#cleanly_create_ipa_with_scheme' do
+    let(:scheme) { 'AppTarget' }
+    let(:app_name) { 'AppName' }
+    let(:signing_identity) { 'iPhone Distribution' }
+    let(:provision_search_query) { 'query' }
+    let(:provisioning_path) { 'provisioning-path' }
+    subject { Thrust::XcodeTools.new(thrust_executor, out, build_configuration, build_directory, project_name: project_name) }
+
+    before do
+      provision_search_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles')
+      command = "find '#{provision_search_path}' -print0 | xargs -0 grep -lr 'query' --null | xargs -0 ls -t"
+      thrust_executor.register_output_for_cmd(provisioning_path, command)
+    end
+
+    def create_ipa
+      subject.cleanly_create_ipa_with_scheme(scheme, app_name, signing_identity, provision_search_query)
+    end
+
+    it 'kills the simulator' do
+      create_ipa
+
+      expect(thrust_executor.system_history).to eq([
+                                                       {cmd: 'killall -m -KILL "gdb"', output_file: nil},
+                                                       {cmd: 'killall -m -KILL "otest"', output_file: nil},
+                                                       {cmd: 'killall -m -KILL "iOS Simulator"', output_file: nil}
+                                                   ])
+    end
+
+    it 'cleans and builds the app scheme' do
+      expect(subject).to receive(:build_scheme).with(scheme, 'iphoneos', true)
+      create_ipa
+    end
+
+    it 'creates the ipa and then resigns it' do
+      create_ipa
+
+      expect(thrust_executor.system_or_exit_history[1]).to eq({cmd: "xcrun -sdk iphoneos -v PackageApplication 'build/Release-iphoneos/AppName.app' -o 'build/Release-iphoneos/AppName.ipa' --embed 'provisioning-path'", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[2]).to eq({cmd: "rm -rf build/Release-iphoneos/Payload", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[3]).to eq({cmd: "cd 'build/Release-iphoneos' && unzip 'AppName.ipa'", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[4]).to eq({cmd: "/usr/bin/codesign --verify --force --preserve-metadata=identifier,entitlements --sign 'iPhone Distribution' 'build/Release-iphoneos/Payload/AppName.app'", output_file: nil})
+      expect(thrust_executor.system_or_exit_history[5]).to eq({cmd: "cd 'build/Release-iphoneos' && zip -qr 'AppName.ipa' 'Payload'", output_file: nil})
+    end
+
+    it 'returns the name of the ipa' do
+      ipa_name = create_ipa
+
+      expect(ipa_name).to eq('build/Release-iphoneos/AppName.ipa')
+    end
+
+    context 'when it can not find the provisioning profile' do
+      let(:provisioning_path) { '' }
+
+      it 'raises an error' do
+        expect {
+          create_ipa
+        }.to raise_error(Thrust::XcodeTools::ProvisioningProfileNotFound)
+      end
+    end
+
+    context 'when xcrun embeds the wrong provisioning profile' do
+      it 'raises an error' do
+        allow(FileUtils).to receive(:cmp).and_return(false)
+
+        expect do
+          create_ipa
+        end.to raise_error(Thrust::XcodeTools::ProvisioningProfileNotEmbedded)
+      end
+    end
+  end
+
+  describe '#cleanly_create_ipa_with_target' do
     let(:target) { 'AppTarget' }
     let(:app_name) { 'AppName' }
     let(:signing_identity) { 'iPhone Distribution' }
@@ -170,7 +240,7 @@ describe Thrust::XcodeTools do
     end
 
     def create_ipa
-      subject.cleanly_create_ipa(target, app_name, signing_identity, provision_search_query)
+      subject.cleanly_create_ipa_with_target(target, app_name, signing_identity, provision_search_query)
     end
 
     it 'kills the simulator' do
