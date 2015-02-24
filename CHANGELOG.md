@@ -1,5 +1,9 @@
 # Thrust Changelog
 
+## Version 0.7.1 Changes
+
+* Adds option to specify a scheme to build (instead of a target) for deployment.
+
 ## Version 0.7 Changes
 
 * Drops support for automated deploys to TestFlight, since testflightapp.com no longer exists.  We recommend that you use **Thrust** in conjunction with another gem that supports automated deploys, e.g. [shenzhen](https://github.com/nomad/shenzhen) or [deliver](https://github.com/KrauseFx/deliver).
