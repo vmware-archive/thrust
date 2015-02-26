@@ -114,7 +114,7 @@ The Apple ID is a unique identifier assigned to your app in iTunes Connect.  Fin
 ## Example thrust.yml for iOS
 
 ```yaml
-thrust_version: 0.6
+thrust_version: 0.7
 project_name: My Great Project # do not use if building with an xcode workspace
 # workspace_name: My Workspace # use if building with an xcode workspace
 # path_to_xcodeproj: 'App/MyApp.xcodeproj' # use if xcodeproj is not in the same directory as this yaml file. Optional.
