@@ -44,6 +44,10 @@ If you had **Thrust** previously installed as a submodule, we recommend that you
 
 See [CHANGELOG.md](https://github.com/pivotal/thrust/blob/master/CHANGELOG.md) for the full list of changes.
 
+## Version 0.7.1 Changes
+
+* Adds support for building schemes instead of targets when deploying
+
 ## Version 0.7 Changes
 
 * Drops support for automated deploys to TestFlight, since testflightapp.com no longer exists.  We recommend that you use **Thrust** in conjunction with another gem that supports automated deploys, e.g. [shenzhen](https://github.com/nomad/shenzhen) or [deliver](https://github.com/KrauseFx/deliver).
@@ -125,6 +129,7 @@ distribution_certificate: 'Name of Distribution Signing Certificate'
 deployment_targets:
   staging:
     target: MyGreatAppTarget # Name of the build target. Optional, defaults to app name.
+    #scheme: MyGreatAppScheme # Replace target with scheme if using a workspace
     build_configuration: Release
     provisioning_search_query: 'query to find Provisioning Profile' # Otherwise, it will use the first provisioning profile in ~/Library/MobileDevice/Provisioning Profiles/
     versioning_method: 'none' # or 'timestamp-sha' or 'commits'. Leave blank to use Git commit SHAs for build numbers.

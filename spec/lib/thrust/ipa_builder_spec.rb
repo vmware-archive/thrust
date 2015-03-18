@@ -25,7 +25,7 @@ describe Thrust::IPABuilder do
 
   describe '#run' do
     let(:out) { StringIO.new }
-    let(:xcode_tools) { double(Thrust::XcodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa: 'ipa_path').as_null_object }
+    let(:xcode_tools) { double(Thrust::XcodeTools, build_configuration_directory: 'build_configuration_directory', cleanly_create_ipa_with_target: 'ipa_path').as_null_object }
     let(:agv_tool) { double(Thrust::AgvTool).as_null_object }
     let(:git) { double(Thrust::Git).as_null_object }
     subject(:deploy) { Thrust::IPABuilder.new(out, xcode_tools, agv_tool, git, app_config, distribution_config, deployment_target) }
@@ -51,7 +51,7 @@ describe Thrust::IPABuilder do
 
     describe 'when something fails' do
       before do
-        allow(xcode_tools).to receive(:cleanly_create_ipa).and_raise(StandardError.new("Build Error"))
+        allow(xcode_tools).to receive(:cleanly_create_ipa_with_target).and_raise(StandardError.new("Build Error"))
       end
 
       it 'should display an error message' do
@@ -190,7 +190,7 @@ describe Thrust::IPABuilder do
       end
 
       it 'creates the ipa, using the target' do
-        expect(xcode_tools).to receive(:cleanly_create_ipa).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
+        expect(xcode_tools).to receive(:cleanly_create_ipa_with_target).with('TargetName', 'AppName', 'signing_identity', 'Provisioning Profile query')
         deploy.run
       end
     end
@@ -206,7 +206,7 @@ describe Thrust::IPABuilder do
       end
 
       it 'defaults to the app name as the target when building the ipa' do
-        expect(xcode_tools).to receive(:cleanly_create_ipa).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
+        expect(xcode_tools).to receive(:cleanly_create_ipa_with_target).with('AppName', 'AppName', 'signing_identity', 'Provisioning Profile query')
         deploy.run
       end
     end

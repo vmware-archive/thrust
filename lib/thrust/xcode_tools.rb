@@ -14,7 +14,16 @@ module Thrust
       raise "project_name OR workspace_name required" unless @project_name.nil? ^ @workspace_name.nil?
     end
 
-    def cleanly_create_ipa(target, app_name, signing_identity, provision_search_query = nil)
+    def cleanly_create_ipa_with_scheme(scheme, app_name, signing_identity, provision_search_query = nil)
+      kill_simulator
+      build_scheme(scheme, 'iphoneos', true)
+      ipa_name = create_ipa(app_name, signing_identity, provision_search_query)
+      verify_provision(app_name, provision_search_query)
+
+      return ipa_name
+    end
+
+    def cleanly_create_ipa_with_target(target, app_name, signing_identity, provision_search_query = nil)
       kill_simulator
       build_target(target, 'iphoneos', true)
       ipa_name = create_ipa(app_name, signing_identity, provision_search_query)
