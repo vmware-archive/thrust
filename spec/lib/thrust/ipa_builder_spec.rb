@@ -63,7 +63,7 @@ describe Thrust::IPABuilder do
       end
 
       it 'should reset the working directory' do
-        expect(git).to receive(:reset)
+        expect(git).to receive(:reset).once
         begin
           deploy.run
         rescue SystemExit
@@ -76,7 +76,7 @@ describe Thrust::IPABuilder do
     end
 
     it 'resets the changes after the deploy' do
-      expect(git).to receive(:reset)
+      expect(git).to receive(:reset).once
       deploy.run
     end
 

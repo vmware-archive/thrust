@@ -36,8 +36,6 @@ module Thrust
           ipa_file = @xcode_tools.cleanly_create_ipa_with_target(target, app_name, @app_config.distribution_certificate, @deployment_config.provisioning_search_query)
         end
 
-        @git.reset
-
         @out.puts "\n\n"
         @out.puts "Successfully built .ipa:".green
         @out.puts ipa_file
@@ -46,8 +44,9 @@ module Thrust
         @out.puts e.message.red
         @out.puts "\n\n"
 
-        @git.reset
         exit 1
+      ensure
+        @git.reset
       end
     end
   end
