@@ -1,5 +1,9 @@
 # Thrust Changelog
 
+## Unreleased Changes
+
+* The `build_ipa` rake task will no longer invoke `git checkout master` but will instead checkout the last branch you were on before you invoked thrust.
+
 ## Version 0.7.1 Changes
 
 * Adds option to specify a scheme to build (instead of a target) for deployment.

@@ -28,6 +28,15 @@ describe Thrust::Git do
     end
   end
 
+  describe '#reset' do
+    it 'resets the working directory back to its original state' do
+      expect(thrust_executor).to receive(:system_or_exit).with('git reset --hard').once
+      expect(thrust_executor).to receive(:system_or_exit).with('git checkout @{-1}').once
+
+      subject.reset
+    end
+  end
+
   describe '#checkout_tag' do
     it 'should checkout the latest commit that has the tag' do
       expect(thrust_executor).to receive(:capture_output_from_system).with('autotag list ci').and_return("7342334 ref/blah\nlatest_ci_tag ref/blahblah")
