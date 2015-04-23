@@ -159,6 +159,11 @@ describe Thrust::IPABuilder do
         expect(git).to receive(:checkout_tag).with('ci')
         deploy.run
       end
+
+      it 'should checkout the previous branch when it is done' do
+        expect(git).to receive(:checkout_previous_branch).once
+        deploy.run
+      end
     end
 
     context 'when the tag is not set' do
@@ -174,6 +179,11 @@ describe Thrust::IPABuilder do
 
       it 'should deploy from HEAD' do
         expect(git).to_not receive(:checkout_tag)
+        deploy.run
+      end
+
+      it 'should not change the current branch' do
+        expect(git).to_not receive(:checkout_previous_branch)
         deploy.run
       end
     end

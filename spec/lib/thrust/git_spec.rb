@@ -31,9 +31,14 @@ describe Thrust::Git do
   describe '#reset' do
     it 'resets the working directory back to its original state' do
       expect(thrust_executor).to receive(:system_or_exit).with('git reset --hard').once
-      expect(thrust_executor).to receive(:system_or_exit).with('git checkout @{-1}').once
-
       subject.reset
+    end
+  end
+
+  describe '#checkout_previous_branch' do
+    it 'checks out the previous branch' do
+      expect(thrust_executor).to receive(:system_or_exit).with('git checkout @{-1}').once
+      subject.checkout_previous_branch
     end
   end
 

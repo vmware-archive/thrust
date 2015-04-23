@@ -26,9 +26,12 @@ module Thrust
       @thrust_executor.system_or_exit("git checkout #{tag_sha}")
     end
 
+    def checkout_previous_branch
+      @thrust_executor.system_or_exit('git checkout @{-1}')
+    end
+
     def reset
       @thrust_executor.system_or_exit('git reset --hard')
-      @thrust_executor.system_or_exit('git checkout @{-1}')
     end
 
     def checkout_file(filename)

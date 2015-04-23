@@ -47,6 +47,7 @@ module Thrust
         exit 1
       ensure
         @git.reset
+        @git.checkout_previous_branch if @deployment_config.tag
       end
     end
   end
