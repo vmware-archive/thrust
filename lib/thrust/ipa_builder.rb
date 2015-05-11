@@ -27,6 +27,9 @@ module Thrust
         end
 
         app_name = @app_config.app_name
+        if @deployment_config.app_name
+          app_name = @deployment_config.app_name
+        end
         target = @deployment_config.target || app_name
         scheme = @deployment_config.scheme
 

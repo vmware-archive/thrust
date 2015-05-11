@@ -220,5 +220,22 @@ describe Thrust::IPABuilder do
         deploy.run
       end
     end
+
+    context 'when the app_name is specified in deployment target' do
+      let(:distribution_config) do
+        Thrust::DeploymentTarget.new(
+            'app_name' => 'target_app_name',
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query'
+        )
+      end
+
+      it 'creates the ipa, using the app_name from the deployment target' do
+        expect(xcode_tools).to receive(:cleanly_create_ipa_with_target).with('target_app_name', 'target_app_name', 'signing_identity', 'Provisioning Profile query')
+        deploy.run
+      end
+    end
   end
 end

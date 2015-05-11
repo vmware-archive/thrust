@@ -8,7 +8,8 @@ module Thrust
                 :note_generation_method,
                 :notify,
                 :versioning_method,
-                :tag
+                :tag,
+                :app_name
 
     def initialize(attributes)
       @distribution_list = attributes['distribution_list']
@@ -20,6 +21,7 @@ module Thrust
       @notify = attributes['notify']
       @versioning_method = attributes['versioning_method']
       @tag = attributes['tag']
+      @app_name = attributes['app_name']
     end
   end
 end
