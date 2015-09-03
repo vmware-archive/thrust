@@ -220,5 +220,23 @@ describe Thrust::IPABuilder do
         deploy.run
       end
     end
+
+    context 'when the signing identity is set in the deployment target config' do
+      let(:distribution_config) do
+        Thrust::DeploymentTarget.new(
+            'notify' => 'true',
+            'distribution_list' => 'devs',
+            'build_configuration' => 'configuration',
+            'provisioning_search_query' => 'Provisioning Profile query',
+            'target' => 'TargetName',
+            'distribution_certificate' => 'deployment_target_signing_identity'
+        )
+      end
+
+      it 'overrides the app-level signing identity when building the ipa' do
+        expect(xcode_tools).to receive(:cleanly_create_ipa_with_target).with('TargetName', 'AppName', 'deployment_target_signing_identity', 'Provisioning Profile query')
+        deploy.run
+      end
+    end
   end
 end
