@@ -1,7 +1,7 @@
 module Thrust
   module Tasks
     class FocusedSpecs
-      FOCUSED_METHODS = %w[fit(@ fcontext(@ fdescribe(@]
+      FOCUSED_METHODS = %w[fit(@ fcontext(@ fdescribe(@ fit(\" fcontext(\" fdescribe(\"]
 
       def initialize(out = $stdout, executor = Thrust::Executor.new)
         @out = out
