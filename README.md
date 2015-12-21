@@ -134,6 +134,7 @@ deployment_targets:
     provisioning_search_query: 'query to find Provisioning Profile' # Otherwise, it will use the first provisioning profile in ~/Library/MobileDevice/Provisioning Profiles/
     versioning_method: 'none' # or 'timestamp-sha' or 'commits'. Leave blank to use Git commit SHAs for build numbers.
     tag: ci # Deploys latest commit with the tag. Leave blank to deploy from master.
+    #distribution_certificate: 'Target-Specific Distribution Signing Certificate' # Optional. Use to override project-wide distribution certificate for particular targets.
 
   demo:
     build_configuration: Demo
